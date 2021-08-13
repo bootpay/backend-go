@@ -78,6 +78,44 @@ type SubscribePayload struct {
 	ExecuteAt           int64          `json:"execute_at"`
 }
 
+type SubscribeBilling struct {
+	APIResponse
+	Data    struct {
+		ReceiptId          string 					`json:"receipt_id"`
+		Price     		   float64    				`json:"price"`
+		CardNo     		   string    				`json:"card_no"`
+		CardCode     	   string    				`json:"card_code"`
+		CardName     	   string    				`json:"card_name"`
+		CardQuota     	   string    				`json:"card_quota"`
+		Params             map[string]interface{}   `json:"params"`
+		ItemName     	   string    				`json:"item_name"`
+		OrderId     	   string    				`json:"order_id"`
+		Url     		   string    				`json:"url"`
+		PaymentName        string    				`json:"payment_name"`
+		PgName     	  	   string    				`json:"pg_name"`
+		Pg     			   string    				`json:"pg"`
+		Method     		   string    				`json:"method"`
+		MethodName     	   string    				`json:"method_name"`
+		RequestedAt        string                   `json:"requested_at"`
+		PurchasedAt        string                   `json:"purchased_at"`
+		Status             int                      `json:"status"`
+	} `json:"data"`
+}
+
+type SubscribeBillingReserve struct {
+	APIResponse
+	Data    struct {
+		ReserveId          string 			`json:"reserve_id"` 
+		BillingKey         string 			`json:"billing_key"` 
+		ItemName           string 			`json:"item_name"` 
+		Price              float64 			`json:"price"` 
+		PurchaseCount      int 				`json:"purchase_count"` 
+		PurchaseLimit      int 				`json:"purchase_limit"` 
+		ExecuteAt          int64          	`json:"execute_at"`
+		Status             int              `json:"status"`
+	} `json:"data"`
+}
+
 func (c *Client) GetBillingKey(payload BillingKeyPayload) (BillingKey, error) {
 	if payload.ApplicationId == "" {
 		payload.ApplicationId = c.applicationId
@@ -116,7 +154,7 @@ func (c *Client) DestroyBillingKey(billingKey string) (APIResponse, error) {
 	json.NewDecoder(res.Body).Decode(&result)
 	return result, nil
 }
-func (c *Client) RequestSubscribe(payload SubscribePayload) (APIResponse, error) {
+func (c *Client) RequestSubscribe(payload SubscribePayload) (SubscribeBilling, error) {
 	if payload.ApplicationId == "" {
 		payload.ApplicationId = c.applicationId
 	}
@@ -139,7 +177,7 @@ func (c *Client) RequestSubscribe(payload SubscribePayload) (APIResponse, error)
 	return result, nil
 }
 
-func (c *Client) ReserveSubscribe(payload SubscribePayload) (APIResponse, error) {
+func (c *Client) ReserveSubscribe(payload SubscribePayload) (SubscribeBillingReserve, error) {
 	if payload.ApplicationId == "" {
 		payload.ApplicationId = c.applicationId
 	}

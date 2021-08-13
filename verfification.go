@@ -10,12 +10,12 @@ type VerifyData struct {
 	ReceiptId        string                 `json:"receipt_id"`
 	OrderId          string                 `json:"order_id"`
 	Name             string                 `json:"name"`
-	Price            int                    `json:"price"`
-	TaxFree          int                    `json:"tax_free"`
-	RemainPrice      int                    `json:"remain_price"`
-	RemainTaxFree    int                    `json:"remain_tax_free"`
-	CancelledPrice   int                    `json:"cancelled_price"`
-	CancelledTaxFree int                    `json:"cancelled_tax_free"`
+	Price            float64                `json:"price"`
+	TaxFree          float64                `json:"tax_free"`
+	RemainPrice      float64                `json:"remain_price"`
+	RemainTaxFree    float64                `json:"remain_tax_free"`
+	CancelledPrice   float64                `json:"cancelled_price"`
+	CancelledTaxFree float64                `json:"cancelled_tax_free"`
 	ReceiptUrl       string                 `json:"receipt_url"`
 	Unit             string                 `json:"unit"`
 	Pg               string                 `json:"pg"`

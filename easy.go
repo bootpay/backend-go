@@ -19,9 +19,11 @@ type UserTokenPayload struct {
 
 type UserToken struct {
 	APIResponse
-	UserToken        string `json:"user_token"`
-	ExpiredUnixtime  int64  `json:"expired_unixtime"`
-	ExpiredLocaltime string `json:"expired_localtime"`
+	Data    struct {
+		UserToken        string `json:"user_token"`
+		ExpiredUnixtime  int64  `json:"expired_unixtime"`
+		ExpiredLocaltime string `json:"expired_localtime"`
+	} `json:"data"`
 }
 
 func (c *Client) GetUserToken(userToken UserTokenPayload) (UserToken, error) {
