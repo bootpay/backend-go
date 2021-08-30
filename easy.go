@@ -26,7 +26,7 @@ type UserToken struct {
 	} `json:"data"`
 }
 
-func (c *Client) GetUserToken(userToken UserTokenPayload) (UserToken, error) {
+func (c *Client) GetUserToken(UserTokenPayload UserTokenPayload) (UserToken, error) {
 	if userToken.ApplicationId == "" {
 		userToken.ApplicationId = c.applicationId
 	}

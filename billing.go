@@ -40,8 +40,8 @@ type BillingKeyPayload struct {
 	Extra          SubscribeExtra `json:"extra"`
 }
 type SubscribeExtra struct {
-	SubscribeTestPayment int `json:"subscribeTestPayment"`
-	RawData              int `json:"rawData"`
+	SubscribeTestPayment int `json:"subscribe_test_payment"`
+	RawData              int `json:"raw_data"`
 }
 type User struct {
 	Id       string `json:"id"`
