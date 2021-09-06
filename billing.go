@@ -166,13 +166,13 @@ func (c *Client) RequestSubscribe(payload SubscribePayload) (SubscribeBilling, e
 	req, err := c.NewRequest(http.MethodPost, "/subscribe/billing", body)
 	if err != nil {
 		errors.New("bootpay: RequestSubscribe error: " + err.Error())
-		return APIResponse{}, err
+		return SubscribeBilling{}, err
 	}
 	req.Header.Set("Authorization", c.token)
 	res, err := c.httpClient.Do(req)
 	defer res.Body.Close()
 
-	result := APIResponse{}
+	result := SubscribeBilling{}
 	json.NewDecoder(res.Body).Decode(&result)
 	return result, nil
 }
@@ -189,13 +189,13 @@ func (c *Client) ReserveSubscribe(payload SubscribePayload) (SubscribeBillingRes
 	req, err := c.NewRequest(http.MethodPost, "/subscribe/billing/reserve", body)
 	if err != nil {
 		errors.New("bootpay: ReserveSubscribe error: " + err.Error())
-		return APIResponse{}, err
+		return SubscribeBillingReserve{}, err
 	}
 	req.Header.Set("Authorization", c.token)
 	res, err := c.httpClient.Do(req)
 	defer res.Body.Close()
 
-	result := APIResponse{}
+	result := SubscribeBillingReserve{}
 	json.NewDecoder(res.Body).Decode(&result)
 	return result, nil
 }
