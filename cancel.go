@@ -1,4 +1,4 @@
-package bootpay_go
+package bootpay
 
 import (
 	"bytes"
