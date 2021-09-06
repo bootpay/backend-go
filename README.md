@@ -12,24 +12,25 @@ go get github.com/bootpay/backend-go
 ## Getting Started
 
 ```go
+package main
 
-func TestGetBillingKey(t *testing.T) {
-	bc := Client{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+import (
+	"fmt"
+	"github.com/bootpay/backend-go"
+)
+//import "bootpay_go"
 
+func main() {
+	//backend_go.Cl
+	bc := bootpay.Client{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
 
-	receiptId := "610c96352386840036db8bef"
-
-  token, err := bc.GetToken()
-  fmt.Println("--------------- GetVerify() Start ---------------")
-	verify, err := bc.Verify(receiptId)
-
-	fmt.Println(verify)
-	fmt.Println(verify.Data.PaymentData)
-	fmt.Println(verify.Data.PaymentData["o_id"])
+	fmt.Println("--------------- GetToken() Start ---------------")
+	token, err := bc.GetToken()
+	fmt.Println("token : " + token.Data.Token)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
-	fmt.Println("--------------- GetVerify() End ---------------")
+	fmt.Println("--------------- GetToken() End ---------------")
 }
 ```
 
