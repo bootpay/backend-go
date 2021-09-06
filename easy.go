@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-type UserTokenPayload struct {
+type EasyUserTokenPayload struct {
 	RestConfig
 	UserId string `json:"user_id"`
 	Email  string `json:"email"`
@@ -17,7 +17,7 @@ type UserTokenPayload struct {
 	Phone  string `json:"phone"`
 }
 
-type UserToken struct {
+type EasyUserToken struct {
 	APIResponse
 	Data    struct {
 		UserToken        string `json:"user_token"`
@@ -26,7 +26,7 @@ type UserToken struct {
 	} `json:"data"`
 }
 
-func (c *Client) GetUserToken(UserTokenPayload UserTokenPayload) (UserToken, error) {
+func (c *Client) GetUserToken(userToken EasyUserTokenPayload) (EasyUserToken, error) {
 	if userToken.ApplicationId == "" {
 		userToken.ApplicationId = c.applicationId
 	}
@@ -38,14 +38,14 @@ func (c *Client) GetUserToken(UserTokenPayload UserTokenPayload) (UserToken, err
 	req, err := c.NewRequest(http.MethodPost, "/request/user/token", body)
 	if err != nil {
 		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
-		return UserToken{}, err
+		return EasyUserToken{}, err
 	}
 	req.Header.Set("Authorization", c.token)
 	res, err := c.httpClient.Do(req)
 
 	defer res.Body.Close()
 
-	result := UserToken{}
+	result := EasyUserToken{}
 	json.NewDecoder(res.Body).Decode(&result)
 	return result, nil
 }

@@ -32,14 +32,14 @@ type RefundData struct {
 type Cancel struct {
 	APIResponse
 	Data    struct {
-		ReceiptId          string `json:"receipt_id"`
-		RequestCancelPrice int    `json:"request_cancel_price"`
-		RemainPrice        int    `json:"remain_price"`
-		RemainTaxFree      int    `json:"remain_tax_free"`
-		CancelledPrice     int    `json:"cancelled_price"`
-		CancelledTaxFree   int    `json:"cancelled_tax_free"`
-		RevokedAt          string `json:"revoked_at"`
-		Tid                string `json:"tid"`
+		ReceiptId          string 		`json:"receipt_id"`
+		RequestCancelPrice float64    	`json:"request_cancel_price"`
+		RemainPrice        float64    	`json:"remain_price"`
+		RemainTaxFree      float64    	`json:"remain_tax_free"`
+		CancelledPrice     float64    	`json:"cancelled_price"`
+		CancelledTaxFree   float64    	`json:"cancelled_tax_free"`
+		RevokedAt          string 		`json:"revoked_at"`
+		Tid                string 		`json:"tid"`
 	} `json:"data"`
 }
 func (c *Client) ReceiptCancel(receiptId string, price float64, name string, reason string, refund RefundData) (Cancel, error) {
