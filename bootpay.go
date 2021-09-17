@@ -28,22 +28,22 @@ type RestConfig struct {
 	PrivateKey    string `json:"private_key"`
 }
 
-type Client struct {
+type Bootpay struct {
 	token         string
 	applicationId string
 	privateKey    string
 	baseUrl       string
-	httpClient    *http.Client
+	client        *http.Client
 }
 
-func (c Client) NewRequest(method string, url string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequest(method, c.baseUrl+url, body)
+func (bootpay Bootpay) NewRequest(method string, url string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, bootpay.baseUrl+url, body)
 	if err != nil {
 		errors.New("Cannot create Bootpay request: " + err.Error())
 		return nil, err
 	}
-	if c.token != "" {
-		req.Header.Set("Authorization", c.token)
+	if bootpay.token != "" {
+		req.Header.Set("Authorization", bootpay.token)
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -51,7 +51,7 @@ func (c Client) NewRequest(method string, url string, body io.Reader) (*http.Req
 	return req, nil
 }
 
-func (c Client) New(applicationId string, privateKey string, client *http.Client, mode string) *Client {
+func (bootpay Bootpay) New(applicationId string, privateKey string, client *http.Client, mode string) *Bootpay {
 	if client == nil {
 		client = &http.Client{
 			Timeout: defaultHTTPTimeout,
@@ -68,10 +68,10 @@ func (c Client) New(applicationId string, privateKey string, client *http.Client
 	} else if mode == "stage" {
 		baseUrl = STAGE
 	}
-	return &Client{
+	return &Bootpay{
 		applicationId: applicationId,
 		privateKey:    privateKey,
 		baseUrl:       baseUrl,
-		httpClient:    client,
+		client:    	   client,
 	}
 }

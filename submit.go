@@ -12,24 +12,24 @@ type Submit struct {
 	ReceiptId string `json:"receipt_id"`
 }
 
-func (c *Client) ServerSubmit(receiptId string) (APIResponse, error) {
+func (bootpay *Bootpay) ServerSubmit(receiptId string) (APIResponse, error) {
 	sub := Submit{}
 	if sub.ApplicationId == "" {
-		sub.ApplicationId = c.applicationId
+		sub.ApplicationId = bootpay.applicationId
 	}
 	if sub.PrivateKey == "" {
-		sub.PrivateKey = c.privateKey
+		sub.PrivateKey = bootpay.privateKey
 	}
 	sub.ReceiptId = receiptId
 	postBody, _ := json.Marshal(sub)
 	body := bytes.NewBuffer(postBody)
-	req, err := c.NewRequest(http.MethodPost, "/submit", body)
+	req, err := bootpay.NewRequest(http.MethodPost, "/submit", body)
 	if err != nil {
 		errors.New("bootpay: Submit error: " + err.Error())
 		return APIResponse{}, err
 	}
-	req.Header.Set("Authorization", c.token)
-	res, err := c.httpClient.Do(req)
+	req.Header.Set("Authorization", bootpay.token)
+	res, err := bootpay.client.Do(req)
 
 	defer res.Body.Close()
 

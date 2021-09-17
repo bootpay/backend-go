@@ -18,19 +18,20 @@ import (
 	"fmt"
 	"github.com/bootpay/backend-go"
 )
-//import "bootpay_go"
 
 func main() {
-	//backend_go.Cl
 	bc := bootpay.Client{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
 
-	fmt.Println("--------------- GetToken() Start ---------------")
+	fmt.Println("--------------- GetVerify() Start ---------------")
 	token, err := bc.GetToken()
 	fmt.Println("token : " + token.Data.Token)
+
+	receiptId := "610c96352386840036db8bef"
+  verify, err := bc.Verify(receiptId)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
-	fmt.Println("--------------- GetToken() End ---------------")
+	fmt.Println("--------------- GetVerify() End ---------------")
 }
 ```
 

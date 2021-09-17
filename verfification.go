@@ -35,14 +35,14 @@ type Verify struct {
 	Data VerifyData `json:"data"`
 }
 
-func (c *Client) Verify(receiptId string) (Verify, error) {
-	req, err := c.NewRequest(http.MethodGet, "/receipt/"+receiptId, nil)
+func (bootpay *Bootpay) Verify(receiptId string) (Verify, error) {
+	req, err := bootpay.NewRequest(http.MethodGet, "/receipt/"+receiptId, nil)
 	if err != nil {
 		errors.New("bootpay: Verify error: " + err.Error())
 		return Verify{}, err
 	}
-	req.Header.Set("Authorization", c.token)
-	res, err := c.httpClient.Do(req)
+	req.Header.Set("Authorization", bootpay.token)
+	res, err := bootpay.client.Do(req)
 
 	defer res.Body.Close()
 
@@ -84,14 +84,14 @@ type Certificate struct {
 	} `json:"data"`
 }
 
-func (c *Client) Certificate(receiptId string) (Certificate, error) {
-	req, err := c.NewRequest(http.MethodGet, "/certificate/"+receiptId, nil)
+func (bootpay *Bootpay) Certificate(receiptId string) (Certificate, error) {
+	req, err := bootpay.NewRequest(http.MethodGet, "/certificate/"+receiptId, nil)
 	if err != nil {
 		errors.New("bootpay: Certificate error: " + err.Error())
 		return Certificate{}, err
 	}
-	req.Header.Set("Authorization", c.token)
-	res, err := c.httpClient.Do(req)
+	req.Header.Set("Authorization", bootpay.token)
+	res, err := bootpay.client.Do(req)
 
 	defer res.Body.Close()
 

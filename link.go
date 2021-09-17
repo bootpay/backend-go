@@ -37,22 +37,22 @@ type Extra struct {
 	CustomFontColor      string `json:"custom_font_color"`
 }
 
-func (c *Client) RequestLink(payload Payload) (APIResponse, error) {
+func (bootpay *Bootpay) RequestLink(payload Payload) (APIResponse, error) {
 	if payload.ApplicationId == "" {
-		payload.ApplicationId = c.applicationId
+		payload.ApplicationId = bootpay.applicationId
 	}
 	if payload.PrivateKey == "" {
-		payload.PrivateKey = c.privateKey
+		payload.PrivateKey = bootpay.privateKey
 	}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
-	req, err := c.NewRequest(http.MethodPost, "/request/payment", body)
+	req, err := bootpay.NewRequest(http.MethodPost, "/request/payment", body)
 	if err != nil {
 		errors.New("bootpay: RequestLink error: " + err.Error())
 		return APIResponse{}, err
 	}
-	req.Header.Set("Authorization", c.token)
-	res, err := c.httpClient.Do(req)
+	req.Header.Set("Authorization", bootpay.token)
+	res, err := bootpay.client.Do(req)
 
 	defer res.Body.Close()
 

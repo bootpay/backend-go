@@ -16,16 +16,16 @@ type Token struct {
 	APIResponse
 	Data TokenData `json:"data"`
 }
-func (c *Client) GetToken() (Token, error) {
-	config := RestConfig{c.applicationId, c.privateKey}
+func (bootpay *Bootpay) GetToken() (Token, error) {
+	config := RestConfig{bootpay.applicationId, bootpay.privateKey}
 	postBody, _ := json.Marshal(config)
 	body := bytes.NewBuffer(postBody)
-	req, err := c.NewRequest(http.MethodPost, "/request/token", body)
+	req, err := bootpay.NewRequest(http.MethodPost, "/request/token", body)
 	if err != nil {
 		errors.New("bootpay: getToken error: " + err.Error())
 		return Token{}, err
 	}
-	res, err := c.httpClient.Do(req)
+	res, err := bootpay.client.Do(req)
 	defer res.Body.Close()
 
 	result := Token{}
@@ -33,7 +33,7 @@ func (c *Client) GetToken() (Token, error) {
 	fmt.Println(result)
 
 	if result.Status == 200 {
-		if result.Data.Token != "" { c.token = result.Data.Token }
+		if result.Data.Token != "" { bootpay.token = result.Data.Token }
 	}
 
 	return result, nil
