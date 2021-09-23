@@ -42,10 +42,10 @@ type Cancel struct {
 		Tid                string 		`json:"tid"`
 	} `json:"data"`
 }
-func (bootpay *Bootpay) ReceiptCancel(receiptId string, price float64, name string, reason string, refund RefundData) (Cancel, error) {
+func (api *Api) ReceiptCancel(receiptId string, price float64, name string, reason string, refund RefundData) (Cancel, error) {
 	cancel := make(map[string]interface{})
-	cancel["application_id"] = bootpay.applicationId
-	cancel["private_key"] = bootpay.privateKey
+	cancel["application_id"] = api.applicationId
+	cancel["private_key"] = api.privateKey
 	cancel["receipt_id"] = receiptId
 	if price != 0 {  cancel["price"] = price }
 	cancel["name"] = name
@@ -54,13 +54,13 @@ func (bootpay *Bootpay) ReceiptCancel(receiptId string, price float64, name stri
 
 	postBody, _ := json.Marshal(cancel)
 	body := bytes.NewBuffer(postBody)
-	req, err := bootpay.NewRequest(http.MethodPost, "/cancel", body)
+	req, err := api.NewRequest(http.MethodPost, "/cancel", body)
 	if err != nil {
 		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
 		return Cancel{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 
 	defer res.Body.Close()
 

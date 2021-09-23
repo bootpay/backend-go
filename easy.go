@@ -26,22 +26,22 @@ type EasyUserToken struct {
 	} `json:"data"`
 }
 
-func (bootpay *Bootpay) GetUserToken(userToken EasyUserTokenPayload) (EasyUserToken, error) {
+func (api *Api) GetUserToken(userToken EasyUserTokenPayload) (EasyUserToken, error) {
 	if userToken.ApplicationId == "" {
-		userToken.ApplicationId = bootpay.applicationId
+		userToken.ApplicationId = api.applicationId
 	}
 	if userToken.PrivateKey == "" {
-		userToken.PrivateKey = bootpay.privateKey
+		userToken.PrivateKey = api.privateKey
 	}
 	postBody, _ := json.Marshal(userToken)
 	body := bytes.NewBuffer(postBody)
-	req, err := bootpay.NewRequest(http.MethodPost, "/request/user/token", body)
+	req, err := api.NewRequest(http.MethodPost, "/request/user/token", body)
 	if err != nil {
 		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
 		return EasyUserToken{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 
 	defer res.Body.Close()
 

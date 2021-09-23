@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetBillingKey(t *testing.T) {
-	bootpay := Bootpay{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+	bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
 	GetToken(bootpay)
 	GetBillingKey(bootpay)
 	GetVerify(bootpay)
@@ -16,9 +16,9 @@ func TestGetBillingKey(t *testing.T) {
 	ServerSubmit(bootpay)
 }
 
-func GetToken(bootpay *Bootpay) {
+func GetToken(api *Api) {
 	fmt.Println("--------------- GetToken() Start ---------------")
-	token, err := bootpay.GetToken()
+	token, err := api.GetToken()
 	fmt.Println("token : " + token.Data.Token)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
@@ -26,7 +26,7 @@ func GetToken(bootpay *Bootpay) {
 	fmt.Println("--------------- GetToken() End ---------------")
 }
 
-func GetBillingKey(bootpay *Bootpay) {
+func GetBillingKey(api *Api) {
 	fmt.Println("--------------- GetBillingKey() Start ---------------")
 	payload := BillingKeyPayload{
 		OrderId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
@@ -38,7 +38,7 @@ func GetBillingKey(bootpay *Bootpay) {
 		ExpireMonth: "**",
 		IdentifyNumber: "",
 	}
-	billingKey, err := bootpay.GetBillingKey(payload)
+	billingKey, err := api.GetBillingKey(payload)
 
 	fmt.Println(billingKey)
 	if err != nil {
@@ -47,10 +47,10 @@ func GetBillingKey(bootpay *Bootpay) {
 	fmt.Println("--------------- GetBillingKey() End ---------------")
 }
 
-func GetVerify(bootpay *Bootpay) {
+func GetVerify(api *Api) {
 	receiptId := "610c96352386840036db8bef"
 	fmt.Println("--------------- GetVerify() Start ---------------")
-	verify, err := bootpay.Verify(receiptId)
+	verify, err := api.Verify(receiptId)
 
 	fmt.Println(verify)
 	fmt.Println(verify.Data.PaymentData)
@@ -61,12 +61,12 @@ func GetVerify(bootpay *Bootpay) {
 	fmt.Println("--------------- GetVerify() End ---------------")
 }
 
-func ReceiptCancel(bootpay *Bootpay) {
+func ReceiptCancel(api *Api) {
 	receiptId := "610cc0cb7b5ba40044b04530"
 	name := "관리자"
 	reason := "테스트 결제 취소를 테스트"
 	fmt.Println("--------------- ReceiptCancel() Start ---------------")
-	cancel, err := bootpay.ReceiptCancel(receiptId, 0, name, reason, RefundData{})
+	cancel, err := api.ReceiptCancel(receiptId, 0, name, reason, RefundData{})
 
 	fmt.Println(cancel)
 	if err != nil {
@@ -75,7 +75,7 @@ func ReceiptCancel(bootpay *Bootpay) {
 	fmt.Println("--------------- ReceiptCancel() End ---------------")
 }
 
-func RequestLink(bootpay *Bootpay) {
+func RequestLink(api *Api) {
 	payload := Payload{
 		Pg: "kcp",
 		Method: "card",
@@ -84,7 +84,7 @@ func RequestLink(bootpay *Bootpay) {
 		Name: "테스트 결제 상품",
 	}
 	fmt.Println("--------------- RequestLink() End ---------------")
-	res, err := bootpay.RequestLink(payload)
+	res, err := api.RequestLink(payload)
 
 	fmt.Println(res)
 	if err != nil {
@@ -93,10 +93,10 @@ func RequestLink(bootpay *Bootpay) {
 	fmt.Println("--------------- RequestLink() End ---------------")
 }
 
-func ServerSubmit(bootpay *Bootpay) {
+func ServerSubmit(api *Api) {
 	receiptId := "610cc01b238684002adb904e"
 	fmt.Println("--------------- ServerSubmit() Start ---------------")
-	res, err := bootpay.ServerSubmit(receiptId)
+	res, err := api.ServerSubmit(receiptId)
 
 	fmt.Println(res)
 	if err != nil {

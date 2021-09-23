@@ -116,37 +116,37 @@ type SubscribeBillingReserve struct {
 	} `json:"data"`
 }
 
-func (bootpay *Bootpay) GetBillingKey(payload BillingKeyPayload) (BillingKey, error) {
+func (api *Api) GetBillingKey(payload BillingKeyPayload) (BillingKey, error) {
 	if payload.ApplicationId == "" {
-		payload.ApplicationId = bootpay.applicationId
+		payload.ApplicationId = api.applicationId
 	}
 	if payload.PrivateKey == "" {
-		payload.PrivateKey = bootpay.privateKey
+		payload.PrivateKey = api.privateKey
 	}
 
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
-	req, err := bootpay.NewRequest(http.MethodPost, "/request/card_rebill", body)
+	req, err := api.NewRequest(http.MethodPost, "/request/card_rebill", body)
 	if err != nil {
 		errors.New("bootpay: GetBillingKey error: " + err.Error())
 		return BillingKey{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 	defer res.Body.Close()
 
 	result := BillingKey{}
 	json.NewDecoder(res.Body).Decode(&result)
 	return result, nil
 }
-func (bootpay *Bootpay) DestroyBillingKey(billingKey string) (APIResponse, error) {
-	req, err := bootpay.NewRequest(http.MethodDelete, "/subscribe/billing/"+billingKey, nil)
+func (api *Api) DestroyBillingKey(billingKey string) (APIResponse, error) {
+	req, err := api.NewRequest(http.MethodDelete, "/subscribe/billing/"+billingKey, nil)
 	if err != nil {
 		errors.New("bootpay: DestroyBillingKey error: " + err.Error())
 		return APIResponse{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 
 	defer res.Body.Close()
 
@@ -154,22 +154,22 @@ func (bootpay *Bootpay) DestroyBillingKey(billingKey string) (APIResponse, error
 	json.NewDecoder(res.Body).Decode(&result)
 	return result, nil
 }
-func (bootpay *Bootpay) RequestSubscribe(payload SubscribePayload) (SubscribeBilling, error) {
+func (api *Api) RequestSubscribe(payload SubscribePayload) (SubscribeBilling, error) {
 	if payload.ApplicationId == "" {
-		payload.ApplicationId = bootpay.applicationId
+		payload.ApplicationId = api.applicationId
 	}
 	if payload.PrivateKey == "" {
-		payload.PrivateKey = bootpay.privateKey
+		payload.PrivateKey = api.privateKey
 	}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
-	req, err := bootpay.NewRequest(http.MethodPost, "/subscribe/billing", body)
+	req, err := api.NewRequest(http.MethodPost, "/subscribe/billing", body)
 	if err != nil {
 		errors.New("bootpay: RequestSubscribe error: " + err.Error())
 		return SubscribeBilling{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 	defer res.Body.Close()
 
 	result := SubscribeBilling{}
@@ -177,22 +177,22 @@ func (bootpay *Bootpay) RequestSubscribe(payload SubscribePayload) (SubscribeBil
 	return result, nil
 }
 
-func (bootpay *Bootpay) ReserveSubscribe(payload SubscribePayload) (SubscribeBillingReserve, error) {
+func (api *Api) ReserveSubscribe(payload SubscribePayload) (SubscribeBillingReserve, error) {
 	if payload.ApplicationId == "" {
-		payload.ApplicationId = bootpay.applicationId
+		payload.ApplicationId = api.applicationId
 	}
 	if payload.PrivateKey == "" {
-		payload.PrivateKey = bootpay.privateKey
+		payload.PrivateKey = api.privateKey
 	}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
-	req, err := bootpay.NewRequest(http.MethodPost, "/subscribe/billing/reserve", body)
+	req, err := api.NewRequest(http.MethodPost, "/subscribe/billing/reserve", body)
 	if err != nil {
 		errors.New("bootpay: ReserveSubscribe error: " + err.Error())
 		return SubscribeBillingReserve{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 	defer res.Body.Close()
 
 	result := SubscribeBillingReserve{}
@@ -200,14 +200,14 @@ func (bootpay *Bootpay) ReserveSubscribe(payload SubscribePayload) (SubscribeBil
 	return result, nil
 }
 
-func (bootpay *Bootpay) ReserveCancelSubscribe(reserveId string) (APIResponse, error) {
-	req, err := bootpay.NewRequest(http.MethodDelete, "/subscribe/billing/reserve/"+reserveId, nil)
+func (api *Api) ReserveCancelSubscribe(reserveId string) (APIResponse, error) {
+	req, err := api.NewRequest(http.MethodDelete, "/subscribe/billing/reserve/"+reserveId, nil)
 	if err != nil {
 		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
 		return APIResponse{}, err
 	}
-	req.Header.Set("Authorization", bootpay.token)
-	res, err := bootpay.client.Do(req)
+	req.Header.Set("Authorization", api.token)
+	res, err := api.client.Do(req)
 
 	defer res.Body.Close()
 
