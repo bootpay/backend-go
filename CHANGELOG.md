@@ -1,3 +1,12 @@
+### 1.0.6
+- reserve api schedyleType 값이 비어있을때 보완처리  
+
+### 1.0.5
+- rename interface
+
+### 1.0.4
+- rename interface
+
 ### 1.0.3
 - package name update
 
