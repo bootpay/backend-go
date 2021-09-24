@@ -184,6 +184,10 @@ func (api *Api) ReserveSubscribe(payload SubscribePayload) (SubscribeBillingRese
 	if payload.PrivateKey == "" {
 		payload.PrivateKey = api.privateKey
 	}
+	if payload.SchedulerType == "" {
+		payload.SchedulerType = "oneshot"
+	}
+
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/subscribe/billing/reserve", body)

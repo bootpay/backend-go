@@ -22,28 +22,34 @@
 7. 서버 승인 요청
 8. 본인 인증 결과 조회
 
-
-
 ## 설치하기
 
 ```curl
 go get github.com/bootpay/backend-go
 ``` 
 
+# 사용하기  
+```go 
+import (
+	"github.com/bootpay/backend-go"
+)
 
-# 사용하기
-example.y
-```python
-from bootpay import Bootpay
+api := bootpay.Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+api.GetToken()
+```
 
-rest_application_id = '5b8f6a4d396fa665fdc2b5ea'
-rest_private_key = 'rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw='
+## 1. 토큰 발급
 
-bootpay = Bootpay(rest_application_id, rest_private_key)
-result = bootpay.get_access_token()
-
-print(result)
-print(result['data']['token'])
+부트페이와 서버간 통신을 하기 위해서는 부트페이 서버로부터 토큰을 발급받아야 합니다.  
+발급된 토큰은 30분간 유효하며, 최초 발급일로부터 30분이 지날 경우 토큰 발급 함수를 재호출 해주셔야 합니다.
+```go  
+func GetToken(api *bootpay.Api) {
+	token, err := api.GetToken()
+	fmt.Println("token : " + token.Data.Token)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+}
 ```
 
 ## 2. 결제 검증
