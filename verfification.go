@@ -26,6 +26,9 @@ type VerifyData struct {
 	PaymentData      map[string]interface{} `json:"payment_data"`
 	RequestedAt      string                 `json:"requested_at"`
 	PurchasedAt      string                 `json:"purchased_at"`
+	EscrowStatus     int                    `json:"escrow_status"`
+	EscrowStatusEn   string         		`json:"escrow_status_en"`
+	EscrowStatusKo   string         		`json:"escrow_status_ko"`
 	Status           int                    `json:"status"`
 	StatusEn         string                 `json:"status_en"`
 	StatusKo         string                 `json:"status_ko"`
@@ -60,7 +63,17 @@ type Certificate struct {
 		Method      string                 `json:"method"`
 		PgName      string                 `json:"pg_name"`
 		MethodName  string                 `json:"method_name"`
-		Certificate map[string]interface{} `json:"certificate"`
+		//Certificate map[string]interface{} `json:"certificate"`
+		Certificate struct {
+			Username  string `json:"username"`
+			Phone     string `json:"phone"`
+			Birth     string `json:"birth"`
+			Gender    string `json:"gender"`
+			Unique    string `json:"unique"`
+			Di        string `json:"di"`
+			Foreigner bool   `json:"foreigner"`
+			Carrier string   `json:"carrier"`
+		}
 		PaymentData struct {
 			Username  string `json:"username"`
 			Phone     string `json:"phone"`

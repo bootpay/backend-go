@@ -1,3 +1,6 @@
+### 1.0.7
+- verify response date update 
+
 ### 1.0.6
 - reserve api schedyleType 값이 비어있을때 보완처리  
 

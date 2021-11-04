@@ -53,7 +53,9 @@ func GetVerify(api *Api) {
 	verify, err := api.Verify(receiptId)
 
 	fmt.Println(verify)
-	fmt.Println(verify.Data.PaymentData)
+	fmt.Println(verify.Data)
+	//fmt.Println(verify.Data["receipt_id"])
+	fmt.Println(verify.Data.CancelledPrice)
 	fmt.Println(verify.Data.PaymentData["o_id"])
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
