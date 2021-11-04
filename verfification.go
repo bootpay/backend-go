@@ -23,7 +23,28 @@ type VerifyData struct {
 	PgName           string                 `json:"pg_name"`
 	MethodName       string                 `json:"method_name"`
 	Params           map[string]interface{} `json:"params"`
-	PaymentData      map[string]interface{} `json:"payment_data"`
+	//PaymentData      map[string]interface{} `json:"payment_data"`
+	PaymentData struct {
+		Username  string `json:"username"`
+		Phone     string `json:"phone"`
+		Birth     string `json:"birth"`
+		Gender    string `json:"gender"`
+		Unique    string `json:"unique"`
+		Di        string `json:"di"`
+		ReceiptId string `json:"receipt_id"`
+		N         string `json:"n"`
+		P         int    `json:"p"`
+		Tid       string `json:"tid"`
+		Pg        string `json:"pg"`
+		Pm        string `json:"pm"`
+		PgA       string `json:"pg_a"`
+		PmA       string `json:"pm_a"`
+		OId       string `json:"o_id"`
+		PAt       string `json:"p_at"`
+		S         int    `json:"s"`
+		G         int    `json:"g"`
+	} `json:"payment_data"`
+	
 	RequestedAt      string                 `json:"requested_at"`
 	PurchasedAt      string                 `json:"purchased_at"`
 	EscrowStatus     int                    `json:"escrow_status"`
