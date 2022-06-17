@@ -10,16 +10,16 @@ func TestGetBillingKey(t *testing.T) {
 	bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
 	GetToken(bootpay)
 	GetBillingKey(bootpay)
-	GetVerify(bootpay)
-	ReceiptCancel(bootpay)
-	RequestLink(bootpay)
-	ServerSubmit(bootpay)
+	//GetVerify(bootpay)
+	//ReceiptCancel(bootpay)
+	//RequestLink(bootpay)
+	//ServerSubmit(bootpay)
 }
 
 func GetToken(api *Api) {
 	fmt.Println("--------------- GetToken() Start ---------------")
-	token, err := api.GetToken()
-	fmt.Println("token : " + token.Data.Token)
+	token , err := api.GetToken()
+	fmt.Println(token)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
@@ -51,15 +51,11 @@ func GetVerify(api *Api) {
 	receiptId := "610c96352386840036db8bef"
 	fmt.Println("--------------- GetVerify() Start ---------------")
 	verify, err := api.Verify(receiptId)
-
-	fmt.Println(verify)
-	fmt.Println(verify.Data)
-	//fmt.Println(verify.Data["receipt_id"])
-	fmt.Println(verify.Data.CancelledPrice)
-	fmt.Println(verify.Data.PaymentData["o_id"])
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
+
+	fmt.Println(verify)
 	fmt.Println("--------------- GetVerify() End ---------------")
 }
 

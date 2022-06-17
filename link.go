@@ -16,26 +16,55 @@ type Payload struct {
 	OrderId   string   `json:"order_id"`
 	Params    string   `json:"params"`
 	TaxFree   float64  `json:"tax_free"`
-	Name      string   `json:"name"`
-	UserInfo  User     `json:"user_info"`
+	OrderName string   `json:"order_name"`
+	User      User     `json:"user"`
 	Items     []Item   `json:"items"`
-	ReturnUrl string   `json:"return_url"`
+	//ReturnUrl string   `json:"return_url"`
 	Extra     Extra    `json:"extra""`
 	//UserInfo            User           `json:"user_info"`
 }
 
 type Extra struct {
-	Escrow               bool   `json:"escrow"`
-	ExpireMonth          int    `json:"expire_month"`
-	Quota                []int  `json:"quota"`
-	SubscribeTestPayment bool   `json:"subscribe_test_payment"`
-	DispCashResult       bool   `json:"disp_cash_result"`
-	OfferPeriod          string `json:"offer_period"`
+	CardQuota            string `json:"card_quota"`
 	SellerName           string `json:"seller_name"`
-	Theme                string `json:"theme"`
-	CustomBackground     string `json:"custom_background"`
-	CustomFontColor      string `json:"custom_font_color"`
+	DeliveryDay          int    `json:"delivery_day"`
+	Locale          	 string `json:"locale"`
+	OfferPeriod          string `json:"offer_period"`
+	DisplayCashReceipt   bool   `json:"display_cash_receipt"`
+	DepositExpiration    string `json:"deposit_expiration"`
+	AppScheme    		 string `json:"app_scheme"` //서버에선 사용되지 않음
+	UseCardPoint         bool   `json:"use_card_point"`
+	DirectCard           bool   `json:"direct_card"`
+	UseOrderId           bool   `json:"use_order_id"`
+	InternationalCardOnly bool  `json:"international_card_only"`
+	DirectAppCard        bool   `json:"direct_app_card"`
+	DirectSamsungpay     bool   `json:"direct_samsungpay"`
+	EnableErrorWebhook   bool   `json:"enable_error_webhook"`
+	SeparatelyConfirmed  bool   `json:"separately_confirmed"`
+	ConfirmOnlyRestApi   bool   `json:"confirm_only_rest_api"`
+	OpenType   			 string `json:"open_type"`
+	UseBootpayInappSdk   bool   `json:"use_bootpay_inapp_sdk"`
+	RedirectUrl   		 string `json:"redirect_url"`
+	DisplaySuccessResult bool   `json:"display_success_result"`
+	DisplayErrorResult   bool   `json:"display_error_result"`
+	IsposableCupDeposit  int    `json:"disposable_cup_deposit"`
+
+	CardEasyOption       BootExtraCardEasyOption `json:"card_easy_option"`
+	BrowserOpenType      []BrowserOpenType   `json:"browser_open_type"`
+
+	UseWelcomepayment    bool   `json:"use_welcomepayment"`
 }
+
+type BootExtraCardEasyOption struct {
+	Title        string   `json:"title"`
+}
+
+
+type BrowserOpenType struct {
+	Browser        string    `json:"browser"`
+	OpenType       string   `json:"open_type"`
+}
+
 
 func (api *Api) RequestLink(payload Payload) (APIResponse, error) {
 	if payload.ApplicationId == "" {
@@ -50,8 +79,7 @@ func (api *Api) RequestLink(payload Payload) (APIResponse, error) {
 	if err != nil {
 		errors.New("bootpay: RequestLink error: " + err.Error())
 		return APIResponse{}, err
-	}
-	req.Header.Set("Authorization", api.token)
+	} 
 	res, err := api.client.Do(req)
 
 	defer res.Body.Close()
