@@ -31,12 +31,12 @@ type ShippingCompany struct {
 
 
 func (api *Api) ShippingStart(payload Shipping) (APIResponse, error) {
-	if payload.ApplicationId == "" {
-		payload.ApplicationId = api.applicationId
-	}
-	if payload.PrivateKey == "" {
-		payload.PrivateKey = api.privateKey
-	}
+	//if payload.ApplicationId == "" {
+	//	payload.ApplicationId = api.applicationId
+	//}
+	//if payload.PrivateKey == "" {
+	//	payload.PrivateKey = api.privateKey
+	//}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPut, "/subscribe/payment", body)
