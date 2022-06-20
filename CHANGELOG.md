@@ -1,3 +1,6 @@
+### 2.0.2
+-  republish
+
 ### 2.0.1
 -  escrow api added
 
