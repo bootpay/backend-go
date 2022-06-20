@@ -216,7 +216,6 @@ func GetUserToken(api *Api) {
 		fmt.Println("get token error: " + err.Error())
 	}
 	fmt.Println("--------------- GetUserToken() End ---------------")
-
 }
 
 func DestroyBillingKey(api *Api) {
