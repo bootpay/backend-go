@@ -1,3 +1,6 @@
+### 2.0.0 (2-x-development)
+-  bootpay api v1 -> v2 upgrade 
+
 ### 1.0.7
 - verify response date update 
 

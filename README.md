@@ -25,7 +25,7 @@
 ## 설치하기
 
 ```curl
-go get -u github.com/bootpay/backend-go
+go get -u github.com/bootpay/backend-go@2-x-development
 ``` 
 
 # 사용하기  
