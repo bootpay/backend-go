@@ -123,12 +123,12 @@ type SubscribePayload struct {
 //}
 
 func (api *Api) GetBillingKey(payload BillingKeyPayload) (APIResponse, error) {
-	if payload.ApplicationId == "" {
-		payload.ApplicationId = api.applicationId
-	}
-	if payload.PrivateKey == "" {
-		payload.PrivateKey = api.privateKey
-	}
+	//if payload.ApplicationId == "" {
+	//	payload.ApplicationId = api.applicationId
+	//}
+	//if payload.PrivateKey == "" {
+	//	payload.PrivateKey = api.privateKey
+	//}
 
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
@@ -162,7 +162,7 @@ func (api *Api) LookupBillingKey(receiptId string) (APIResponse, error) {
 }
 
 func (api *Api) DestroyBillingKey(billingKey string) (APIResponse, error) {
-	req, err := api.NewRequest(http.MethodDelete, "/subscribe/billing/" + billingKey, nil)
+	req, err := api.NewRequest(http.MethodDelete, "/subscribe/billing_key/" + billingKey, nil)
 	if err != nil {
 		errors.New("bootpay: DestroyBillingKey error: " + err.Error())
 		return APIResponse{}, err
@@ -177,12 +177,12 @@ func (api *Api) DestroyBillingKey(billingKey string) (APIResponse, error) {
 }
 
 func (api *Api) RequestSubscribe(payload SubscribePayload) (APIResponse, error) {
-	if payload.ApplicationId == "" {
-		payload.ApplicationId = api.applicationId
-	}
-	if payload.PrivateKey == "" {
-		payload.PrivateKey = api.privateKey
-	}
+	//if payload.ApplicationId == "" {
+	//	payload.ApplicationId = api.applicationId
+	//}
+	//if payload.PrivateKey == "" {
+	//	payload.PrivateKey = api.privateKey
+	//}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/subscribe/payment", body)
@@ -199,15 +199,15 @@ func (api *Api) RequestSubscribe(payload SubscribePayload) (APIResponse, error) 
 }
 
 func (api *Api) ReserveSubscribe(payload SubscribePayload) (APIResponse, error) {
-	if payload.ApplicationId == "" {
-		payload.ApplicationId = api.applicationId
-	}
-	if payload.PrivateKey == "" {
-		payload.PrivateKey = api.privateKey
-	}
-	if payload.SchedulerType == "" {
-		payload.SchedulerType = "oneshot"
-	}
+	//if payload.ApplicationId == "" {
+	//	payload.ApplicationId = api.applicationId
+	//}
+	//if payload.PrivateKey == "" {
+	//	payload.PrivateKey = api.privateKey
+	//}
+	//if payload.SchedulerType == "" {
+	//	payload.SchedulerType = "oneshot"
+	//}
 
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)

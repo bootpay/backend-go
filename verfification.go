@@ -60,7 +60,7 @@ import (
 //	//Data VerifyData `json:"data"`
 //}
 
-func (api *Api) Verify(receiptId string) (APIResponse, error) {
+func (api *Api) GetReceipt(receiptId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodGet, "/receipt/" + receiptId, nil)
 	if err != nil {
 		errors.New("bootpay: Verify error: " + err.Error())
@@ -119,7 +119,7 @@ func (api *Api) Verify(receiptId string) (APIResponse, error) {
 //}
 
 func (api *Api) Certificate(receiptId string) (APIResponse, error) {
-	req, err := api.NewRequest(http.MethodGet, "/certificate/"+receiptId, nil)
+	req, err := api.NewRequest(http.MethodGet, "/certificate/" + receiptId, nil)
 	if err != nil {
 		errors.New("bootpay: Certificate error: " + err.Error())
 		return APIResponse{}, err

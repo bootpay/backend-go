@@ -25,7 +25,7 @@
 ## 설치하기
 
 ```curl
-go get -u github.com/bootpay/backend-go
+go get -u github.com/bootpay/backend-go@2-x-development
 ``` 
 
 # 사용하기  
@@ -55,23 +55,16 @@ func GetToken(api *bootpay.Api) {
 ## 2. 결제 검증
 결제창 및 정기결제에서 승인/취소된 결제건에 대하여 올바른 결제건인지 서버간 통신으로 결제검증을 합니다.
 ```go  
-func GetBillingKey(api *bootpay.Api) {
-	payload := bootpay.BillingKeyPayload{
-		OrderId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
-		Pg: "nicepay",
-		ItemName: "정기결제 테스트 아이템",
-		CardNo: "5570********1074",
-		CardPw: "**",
-		ExpireYear: "**",
-		ExpireMonth: "**",
-		IdentifyNumber: "",
-	}
-	billingKey, err := api.GetBillingKey(payload)
-
-	fmt.Println(billingKey)
+func GetReceipt(api *Api) {
+	receiptId := "62afc194e38c300021b345d4"
+	fmt.Println("--------------- getReceipt() Start ---------------")
+	verify, err := api.GetReceipt(receiptId)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
-	} 
+	}
+
+	fmt.Println(verify)
+	fmt.Println("--------------- GetVerify() End ---------------")
 }
 ```
 
@@ -86,16 +79,25 @@ price를 지정하지 않으면 전액취소 됩니다.
 
 간혹 개발사에서 실수로 여러번 부분취소를 보내서 여러번 취소되는 경우가 있기때문에, 부트페이에서는 부분취소 중복 요청을 막기 위해 cancel_id 라는 필드를 추가했습니다. cancel_id를 지정하시면, 해당 건에 대해 중복 요청방지가 가능합니다.
 ```go  
-func GetVerify(api *bootpay.Api) {
-	receiptId := "610c96352386840036db8bef" 
-	verify, err := api.Verify(receiptId)
 
-	fmt.Println(verify)
-	fmt.Println(verify.Data.PaymentData)
-	fmt.Println(verify.Data.PaymentData["o_id"])
+func ReceiptCancel(api *Api) {
+	payload := CancelData{
+		ReceiptId: "62afc3c5cf9f6d001b7d101a",
+		CancelId:  fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		CancelUsername: "관리자",
+		CancelMessage: "테스트 결제 취소를 테스트",
+	}
+	//receiptId := "610cc0cb7b5ba40044b04530"
+	//name := "관리자"
+	//reason := "테스트 결제 취소를 테스트"
+	fmt.Println("--------------- ReceiptCancel() Start ---------------")
+	cancel, err := api.ReceiptCancel(payload)
+
+	fmt.Println(cancel)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
-	} 
+	}
+	fmt.Println("--------------- ReceiptCancel() End ---------------")
 }
 ```
 

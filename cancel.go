@@ -12,7 +12,7 @@ type CancelData struct {
 	ReceiptId       string     `json:"receipt_id"`
 	CancelPrice     float64    `json:"cancel_price,omitempty"`
 	CancelTaxFree   float64    `json:"cancel_tax_free,omitempty"`
-	CancelId        string     `json:"cancel_id"`
+	CancelId        string     `json:"cancel_id,omitempty"`
 	CancelUsername  string     `json:"cancel_username"`
 	CancelMessage   string     `json:"cancel_message"`
 	//Name      		string     `json:"name"`
