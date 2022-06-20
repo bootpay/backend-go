@@ -1,3 +1,6 @@
+### 2.0.1
+-  escrow api added
+
 ### 2.0.0 (2-x-development)
 -  bootpay api v1 -> v2 upgrade 
 
