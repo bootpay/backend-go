@@ -12,6 +12,8 @@ type Shipping struct {
 	DeliveryCorp string `json:"delivery_corp"`
 	TrackingNumber string `json:"tracking_number"`
 	//Data VerifyData `json:"data"`
+	ShippingPrepayment bool `json:"shipping_prepayment"`
+	ShippingDay bool `json:"shipping_day"`
 	User ShippingUser `json:"user"`
 	Company ShippingCompany `json:"company"`
 }

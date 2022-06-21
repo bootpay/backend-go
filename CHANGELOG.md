@@ -1,3 +1,6 @@
+### 2.0.3
+-  shipping model field added 
+
 ### 2.0.2
 -  republish
 
