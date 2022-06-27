@@ -1,3 +1,6 @@
+### 2.0.5
+-  package name v2 added
+
 ### 2.0.4
 -  shipping api http method change get -> put
 
