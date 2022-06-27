@@ -1,3 +1,18 @@
+### 2.0.4
+-  shipping api http method change get -> put
+
+### 2.0.3
+-  shipping model field added
+
+### 2.0.2
+-  republish
+
+### 2.0.1
+-  escrow api added
+
+### 2.0.0 (2-x-development)
+-  bootpay api v1 -> v2 upgrade
+
 ### 1.0.7
 - verify response date update 
 

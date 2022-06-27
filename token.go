@@ -4,36 +4,38 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 )
 type TokenData struct {
-	Token      string `json:"token"`
+	Token      string `json:"access_token"`
 	ServerTime int64  `json:"server_time"`
 	ExpiredAt  int64  `json:"expired_at"`
 }
-type Token struct {
-	APIResponse
-	Data TokenData `json:"data"`
-}
-func (api *Api) GetToken() (Token, error) {
+//type Token struct {
+//	Data interface{}
+//	//ExpireIn int64 `json:"expire_in"`
+//	//AccessToken string `json:"access_token"`
+//}
+func (api *Api) GetToken() (APIResponse, error) {
 	config := RestConfig{api.applicationId, api.privateKey}
 	postBody, _ := json.Marshal(config)
 	body := bytes.NewBuffer(postBody)
-	req, err := api.NewRequest(http.MethodPost, "/request/token", body)
+	req, err := api.NewRequest(http.MethodPost, "/request/token.json", body)
+	
 	if err != nil {
 		errors.New("bootpay: getToken error: " + err.Error())
-		return Token{}, err
+		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
 	defer res.Body.Close()
 
-	result := Token{}
+	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
-	fmt.Println(result)
 
-	if result.Status == 200 {
-		if result.Data.Token != "" { api.token = result.Data.Token }
+	result["http_status_code"] = res.StatusCode
+
+	if result["access_token"] != nil {
+		api.token = result["access_token"].(string)
 	}
 
 	return result, nil

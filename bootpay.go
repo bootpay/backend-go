@@ -9,19 +9,22 @@ import (
 )
 
 const (
-	DEVELOPMENT string = "https://dev-api.bootpay.co.kr"
-	TEST        string = "https://test-api.bootpay.co.kr"
-	STAGE       string = "https://stage-api.bootpay.co.kr"
-	PRODUCTION  string = "https://api.bootpay.co.kr"
+	DEVELOPMENT string = "https://dev-api.bootpay.co.kr/v2"
+	TEST        string = "https://test-api.bootpay.co.kr/v2"
+	STAGE       string = "https://stage-api.bootpay.co.kr/v2"
+	PRODUCTION  string = "https://api.bootpay.co.kr/v2"
 )
 const defaultHTTPTimeout = 10 * time.Second
 
-type APIResponse struct {
-	Status  int    `json:"status"`
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Data    interface{} `json:"data"`
-}
+type APIResponse = map[string]interface{}
+
+//type APIResponse struct {
+//	Data map[string]interface{}
+//	//Status  int    `json:"status"`
+//	//Code    int    `json:"code"`
+//	//Message string `json:"message"`
+//	//Data    map[string]interface{} `json:"data"`
+//}
 
 type RestConfig struct {
 	ApplicationId string `json:"application_id"`
@@ -43,8 +46,9 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 		return nil, err
 	}
 	if api.token != "" {
-		req.Header.Set("Authorization", api.token)
-	}
+		req.Header.Set("Authorization", "Bearer " + api.token)
+	} 
+	
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept-Charset", "utf-8")
