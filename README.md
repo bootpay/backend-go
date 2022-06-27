@@ -5,22 +5,27 @@
 
  
 ## 기능
-1. (부트페이 통신을 위한) 토큰 발급 요청
-2. 결제 검증
+1. (부트페이 통신을 위한) 토큰 발급
+2. 결제 단건 조회
 3. 결제 취소 (전액 취소 / 부분 취소)
-4. 빌링키 발급
+4. 신용카드 자동결제 (빌링결제)
 
-   4-1. 발급된 빌링키로 결제 승인 요청
+   4-1. 빌링키 발급
 
-   4-2. 발급된 빌링키로 결제 승인 예약 요청
+   4-2. 발급된 빌링키로 결제 승인 요청
 
-   4-2-1. 발급된 빌링키로 결제 승인 예약 - 취소 요청
+   4-3. 발급된 빌링키로 결제 예약 요청
 
-   4-3. 빌링키 삭제
-5. (부트페이 단독) 사용자 토큰 발급
-6. (부트페이 단독) 결제 링크 생성
-7. 서버 승인 요청
-8. 본인 인증 결과 조회
+   4-4. 발급된 빌링키로 결제 예약 - 취소 요청
+
+   4-5. 빌링키 삭제
+
+   4-6. 빌링키 조회
+
+5. (생체인증, 비밀번호 결제를 위한) 구매자 토큰 발급
+6. 서버 승인 요청
+7. 본인 인증 결과 조회
+8. (에스크로 이용시) PG사로 배송정보 보내기
 
 ## 설치하기
 
@@ -52,7 +57,7 @@ func GetToken(api *bootpay.Api) {
 }
 ```
 
-## 2. 결제 검증
+## 2. 결제 단건 조회
 결제창 및 정기결제에서 승인/취소된 결제건에 대하여 올바른 결제건인지 서버간 통신으로 결제검증을 합니다.
 ```go  
 func GetReceipt(api *Api) {
@@ -101,7 +106,7 @@ func ReceiptCancel(api *Api) {
 }
 ```
 
-## 4. 빌링키 발급
+## 4-1. 빌링키 발급
 REST API 방식으로 고객으로부터 카드 정보를 전달하여, PG사에게 빌링키를 발급받을 수 있습니다.
 발급받은 빌링키를 저장하고 있다가, 원하는 시점, 원하는 금액에 결제 승인 요청하여 좀 더 자유로운 결제시나리오에 적용이 가능합니다.
 * 비인증 정기결제(REST API) 방식을 지원하는 PG사만 사용 가능합니다.
@@ -129,7 +134,7 @@ func GetBillingKey(api *Api) {
 }
 ```
 
-## 4-1. 발급된 빌링키로 결제 승인 요청
+## 4-2. 발급된 빌링키로 결제 승인 요청
 발급된 빌링키로 원하는 시점에 원하는 금액으로 결제 승인 요청을 할 수 있습니다. 잔액이 부족하거나 도난 카드 등의 특별한 건이 아니면 PG사에서 결제를 바로 승인합니다.
 ```go  
 func RequestSubscribe(api *bootpay.Api) {
@@ -148,8 +153,8 @@ func RequestSubscribe(api *bootpay.Api) {
 	fmt.Println("--------------- RequestSubscribe() End ---------------")
 }
 ```
-## 4-2. 발급된 빌링키로 결제 예약 요청
-원하는 시점에 4-1로 결제 승인 요청을 보내도 되지만, 빌링키 발급 이후에 바로 결제 예약 할 수 있습니다. (빌링키당 최대 5건)
+## 4-3. 발급된 빌링키로 결제 예약 요청
+원하는 시점에 4-1로 결제 승인 요청을 보내도 되지만, 빌링키 발급 이후에 바로 결제 예약 할 수 있습니다. (빌링키당 최대 10건)
 ```go  
 func ReserveSubscribe(api *Api) {
 	s10 := time.Now().Add(time.Second * 100).Format("2006-01-02T15:04:05-07:00")
@@ -171,7 +176,7 @@ func ReserveSubscribe(api *Api) {
 	fmt.Println("--------------- ReserveSubscribe() End ---------------")
 }
 ```
-## 4-2-1. 발급된 빌링키로 결제 예약 - 취소 요청
+## 4-4. 발급된 빌링키로 결제 예약 - 취소 요청
 빌링키로 예약된 결제건을 취소합니다.
 ```go  
 func ReserveCancel(api *Api) {
@@ -186,7 +191,7 @@ func ReserveCancel(api *Api) {
 	fmt.Println("--------------- ReserveCancel() End ---------------")
 }
 ```
-## 4-3. 빌링키 삭제
+## 4-5. 빌링키 삭제
 발급된 빌링키로 더 이상 사용되지 않도록, 삭제 요청합니다.
 ```go  
 func DestroyBillingKey(api *Api) {
@@ -224,36 +229,16 @@ func GetUserToken(api *Api) {
 	}
 	fmt.Println("--------------- GetUserToken() End ---------------")
 }
-```
-## 6. 결제 링크 생성
-(부트페이 단독) 요청 하시면 결제링크가 리턴되며, 해당 url을 고객에게 안내, 결제 유도하여 결제를 진행할 수 있습니다. (v2에서는 아직 지원되지 않습니다)
-```go  
-func RequestLink(api *bootpay.Api) {
-	payload := bootpay.Payload{
-		Pg: "kcp",
-		Method: "card",
-		Price: 1000,
-		OrderId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
-		Name: "테스트 결제 상품",
-	} 
-	res, err := api.RequestLink(payload)
+``` 
 
-	fmt.Println(res)
-	if err != nil {
-		fmt.Println("get token error: " + err.Error())
-	} 
-}
-```
-
-## 7. 서버 승인 요청
+## 6. 서버 승인 요청
 결제승인 방식은 클라이언트 승인 방식과, 서버 승인 방식으로 총 2가지가 있습니다.
 
-클라이언트 승인 방식은 javascript나 native 등에서 confirm 함수에서 진행하는 일반적인 방법입니다만, 경우에 따라 서버 승인 방식이 필요할 수 있습니다.
+클라이언트 승인 방식은 pythonscript나 native 등에서 confirm 함수에서 진행하는 일반적인 방법입니다만, 경우에 따라 서버 승인 방식이 필요할 수 있습니다.
 
 필요한 이유
 1. 100% 안정적인 결제 후 고객 안내를 위해 - 클라이언트에서 PG결제 진행 후 승인 완료될 때 onDone이 수행되지 않아 (인터넷 환경 등), 결제 이후 고객에게 안내하지 못할 수 있습니다
 2. 단일 트랜잭션의 개념이 필요할 경우 - 재고파악이 중요한 커머스를 운영할 경우 트랜잭션 개념이 필요할 수 있겠으며, 이를 위해서는 서버 승인을 사용해야 합니다.
-
 ```go  
 func ServerConfirm(api *Api) {
 	receiptId := "62afda41cf9f6d001f7d105f"
@@ -268,10 +253,10 @@ func ServerConfirm(api *Api) {
 }
 ```
 
-## 8. 본인 인증 결과 조회
+## 7. 본인 인증 결과 조회
 다날 본인인증 후 결과값을 조회합니다.
 다날 본인인증에서 통신사, 외국인여부, 전화번호 이 3가지 정보는 다날에 추가로 요청하셔야 받으실 수 있습니다.
-```java 
+```go 
 func Certificate(api *Api) {
 	receiptId := "6285ffa6cf9f6d0022c4346b"
 	fmt.Println("--------------- Certificate() Start ---------------")
@@ -285,13 +270,43 @@ func Certificate(api *Api) {
 }
 ```
 
+
+8. (에스크로 이용시) PG사로 배송정보 보내기
+   현금 거래에 한해 구매자의 안전거래를 보장하는 방법으로, 판매자와 구매자의 온라인 전자상거래가 원활하게 이루어질 수 있도록 중계해주는 매매보호서비스입니다. 국내법에 따라 전자상거래에서 반드시 적용이 되어 있어야합니다. PG에서도 에스크로 결제를 지원하며, 에스크로 결제 사용을 원하시면 PG사 가맹시에 에스크로결제를 미리 얘기하고나서 진행을 하시는 것이 수월합니다.
+
+PG사로 배송정보( 이니시스, KCP만 지원 )를 보내서 에스크로 상태를 변경하는 API 입니다.
+```go 
+func ShoppingStart(api *Api) {
+	shipping := Shipping{
+		ReceiptId: "628ae7ffd01c7e001e9b6066",
+		TrackingNumber: "123456",
+		DeliveryCorp: "CJ대한통운",
+		User: ShippingUser{
+			Username: "홍길동",
+			Phone: "01000000000",
+			Address: "서울특별시 종로구",
+			Zipcode: "08490",
+		},
+	}
+
+	fmt.Println("--------------- ShoppingStart() Start ---------------")
+	res, err := api.putShippingStart(shipping)
+
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- ShoppingStart() End ---------------")
+}
+```
+
 ## Example 프로젝트
 
 [적용한 샘플 프로젝트](https://github.com/bootpay/backend-go-example)을 참조해주세요
 
 ## Documentation
 
-[부트페이 개발매뉴얼](https://bootpay.gitbook.io/docs/)을 참조해주세요
+[부트페이 개발매뉴얼](https://docs.bootpay.co.kr/next/)을 참조해주세요
 
 ## 기술문의
 

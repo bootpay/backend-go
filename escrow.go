@@ -1,6 +1,7 @@
 package bootpay
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -40,9 +41,9 @@ func (api *Api) putShippingStart(shipping Shipping) (APIResponse, error) {
 	putBody, _ := json.Marshal(shipping)
 	body := bytes.NewBuffer(putBody)
 
-	req, err := api.NewRequest(http.MethodGet, "/escrow/shipping/start/" + shipping.ReceiptId, body)
+	req, err := api.NewRequest(http.MethodPut, "/escrow/shipping/start/" + shipping.ReceiptId, body)
 	if err != nil {
-		errors.New("bootpay: Verify error: " + err.Error())
+		errors.New("bootpay: putShippingStart error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)

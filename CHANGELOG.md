@@ -1,3 +1,6 @@
+### 2.0.4
+-  shipping api http method change get -> put
+
 ### 2.0.3
 -  shipping model field added 
 

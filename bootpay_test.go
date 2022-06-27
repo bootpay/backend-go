@@ -9,19 +9,20 @@ import (
 func TestGetBillingKey(t *testing.T) {
 	bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
 	GetToken(bootpay)
-	ReceiptCancel(bootpay)
-	GetReceipt(bootpay)
-	GetBillingKey(bootpay)
-	RequestSubscribe(bootpay)
-	LookupBillingKey(bootpay)
-	ReserveSubscribe(bootpay)
-	ReserveCancel(bootpay)
-	DestroyBillingKey(bootpay)
-	GetUserToken(bootpay)
-	GetVerify(bootpay)
-	//RequestLink(bootpay)
-	ServerConfirm(bootpay)
-	Certificate(bootpay)
+	//ReceiptCancel(bootpay)
+	//GetReceipt(bootpay)
+	//GetBillingKey(bootpay)
+	//RequestSubscribe(bootpay)
+	//LookupBillingKey(bootpay)
+	//ReserveSubscribe(bootpay)
+	//ReserveCancel(bootpay)
+	//DestroyBillingKey(bootpay)
+	//GetUserToken(bootpay)
+	//GetVerify(bootpay)
+	////RequestLink(bootpay)
+	//ServerConfirm(bootpay)
+	//Certificate(bootpay)
+	ShoppingStart(bootpay)
 }
 
 func GetToken(api *Api) {
@@ -240,4 +241,27 @@ func Certificate(api *Api) {
 		fmt.Println("get token error: " + err.Error())
 	}
 	fmt.Println("--------------- Certificate() End ---------------")
+}
+
+func ShoppingStart(api *Api) {
+	shipping := Shipping{
+		ReceiptId: "628ae7ffd01c7e001e9b6066",
+		TrackingNumber: "123456",
+		DeliveryCorp: "CJ대한통운",
+		User: ShippingUser{
+			Username: "홍길동",
+			Phone: "01000000000",
+			Address: "서울특별시 종로구",
+			Zipcode: "08490",
+		},
+	}
+
+	fmt.Println("--------------- ShoppingStart() Start ---------------")
+	res, err := api.putShippingStart(shipping)
+
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- ShoppingStart() End ---------------")
 }
