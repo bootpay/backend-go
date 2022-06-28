@@ -1,3 +1,9 @@
+### 2.0.7
+-  putShippingStart -> PutShippingStart renamed function 
+
+### 2.0.6
+-  go.sum added
+
 ### 2.0.5
 -  package name v2 added
 

@@ -37,7 +37,7 @@ type ShippingCompany struct {
 }
 
 
-func (api *Api) putShippingStart(shipping Shipping) (APIResponse, error) {
+func (api *Api) PutShippingStart(shipping Shipping) (APIResponse, error) {
 	putBody, _ := json.Marshal(shipping)
 	body := bytes.NewBuffer(putBody)
 
