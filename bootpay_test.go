@@ -256,8 +256,7 @@ func ShoppingStart(api *Api) {
 	}
 
 	fmt.Println("--------------- ShoppingStart() Start ---------------")
-	res, err := api.putShippingStart(shipping)
-
+	res, err := api.PutShippingStart(shipping)
 	fmt.Println(res)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())

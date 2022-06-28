@@ -30,17 +30,17 @@
 ## 설치하기
 
 ```curl
-go install github.com/bootpay/backend-go@2-x-development
+  go get -u  github.com/bootpay/backend-go/v2
 ``` 
 
 # 사용하기  
 ```go 
 import (
-	"github.com/bootpay/backend-go"
+	bootpay "github.com/bootpay/backend-go/v2"
 )
 
-api := bootpay.Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
-api.GetToken()
+bootpay := bootpay.Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+bootpay.GetToken()
 ```
 
 ## 1. 토큰 발급
@@ -49,18 +49,20 @@ api.GetToken()
 발급된 토큰은 30분간 유효하며, 최초 발급일로부터 30분이 지날 경우 토큰 발급 함수를 재호출 해주셔야 합니다.
 ```go  
 func GetToken(api *bootpay.Api) {
+	fmt.Println("--------------- GetToken() Start ---------------")
 	token, err := api.GetToken()
-	fmt.Println("token : " + token.Data.Token)
+	fmt.Println(token)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
+	fmt.Println("--------------- GetToken() End ---------------")
 }
 ```
 
 ## 2. 결제 단건 조회
 결제창 및 정기결제에서 승인/취소된 결제건에 대하여 올바른 결제건인지 서버간 통신으로 결제검증을 합니다.
 ```go  
-func GetReceipt(api *Api) {
+func GetReceipt(api *bootpay.Api) {
 	receiptId := "62afc194e38c300021b345d4"
 	fmt.Println("--------------- getReceipt() Start ---------------")
 	verify, err := api.GetReceipt(receiptId)
@@ -85,12 +87,12 @@ price를 지정하지 않으면 전액취소 됩니다.
 간혹 개발사에서 실수로 여러번 부분취소를 보내서 여러번 취소되는 경우가 있기때문에, 부트페이에서는 부분취소 중복 요청을 막기 위해 cancel_id 라는 필드를 추가했습니다. cancel_id를 지정하시면, 해당 건에 대해 중복 요청방지가 가능합니다.
 ```go  
 
-func ReceiptCancel(api *Api) {
-	payload := CancelData{
-		ReceiptId: "62afc3c5cf9f6d001b7d101a",
-		CancelId:  fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+func ReceiptCancel(api *bootpay.Api) {
+	payload := bootpay.CancelData{
+		ReceiptId:      "62afc3c5cf9f6d001b7d101a",
+		CancelId:       fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		CancelUsername: "관리자",
-		CancelMessage: "테스트 결제 취소를 테스트",
+		CancelMessage:  "테스트 결제 취소를 테스트",
 	}
 	//receiptId := "610cc0cb7b5ba40044b04530"
 	//name := "관리자"
@@ -104,6 +106,7 @@ func ReceiptCancel(api *Api) {
 	}
 	fmt.Println("--------------- ReceiptCancel() End ---------------")
 }
+
 ```
 
 ## 4-1. 빌링키 발급
@@ -112,17 +115,17 @@ REST API 방식으로 고객으로부터 카드 정보를 전달하여, PG사에
 * 비인증 정기결제(REST API) 방식을 지원하는 PG사만 사용 가능합니다.
 ```go  
 
-func GetBillingKey(api *Api) {
+func GetBillingKey(api *bootpay.Api) {
 	fmt.Println("--------------- GetBillingKey() Start ---------------")
-	payload := BillingKeyPayload{
-		SubscriptionId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
-		Pg: "nicepay",
-		OrderName: "정기결제 테스트 아이템",
-		CardNo: "5570********1074",
-		CardPw: "**",
-		CardExpireYear: "**",
+	payload := bootpay.BillingKeyPayload{
+		SubscriptionId:  fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		Pg:              "nicepay",
+		OrderName:       "정기결제 테스트 아이템",
+		CardNo:          "5570********1074",
+		CardPw:          "**",
+		CardExpireYear:  "**",
 		CardExpireMonth: "**",
-		CardIdentityNo: "",
+		CardIdentityNo:  "",
 	}
 	billingKey, err := api.GetBillingKey(payload)
 
@@ -132,38 +135,41 @@ func GetBillingKey(api *Api) {
 	}
 	fmt.Println("--------------- GetBillingKey() End ---------------")
 }
+
 ```
 
 ## 4-2. 발급된 빌링키로 결제 승인 요청
 발급된 빌링키로 원하는 시점에 원하는 금액으로 결제 승인 요청을 할 수 있습니다. 잔액이 부족하거나 도난 카드 등의 특별한 건이 아니면 PG사에서 결제를 바로 승인합니다.
 ```go  
 func RequestSubscribe(api *bootpay.Api) {
-	fmt.Println("--------------- RequestSubscribe() Start ---------------")
 	payload := bootpay.SubscribePayload{
-		BillingKey: "6100e8c80d681b001dd4e0d7",
-		ItemName: "테스트아이템",
-		Price: 1000,
-		OrderId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		BillingKey: "62afc52dcf9f6d001d7d1035",
+		OrderName:  "정기결제 테스트",
+		OrderId:    fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		Price:      1000,
 	}
-	res, err := api.RequestSubscribe(payload)
-	fmt.Println(res)
+
+	fmt.Println("--------------- requestSubscribe() Start ---------------")
+	cancel, err := api.RequestSubscribe(payload)
+
+	fmt.Println(cancel)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
-	fmt.Println("--------------- RequestSubscribe() End ---------------")
+	fmt.Println("--------------- requestSubscribe() End ---------------")
 }
 ```
 ## 4-3. 발급된 빌링키로 결제 예약 요청
 원하는 시점에 4-1로 결제 승인 요청을 보내도 되지만, 빌링키 발급 이후에 바로 결제 예약 할 수 있습니다. (빌링키당 최대 10건)
 ```go  
-func ReserveSubscribe(api *Api) {
+func ReserveSubscribe(api *bootpay.Api) {
 	s10 := time.Now().Add(time.Second * 100).Format("2006-01-02T15:04:05-07:00")
-	payload := SubscribePayload{
-		BillingKey: "62aff193cf9f6d001a7d10be",
-		OrderName: "정기결제 테스트",
-		OrderId:  fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+	payload := bootpay.SubscribePayload{
+		BillingKey:       "62aff193cf9f6d001a7d10be",
+		OrderName:        "정기결제 테스트",
+		OrderId:          fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		ReserveExecuteAt: s10,
-		Price: 1000,
+		Price:            1000,
 	}
 
 	fmt.Println("--------------- ReserveSubscribe() Start ---------------")
@@ -179,7 +185,7 @@ func ReserveSubscribe(api *Api) {
 ## 4-4. 발급된 빌링키로 결제 예약 - 취소 요청
 빌링키로 예약된 결제건을 취소합니다.
 ```go  
-func ReserveCancel(api *Api) {
+func ReserveCancel(api *bootpay.Api) {
 	reserveId := "62aff2a0cf9f6d001a7d10c4"
 	fmt.Println("--------------- ReserveCancel() Start ---------------")
 	cancel, err := api.ReserveCancelSubscribe(reserveId)
@@ -194,7 +200,7 @@ func ReserveCancel(api *Api) {
 ## 4-5. 빌링키 삭제
 발급된 빌링키로 더 이상 사용되지 않도록, 삭제 요청합니다.
 ```go  
-func DestroyBillingKey(api *Api) {
+func DestroyBillingKey(api *bootpay.Api) {
 	billingKey := "62afc52dcf9f6d001d7d1035"
 	fmt.Println("--------------- DestroyBillingKey() Start ---------------")
 	res, err := api.DestroyBillingKey(billingKey)
@@ -210,14 +216,14 @@ func DestroyBillingKey(api *Api) {
 (부트페이 단독) 부트페이에서 제공하는 간편결제창, 생체인증 기반의 결제 사용을 위해서는 개발사에서 회원 고유번호를 관리해야하며, 해당 회원에 대한 사용자 토큰을 발급합니다.
 이 토큰값을 기반으로 클라이언트에서 결제요청 하시면 되겠습니다.
 ```go  
-func GetUserToken(api *Api) {
-	payload := EasyUserTokenPayload{
+func GetUserToken(api *bootpay.Api) {
+	payload := bootpay.EasyUserTokenPayload{
 		UserId: "user_1234",
-		Email: "test1234@gmail.com",
-		Name: "홍길동",
+		Email:  "test1234@gmail.com",
+		Name:   "홍길동",
 		Gender: 0,
-		Birth: "19861014",
-		Phone: "01012345678",
+		Birth:  "19861014",
+		Phone:  "01012345678",
 	}
 
 	fmt.Println("--------------- GetUserToken() Start ---------------")
@@ -240,11 +246,11 @@ func GetUserToken(api *Api) {
 1. 100% 안정적인 결제 후 고객 안내를 위해 - 클라이언트에서 PG결제 진행 후 승인 완료될 때 onDone이 수행되지 않아 (인터넷 환경 등), 결제 이후 고객에게 안내하지 못할 수 있습니다
 2. 단일 트랜잭션의 개념이 필요할 경우 - 재고파악이 중요한 커머스를 운영할 경우 트랜잭션 개념이 필요할 수 있겠으며, 이를 위해서는 서버 승인을 사용해야 합니다.
 ```go  
-func ServerConfirm(api *Api) {
+func ServerConfirm(api *bootpay.Api) {
 	receiptId := "62afda41cf9f6d001f7d105f"
 	fmt.Println("--------------- ServerConfirm() Start ---------------")
 	res, err := api.ServerConfirm(receiptId)
-	
+
 	fmt.Println(res)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
@@ -257,7 +263,7 @@ func ServerConfirm(api *Api) {
 다날 본인인증 후 결과값을 조회합니다.
 다날 본인인증에서 통신사, 외국인여부, 전화번호 이 3가지 정보는 다날에 추가로 요청하셔야 받으실 수 있습니다.
 ```go 
-func Certificate(api *Api) {
+func Certificate(api *bootpay.Api) {
 	receiptId := "6285ffa6cf9f6d0022c4346b"
 	fmt.Println("--------------- Certificate() Start ---------------")
 	res, err := api.Certificate(receiptId)
@@ -276,21 +282,21 @@ func Certificate(api *Api) {
 
 PG사로 배송정보( 이니시스, KCP만 지원 )를 보내서 에스크로 상태를 변경하는 API 입니다.
 ```go 
-func ShoppingStart(api *Api) {
-	shipping := Shipping{
-		ReceiptId: "628ae7ffd01c7e001e9b6066",
+func ShoppingStart(api *bootpay.Api) {
+	shipping := bootpay.Shipping{
+		ReceiptId:      "628ae7ffd01c7e001e9b6066",
 		TrackingNumber: "123456",
-		DeliveryCorp: "CJ대한통운",
-		User: ShippingUser{
+		DeliveryCorp:   "CJ대한통운",
+		User: bootpay.ShippingUser{
 			Username: "홍길동",
-			Phone: "01000000000",
-			Address: "서울특별시 종로구",
-			Zipcode: "08490",
+			Phone:    "01000000000",
+			Address:  "서울특별시 종로구",
+			Zipcode:  "08490",
 		},
 	}
 
 	fmt.Println("--------------- ShoppingStart() Start ---------------")
-	res, err := api.putShippingStart(shipping)
+	res, err := api.PutShippingStart(shipping)
 
 	fmt.Println(res)
 	if err != nil {
