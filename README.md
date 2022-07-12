@@ -173,9 +173,9 @@ func ReserveSubscribe(api *bootpay.Api) {
 	}
 
 	fmt.Println("--------------- ReserveSubscribe() Start ---------------")
-	cancel, err := api.ReserveSubscribe(payload)
+	res, err := api.ReserveSubscribe(payload)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
