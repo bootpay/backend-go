@@ -150,9 +150,9 @@ func RequestSubscribe(api *bootpay.Api) {
 	}
 
 	fmt.Println("--------------- requestSubscribe() Start ---------------")
-	cancel, err := api.RequestSubscribe(payload)
+	res, err := api.RequestSubscribe(payload)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("get token error: " + err.Error())
 	}
@@ -212,6 +212,24 @@ func DestroyBillingKey(api *bootpay.Api) {
 	fmt.Println("--------------- DestroyBillingKey() End ---------------")
 }
 ```
+
+
+## 4-6. 빌링키 조회 
+클라이언트에서 빌링키 발급시, 보안상 클라이언트 이벤트에 빌링키를 전달해주지 않습니다. 그러므로 이 API를 통해 조회해야 합니다.
+```go  
+func LookupBillingKey(api *Api) {
+	receiptId := "62afccb3cf9f6d001b7d101d"
+	fmt.Println("--------------- LookupBillingKey() Start ---------------")
+	verify, err := api.LookupBillingKey(receiptId)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	
+	fmt.Println(verify)
+	fmt.Println("--------------- LookupBillingKey() End ---------------")
+}
+```
+
 ## 5. 사용자 토큰 발급
 (부트페이 단독) 부트페이에서 제공하는 간편결제창, 생체인증 기반의 결제 사용을 위해서는 개발사에서 회원 고유번호를 관리해야하며, 해당 회원에 대한 사용자 토큰을 발급합니다.
 이 토큰값을 기반으로 클라이언트에서 결제요청 하시면 되겠습니다.

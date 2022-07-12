@@ -21,7 +21,7 @@ func TestGetBillingKey(t *testing.T) {
 	GetVerify(bootpay) 
 	ServerConfirm(bootpay)
 	Certificate(bootpay)
-	ShoppingStart(bootpay)
+	ShoppingStart(bootpay) 
 }
 
 func GetToken(api *Api) {
