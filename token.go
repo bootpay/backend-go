@@ -31,8 +31,8 @@ func (api *Api) GetToken() (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
-
-	result["http_status_code"] = res.StatusCode
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 
 	if result["access_token"] != nil {
 		api.token = result["access_token"].(string)

@@ -1,3 +1,8 @@
+### 2.0.8
+- 현금영수증 API 추가 
+- return 타입에 http_status 추가 
+- getToken Api 호출시 http_status_code -> http_status 로 키 변경 
+
 ### 2.0.7
 -  putShippingStart -> PutShippingStart renamed function 
 

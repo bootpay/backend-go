@@ -39,7 +39,7 @@ type BillingKeyPayload struct {
 	CardExpireYear  string         			 `json:"card_expire_year"`
 	CardExpireMonth string         			 `json:"card_expire_month"`
 	Price    		float64 	   			 `json:"price"`
-	taxFree    		float64 	   			 `json:"tax_free"`
+	TaxFree    		float64 	   			 `json:"tax_free"`
 	User            User           			 `json:"user"`
 	Extra           SubscribeExtra 			 `json:"extra"`
 	Metadata        map[string]interface{}   `json:"metadata"`
@@ -142,6 +142,9 @@ func (api *Api) GetBillingKey(payload BillingKeyPayload) (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
+
 	return result, nil
 }
 
@@ -158,6 +161,8 @@ func (api *Api) LookupBillingKey(receiptId string) (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
 
@@ -173,6 +178,8 @@ func (api *Api) DestroyBillingKey(billingKey string) (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
 
@@ -195,6 +202,8 @@ func (api *Api) RequestSubscribe(payload SubscribePayload) (APIResponse, error) 
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
 
@@ -221,6 +230,8 @@ func (api *Api) ReserveSubscribe(payload SubscribePayload) (APIResponse, error) 
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
 
@@ -236,5 +247,7 @@ func (api *Api) ReserveCancelSubscribe(reserveId string) (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }

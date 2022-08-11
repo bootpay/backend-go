@@ -35,5 +35,7 @@ func (api *Api) ServerSubmit(receiptId string) (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }

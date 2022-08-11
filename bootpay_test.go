@@ -7,21 +7,28 @@ import (
 )
 
 func TestGetBillingKey(t *testing.T) {
-	bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+	//bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+	bootpay := Api{}.New("59bfc738e13f337dbd6ca48a", "pDc0NwlkEX3aSaHTp/PPL/i8vn5E/CqRChgyEp/gHD0=", nil, "development")
+
 	GetToken(bootpay)
-	ReceiptCancel(bootpay)
-	GetReceipt(bootpay)
-	GetBillingKey(bootpay)
-	RequestSubscribe(bootpay)
-	LookupBillingKey(bootpay)
-	ReserveSubscribe(bootpay)
-	ReserveCancel(bootpay)
-	DestroyBillingKey(bootpay)
-	GetUserToken(bootpay)
-	GetVerify(bootpay) 
-	ServerConfirm(bootpay)
-	Certificate(bootpay)
-	ShoppingStart(bootpay) 
+	//ReceiptCancel(bootpay)
+	//GetReceipt(bootpay)
+	//GetBillingKey(bootpay)
+	//RequestSubscribe(bootpay)
+	//LookupBillingKey(bootpay)
+	//ReserveSubscribe(bootpay)
+	//ReserveCancel(bootpay)
+	//DestroyBillingKey(bootpay)
+	//GetUserToken(bootpay)
+	//GetVerify(bootpay)
+	//ServerConfirm(bootpay)
+	//Certificate(bootpay)
+	//ShoppingStart(bootpay)
+
+	//RequestCashReceiptByBootpay(bootpay)
+	//RequestCashReceiptCancelByBootpay(bootpay)
+	RequestCashReceipt(bootpay)
+	RequestCashReceiptCancel(bootpay)
 }
 
 func GetToken(api *Api) {
@@ -262,4 +269,80 @@ func ShoppingStart(api *Api) {
 		fmt.Println("get token error: " + err.Error())
 	}
 	fmt.Println("--------------- ShoppingStart() End ---------------")
+}
+
+
+func RequestCashReceiptByBootpay(api *Api) {
+	cashReceipt := CashReceiptData{
+		ReceiptId: "62e0f11f1fc192036b1b3c92",
+		Username: "테스트",
+		Email: "test@bootpay.co.kr",
+		Phone: "01000000000",
+		IdentityNo: "01000000000",
+		CashReceiptType: "01000000000",
+	}
+
+	fmt.Println("--------------- RequestCashReceiptByBootpay() Start ---------------")
+	res, err := api.RequestCashReceiptByBootpay(cashReceipt)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceiptByBootpay() End ---------------")
+}
+
+func RequestCashReceiptCancelByBootpay(api *Api) {
+	cancelData := CancelData{
+		ReceiptId: "62e0f11f1fc192036b1b3c92",
+		CancelUsername: "테스트",
+		CancelMessage: "테스트 관리자",
+	}
+
+	fmt.Println("--------------- RequestCashReceiptCancelByBootpay() Start ---------------")
+	fmt.Println("2135554")
+	res, err := api.RequestCashReceiptCancelByBootpay(cancelData)
+	fmt.Println("2134")
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceiptCancelByBootpay() End ---------------")
+}
+
+func RequestCashReceipt(api *Api) {
+	purchasedAt := time.Now().Format("2006-01-02T15:04:05-07:00")
+
+	cashReceipt := CashReceiptData{
+		Pg: "토스",
+		Price: 1000,
+		OrderName: "테스트",
+		CashReceiptType: "소득공제",
+		IdentityNo: "01000000000",
+		OrderId:  fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		PurchasedAt:  purchasedAt,
+	}
+
+	fmt.Println("--------------- RequestCashReceipt() Start ---------------")
+	res, err := api.RequestCashReceipt(cashReceipt)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceipt() End ---------------")
+}
+
+func RequestCashReceiptCancel(api *Api) {
+	cancelData := CancelData{
+		ReceiptId: "62f4be7f1fc192036f9f4bc6",
+		CancelUsername: "테스트",
+		CancelMessage: "테스트 관리자",
+	}
+
+	fmt.Println("--------------- RequestCashReceiptCancel() Start ---------------")
+	res, err := api.RequestCashReceiptCancel(cancelData)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceiptCancel() End ---------------")
 }

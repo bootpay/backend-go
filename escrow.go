@@ -52,6 +52,8 @@ func (api *Api) PutShippingStart(shipping Shipping) (APIResponse, error) {
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
  
