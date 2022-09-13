@@ -26,7 +26,15 @@
 6. 서버 승인 요청
 7. 본인 인증 결과 조회
 8. (에스크로 이용시) PG사로 배송정보 보내기
+9. 현금영수증 발행
 
+   9-1. 현금영수증 발행
+
+   9-2. 현금영수증 발행 취소
+
+   9-3. (별건) 현금영수증 발행
+
+   9-4. (별건) 현금영수증 발행 취소
 ## 설치하기
 
 ```curl
@@ -321,6 +329,98 @@ func ShoppingStart(api *bootpay.Api) {
 		fmt.Println("get token error: " + err.Error())
 	}
 	fmt.Println("--------------- ShoppingStart() End ---------------")
+}
+```
+
+## 9-1. 현금영수증 발행하기
+bootpay api를 통해 결제된 건에 대하여 현금영수증을 발행합니다.
+```go 
+func RequestCashReceiptByBootpay(api *Api) {
+    cashReceipt := CashReceiptData{
+        ReceiptId: "62e0f11f1fc192036b1b3c92",
+        Username: "테스트",
+        Email: "test@bootpay.co.kr",
+        Phone: "01000000000",
+        IdentityNo: "01000000000",
+        CashReceiptType: "01000000000",
+    }
+
+    fmt.Println("--------------- RequestCashReceiptByBootpay() Start ---------------")
+    res, err := api.RequestCashReceiptByBootpay(cashReceipt)
+   
+    fmt.Println(res)
+    if err != nil {
+        fmt.Println("get token error: " + err.Error())
+    }
+   fmt.Println("--------------- RequestCashReceiptByBootpay() End ---------------")
+}
+```
+
+## 9-2. 현금영수증 발행 취소
+9-1을 통해 발행한 현금영수증을 취소합니다.
+```go 
+func RequestCashReceiptCancelByBootpay(api *Api) {
+	cancelData := CancelData{
+		ReceiptId: "62e0f11f1fc192036b1b3c92",
+		CancelUsername: "테스트",
+		CancelMessage: "테스트 관리자",
+	}
+
+	fmt.Println("--------------- RequestCashReceiptCancelByBootpay() Start ---------------")
+	fmt.Println("2135554")
+	res, err := api.RequestCashReceiptCancelByBootpay(cancelData)
+	fmt.Println("2134")
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceiptCancelByBootpay() End ---------------")
+}
+```
+
+## 9-3. (별건) 현금영수증 발행
+부트페이 결제와 상관없이 금액, 상품명, 현금영수증 발행정보 등을 보내 현금영수증을 발행하는 API 입니다
+```go 
+func RequestCashReceipt(api *Api) {
+	purchasedAt := time.Now().Format("2006-01-02T15:04:05-07:00")
+
+	cashReceipt := CashReceiptData{
+		Pg: "토스",
+		Price: 1000,
+		OrderName: "테스트",
+		CashReceiptType: "소득공제",
+		IdentityNo: "01000000000",
+		OrderId:  fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		PurchasedAt:  purchasedAt,
+	}
+
+	fmt.Println("--------------- RequestCashReceipt() Start ---------------")
+	res, err := api.RequestCashReceipt(cashReceipt)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceipt() End ---------------")
+}
+```
+
+## 9-4. (별건) 현금영수증 발행 취소
+9-3을 통해 발행한 현금영수증을 취소합니다.
+```go 
+func RequestCashReceiptCancel(api *Api) {
+	cancelData := CancelData{
+		ReceiptId: "62f4be7f1fc192036f9f4bc6",
+		CancelUsername: "테스트",
+		CancelMessage: "테스트 관리자",
+	}
+
+	fmt.Println("--------------- RequestCashReceiptCancel() Start ---------------")
+	res, err := api.RequestCashReceiptCancel(cancelData)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestCashReceiptCancel() End ---------------")
 }
 ```
 
