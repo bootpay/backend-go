@@ -1,3 +1,6 @@
+### 2.0.9
+- 본인인증 REST API 추가 
+
 ### 2.0.8
 - 현금영수증 API 추가 
 - return 타입에 http_status 추가 

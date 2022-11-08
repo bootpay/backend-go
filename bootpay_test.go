@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-func TestGetBillingKey(t *testing.T) {
-	//bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
-	bootpay := Api{}.New("59bfc738e13f337dbd6ca48a", "pDc0NwlkEX3aSaHTp/PPL/i8vn5E/CqRChgyEp/gHD0=", nil, "development")
+func TestFunctions(t *testing.T) {
+	bootpay := Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+	//bootpay := Api{}.New("59bfc738e13f337dbd6ca48a", "pDc0NwlkEX3aSaHTp/PPL/i8vn5E/CqRChgyEp/gHD0=", nil, "development")
 
 	GetToken(bootpay)
 	//ReceiptCancel(bootpay)
@@ -24,11 +24,15 @@ func TestGetBillingKey(t *testing.T) {
 	//ServerConfirm(bootpay)
 	//Certificate(bootpay)
 	//ShoppingStart(bootpay)
-
+	//
 	//RequestCashReceiptByBootpay(bootpay)
 	//RequestCashReceiptCancelByBootpay(bootpay)
-	RequestCashReceipt(bootpay)
-	RequestCashReceiptCancel(bootpay)
+	//RequestCashReceipt(bootpay)
+	//RequestCashReceiptCancel(bootpay)
+
+	RequestAuthentication(bootpay)
+	//ConfirmAuthentication(bootpay)
+	//RealarmAuthentication(bootpay)
 }
 
 func GetToken(api *Api) {
@@ -345,4 +349,57 @@ func RequestCashReceiptCancel(api *Api) {
 		fmt.Println("get token error: " + err.Error())
 	}
 	fmt.Println("--------------- RequestCashReceiptCancel() End ---------------")
+}
+
+
+func RequestAuthentication(api *Api) {
+	authData := Authentication{
+		Pg: "다날",
+		Method: "본인인증",
+		Username: "사용자명",
+		IdentityNo: "0000000", //생년월일 + 주민번호 뒷 1자리
+		Carrier: "SKT",
+		Phone:  "01010002000", //사용자 전화번호
+		SiteUrl: "https://www.bootpay.co.kr",
+		OrderName: "회원 본인인증",
+		AuthenticationId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+	}
+
+	fmt.Println("--------------- RequestAuthentication() Start ---------------")
+	res, err := api.RequestAuthentication(authData)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RequestAuthentication() End ---------------")
+}
+
+func ConfirmAuthentication(api *Api) {
+	authParams := AuthenticationParams{
+		ReceiptId: "636a020d1fc1920373e6d8ff",
+		Otp: "613026",
+	}
+
+	fmt.Println("--------------- ConfirmAuthentication() Start ---------------")
+	res, err := api.ConfirmAuthentication(authParams)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- ConfirmAuthentication() End ---------------")
+}
+
+
+func RealarmAuthentication(api *Api) {
+	authParams := AuthenticationParams{
+		ReceiptId: "636a020d1fc1920373e6d8ff",
+	}
+
+	fmt.Println("--------------- RealarmAuthentication() Start ---------------")
+	res, err := api.RealarmAuthentication(authParams)
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("get token error: " + err.Error())
+	}
+	fmt.Println("--------------- RealarmAuthentication() End ---------------")
 }
