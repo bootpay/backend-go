@@ -15,7 +15,7 @@ const (
 	PRODUCTION  string = "https://api.bootpay.co.kr/v2"
 
 	API_VERSION string = "5.0.0"
-	SDK_VERSION string = "2.1.0"
+	SDK_VERSION string = "2.1.1"
 )
 const defaultHTTPTimeout = 10 * time.Second
 
