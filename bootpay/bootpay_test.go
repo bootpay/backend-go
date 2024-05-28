@@ -1,6 +1,6 @@
 package bootpay
 
-import (
+import ( 
 	"fmt"
 	"testing"
 	"time"
@@ -13,9 +13,10 @@ func TestFunctions(t *testing.T) {
 	GetToken(bootpay)
 	//ReceiptCancel(bootpay)
 	//GetReceipt(bootpay)
-	//GetBillingKey(bootpay)
+	// GetBillingKey(bootpay)
 	//RequestSubscribe(bootpay)
-	LookupBillingKey(bootpay)
+	// LookupBillingKey(bootpay)
+	// LookupBillingKeyByKey(bootpay)
 // 	LookupSubscribeBillingKey(bootpay)
 	//ReserveSubscribe(bootpay)
 	//ReserveCancel(bootpay)
@@ -34,6 +35,8 @@ func TestFunctions(t *testing.T) {
 // 	RequestAuthentication(bootpay)
 	//ConfirmAuthentication(bootpay)
 	//RealarmAuthentication(bootpay)
+	requestSubscribeAutomaticTransferBillingKey(bootpay)
+	// publishAutomaticTransferBillingKey(bootpay)
 }
 
 func GetToken(api *Api) {
@@ -48,8 +51,9 @@ func GetToken(api *Api) {
 
 func GetBillingKey(api *Api) {
 	fmt.Println("--------------- GetBillingKey() Start ---------------")
+	subscriptId := fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond)))
 	payload := BillingKeyPayload{
-		SubscriptionId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		SubscriptionId: subscriptId,
 		Pg: "nicepay",
 		OrderName: "정기결제 테스트 아이템",
 		CardNo: "5570********1074",
@@ -91,8 +95,6 @@ func GetVerify(api *Api) {
 	fmt.Println(verify)
 	fmt.Println("--------------- GetVerify() End ---------------")
 }
-
-//lookupBillingKey
 
 func LookupBillingKey(api *Api) {
 	receiptId := "62afccb3cf9f6d001b7d101d"
@@ -419,17 +421,21 @@ func RealarmAuthentication(api *Api) {
 
 func requestSubscribeAutomaticTransferBillingKey(api *Api) {
     fmt.Println("--------------- requestSubscribeAutomaticTransferBillingKey() Start ---------------")
+	
+	subscriptId := fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond)))
+
 	payload := BillingKeyPayload{
-		SubscriptionId: fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
+		SubscriptionId: subscriptId,
 		Pg: "nicepay",
 		OrderName: "정기결제 테스트 아이템",
+		Username: "홍길동",
 		AuthType: "ARS",
 		BankName: "국민",
-		BankAccount: "67560101092472",
-		IdentityNo: "861014",
+		BankAccount: "6756123412342472",
+		IdentityNo: "901014",
 		CashReceiptType: "소득공제",
-		CashReceiptIdentityNo: "01040334678",
-		Phone: "01040334678"
+		CashReceiptIdentityNo: "01012341234",
+		Phone: "01012341234",
 	}
 	res, err := api.requestSubscribeAutomaticTransferBillingKey(payload)
 
@@ -442,8 +448,8 @@ func requestSubscribeAutomaticTransferBillingKey(api *Api) {
 
 func publishAutomaticTransferBillingKey(api *Api) {
     fmt.Println("--------------- publishAutomaticTransferBillingKey() Start ---------------")
-	 
-	res, err := api.publishAutomaticTransferBillingKey("665534d0707116122ea322d5")
+
+	res, err := api.publishAutomaticTransferBillingKey("6655069ca691573f1bb9c28a")
 
 	fmt.Println(res)
 	if err != nil {
