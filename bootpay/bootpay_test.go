@@ -19,6 +19,7 @@ func TestFunctions(t *testing.T) {
 	// LookupBillingKeyByKey(bootpay)
 // 	LookupSubscribeBillingKey(bootpay)
 	//ReserveSubscribe(bootpay)
+	ReserveSubscribeLookup(bootpay)
 	//ReserveCancel(bootpay)
 	//DestroyBillingKey(bootpay)
 	//GetUserToken(bootpay)
@@ -35,7 +36,7 @@ func TestFunctions(t *testing.T) {
 // 	RequestAuthentication(bootpay)
 	//ConfirmAuthentication(bootpay)
 	//RealarmAuthentication(bootpay)
-	requestSubscribeAutomaticTransferBillingKey(bootpay)
+	// requestSubscribeAutomaticTransferBillingKey(bootpay)
 	// publishAutomaticTransferBillingKey(bootpay)
 }
 
@@ -132,9 +133,9 @@ func ReceiptCancel(api *Api) {
 	//name := "관리자"
 	//reason := "테스트 결제 취소를 테스트"
 	fmt.Println("--------------- ReceiptCancel() Start ---------------")
-	cancel, err := api.ReceiptCancel(payload)
+	res, err := api.ReceiptCancel(payload)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -150,9 +151,9 @@ func RequestSubscribe(api *Api) {
 	}
 
 	fmt.Println("--------------- requestSubscribe() Start ---------------")
-	cancel, err := api.RequestSubscribe(payload)
+	res, err := api.RequestSubscribe(payload)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -170,9 +171,9 @@ func ReserveSubscribe(api *Api) {
 	}
 
 	fmt.Println("--------------- ReserveSubscribe() Start ---------------")
-	cancel, err := api.ReserveSubscribe(payload)
+	res, err := api.ReserveSubscribe(payload)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -180,12 +181,27 @@ func ReserveSubscribe(api *Api) {
 }
 
 
+func ReserveSubscribeLookup(api *Api) {
+	
+	reserveId := "6490149ca575b40024f0b70d"
+
+	fmt.Println("--------------- ReserveSubscribeLookup() Start ---------------")
+	res, err := api.ReserveSubscribeLookup(reserveId)
+
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("error: " + err.Error())
+	}
+	fmt.Println("--------------- ReserveSubscribeLookup() End ---------------")
+}
+
+
 func ReserveCancel(api *Api) {
 	reserveId := "62aff2a0cf9f6d001a7d10c4"
 	fmt.Println("--------------- ReserveCancel() Start ---------------")
-	cancel, err := api.ReserveCancelSubscribe(reserveId)
+	res, err := api.ReserveCancelSubscribe(reserveId)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -235,9 +251,9 @@ func GetUserToken(api *Api) {
 	}
 
 	fmt.Println("--------------- GetUserToken() Start ---------------")
-	cancel, err := api.GetUserToken(payload)
+	res, err := api.GetUserToken(payload)
 
-	fmt.Println(cancel)
+	fmt.Println(res)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}

@@ -246,19 +246,28 @@ func (api *Api) RequestSubscribe(payload SubscribePayload) (APIResponse, error) 
 }
 
 func (api *Api) ReserveSubscribe(payload SubscribePayload) (APIResponse, error) {
-	//if payload.ApplicationId == "" {
-	//	payload.ApplicationId = api.applicationId
-	//}
-	//if payload.PrivateKey == "" {
-	//	payload.PrivateKey = api.privateKey
-	//}
-	//if payload.SchedulerType == "" {
-	//	payload.SchedulerType = "oneshot"
-	//}
-
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
+	
 	req, err := api.NewRequest(http.MethodPost, "/subscribe/payment/reserve", body)
+	if err != nil {
+		errors.New("bootpay: ReserveSubscribe error: " + err.Error())
+		return APIResponse{}, err
+	} 
+	res, err := api.client.Do(req)
+	defer res.Body.Close()
+
+	result := APIResponse{}
+	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
+	return result, nil
+}
+
+
+func (api *Api) ReserveSubscribeLookup(reserveId string) (APIResponse, error) {	 
+
+	req, err := api.NewRequest(http.MethodGet, "/subscribe/payment/reserve/" + reserveId, nil)
 	if err != nil {
 		errors.New("bootpay: ReserveSubscribe error: " + err.Error())
 		return APIResponse{}, err
