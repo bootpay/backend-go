@@ -10,6 +10,7 @@ import (
 
 type Shipping struct {
 	ReceiptId string `json:"receipt_id"`
+	RedirectUrl string `json:"redirect_url"`
 	DeliveryCorp string `json:"delivery_corp"`
 	TrackingNumber string `json:"tracking_number"`
 	//Data VerifyData `json:"data"`
