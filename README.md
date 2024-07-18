@@ -490,7 +490,7 @@ func RequestCashReceiptCancel(api *Api) {
 
 ## Documentation
 
-[부트페이 개발매뉴얼](https://docs.bootpay.co.kr/next/)을 참조해주세요
+[부트페이 개발매뉴얼](https://developer.bootpay.co.kr/)을 참조해주세요
 
 ## 기술문의
 
