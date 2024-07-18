@@ -9,12 +9,20 @@
 4. 카드/계좌 자동결제 (빌링결제)
 
    4-1. 카드 빌링키 발급
+
    4-2. 계좌 빌링키 발급
+
    4-3. 결제 요청하기
-   4-4. 결제 예약하기 
-   4-5. 예약 취소하기 
-   4-6. 빌링키 삭제하기 
-   4-7. 빌링키 조회하기 
+
+   4-4. 결제 예약하기
+
+   4-5. 예약 조회하기 
+
+   4-6. 예약 취소하기
+
+   4-7. 빌링키 삭제하기
+
+   4-8. 빌링키 조회하기
 
 5. (ㅇㅇ페이) 회원 토큰 발급요청 
 6. 서버 승인 요청
@@ -29,6 +37,7 @@
    9-3. (별건) 현금영수증 발행
 
    9-4. (별건) 현금영수증 발행 취소
+
 ## 설치하기
 
 ```curl
@@ -171,6 +180,7 @@ func requestSubscribeAutomaticTransferBillingKey(api *Api) {
 	fmt.Println("--------------- requestSubscribeAutomaticTransferBillingKey() End ---------------")
 }
 ```
+
 이후 빌링키 발급 요청시 응답받은 receipt_id로, 출금 동의 확인을 요청합니다. 
 ```go  
 func publishAutomaticTransferBillingKey(api *Api) {
@@ -233,7 +243,26 @@ func ReserveSubscribe(api *bootpay.Api) {
 	fmt.Println("--------------- ReserveSubscribe() End ---------------")
 }
 ```
-## 4-5. 예약 취소하기
+
+## 4-5. 예약 조회하기 
+예약된 결제건을 조회합니다.
+```go
+func ReserveSubscribeLookup(api *Api) {
+	
+	reserveId := "6490149ca575b40024f0b70d"
+
+	fmt.Println("--------------- ReserveSubscribeLookup() Start ---------------")
+	res, err := api.ReserveSubscribeLookup(reserveId)
+
+	fmt.Println(res)
+	if err != nil {
+		fmt.Println("error: " + err.Error())
+	}
+	fmt.Println("--------------- ReserveSubscribeLookup() End ---------------")
+}  
+```
+
+## 4-6. 예약 취소하기
 빌링키로 예약된 결제건을 취소합니다.
 ```go  
 func ReserveCancel(api *bootpay.Api) {
@@ -248,7 +277,7 @@ func ReserveCancel(api *bootpay.Api) {
 	fmt.Println("--------------- ReserveCancel() End ---------------")
 }
 ```
-## 4-6. 빌링키 삭제하기 
+## 4-7. 빌링키 삭제하기 
 발급된 빌링키로 더 이상 사용되지 않도록, 삭제 요청합니다.
 ```go  
 func DestroyBillingKey(api *bootpay.Api) {
@@ -265,7 +294,7 @@ func DestroyBillingKey(api *bootpay.Api) {
 ```
 
 
-## 4-7. 빌링키 조회하기 
+## 4-8. 빌링키 조회하기 
 클라이언트에서 빌링키 발급시, 보안상 클라이언트 이벤트에 빌링키를 전달해주지 않습니다. 그러므로 이 API를 통해 조회해야 합니다.
 다음은 빌링키 발급 요청했던 receiptId 로 빌링키를 조회합니다. 
 ```go  
