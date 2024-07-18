@@ -235,7 +235,7 @@ func ReserveSubscribe(api *bootpay.Api) {
 ```
 
 ## 4-5. 예약 조회하기 
-예약된 결제건을 조회합니다.
+예약시 응답받은 reserveId로 예약된 건을 조회합니다.
 ```go
 func ReserveSubscribeLookup(api *Api) {
 	
@@ -253,7 +253,7 @@ func ReserveSubscribeLookup(api *Api) {
 ```
 
 ## 4-6. 예약 취소하기
-빌링키로 예약된 결제건을 취소합니다.
+예약시 응답받은 reserveId로 예약된 건을 취소합니다.
 ```go  
 func ReserveCancel(api *bootpay.Api) {
 	reserveId := "62aff2a0cf9f6d001a7d10c4"
@@ -268,7 +268,7 @@ func ReserveCancel(api *bootpay.Api) {
 }
 ```
 ## 4-7. 빌링키 삭제하기 
-발급된 빌링키로 더 이상 사용되지 않도록, 삭제 요청합니다.
+발급된 빌링키를 삭제합니다. 삭제하더라도 예약된 결제건은 취소되지 않습니다. 예약된 결제건 취소를 원하시면 예약 취소하기를 요청하셔야 합니다.
 ```go  
 func DestroyBillingKey(api *bootpay.Api) {
 	billingKey := "62afc52dcf9f6d001d7d1035"
