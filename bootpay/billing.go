@@ -83,21 +83,20 @@ type Item struct {
 	EndDate          string  `json:"end_date"`
 }
 type SubscribePayload struct {
-	BillingKey          string         `json:"billing_key"`
-	OrderName           string         `json:"order_name"`
-	OrderId             string         `json:"order_id"`
-	Price               float64        `json:"price"`
-	TaxFree             float64        `json:"tax_free"`
-
-	CardQuota           string         `json:"card_quota"`
-	CardInterest        string         `json:"card_interest"`
-	User            	User           `json:"user"`
-	FeedbackUrl         string         `json:"feedback_url"` // webhook 통지시 받으실 url 주소 (localhost 사용 불가)
-	ContentType 		string         `json:"content_type"` // webhook 통지시 받으실 데이터 타입 (application/json 또는 application/x-www-form-urlencoded 선택)
-	Extra               SubscribeExtra `json:"extra"`
-	//SchedulerType       string         `json:"scheduler_type"`
-	ReserveExecuteAt    string         `json:"reserve_execute_at"` //ex. "2022-04-21T17:05:36+09:00"
-	Metadata            map[string]interface{}   `json:"metadata"`
+	BillingKey       string                 `json:"billing_key"`
+	OrderName        string                 `json:"order_name"`
+	OrderId          string                 `json:"order_id"`
+	Price            float64                `json:"price"`
+	TaxFree          float64                `json:"tax_free,omitempty"`
+	CardQuota        string                 `json:"card_quota,omitempty"`
+	CardInterest     string                 `json:"card_interest,omitempty"`
+	User             User                   `json:"user,omitempty"`
+	Items            []Item                 `json:"items,omitempty"`
+	FeedbackUrl      string                 `json:"feedback_url,omitempty"`  // webhook 통지시 받으실 url 주소 (localhost 사용 불가)
+	ContentType      string                 `json:"content_type,omitempty"`  // webhook 통지시 받으실 데이터 타입 (application/json 또는 application/x-www-form-urlencoded 선택)
+	Extra            SubscribeExtra         `json:"extra,omitempty"`
+	ReserveExecuteAt string                 `json:"reserve_execute_at,omitempty"` //ex. "2022-04-21T17:05:36+09:00"
+	Metadata         map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type RequestPayload struct {
@@ -299,7 +298,7 @@ func (api *Api) ReserveCancelSubscribe(reserveId string) (APIResponse, error) {
 	return result, nil
 }
 
-func (api *Api) requestSubscribeAutomaticTransferBillingKey(payload BillingKeyPayload) (APIResponse, error) {
+func (api *Api) RequestSubscribeAutomaticTransferBillingKey(payload BillingKeyPayload) (APIResponse, error) {
     postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
 
@@ -319,7 +318,7 @@ func (api *Api) requestSubscribeAutomaticTransferBillingKey(payload BillingKeyPa
 	return result, nil
 }
 
-func (api *Api) publishAutomaticTransferBillingKey(receiptId string) (APIResponse, error) {
+func (api *Api) PublishAutomaticTransferBillingKey(receiptId string) (APIResponse, error) {
     payload := RequestPayload{
 		ReceiptID: receiptId,
 	}

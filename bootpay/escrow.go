@@ -9,15 +9,14 @@ import (
 
 
 type Shipping struct {
-	ReceiptId string `json:"receipt_id"`
-	RedirectUrl string `json:"redirect_url"`
-	DeliveryCorp string `json:"delivery_corp"`
-	TrackingNumber string `json:"tracking_number"`
-	//Data VerifyData `json:"data"`
-	ShippingPrepayment bool `json:"shipping_prepayment"`
-	ShippingDay bool `json:"shipping_day"`
-	User ShippingUser `json:"user"`
-	Company ShippingCompany `json:"company"`
+	ReceiptId          string          `json:"receipt_id"`
+	ReceiptUrl         string          `json:"receipt_url"`
+	DeliveryCorp       string          `json:"delivery_corp"`
+	TrackingNumber     string          `json:"tracking_number"`
+	ShippingPrepayment bool            `json:"shipping_prepayment,omitempty"`
+	ShippingDay        int             `json:"shipping_day,omitempty"`
+	User               ShippingUser    `json:"user,omitempty"`
+	Company            ShippingCompany `json:"company,omitempty"`
 }
 
 

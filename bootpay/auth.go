@@ -9,17 +9,20 @@ import (
 
 
 type Authentication struct {
-	Pg             		      string         			 `json:"pg"`
-	Method         			  string         			 `json:"method"`
-	Username      			  string         			 `json:"username"`
-	IdentityNo     			  string         			 `json:"identity_no"`
-
-	Carrier        			  string         			 `json:"carrier"`
-	Phone          			  string         			 `json:"phone"`
-
-	SiteUrl        			  string         		     `json:"site_url"`
-	OrderName      			  string         			 `json:"order_name"`
-	AuthenticationId          string         			 `json:"authentication_id"`
+	Pg               string                 `json:"pg"`
+	Method           string                 `json:"method"`
+	Username         string                 `json:"username"`
+	IdentityNo       string                 `json:"identity_no"`
+	Carrier          string                 `json:"carrier"`
+	Phone            string                 `json:"phone"`
+	SiteUrl          string                 `json:"site_url,omitempty"`
+	OrderName        string                 `json:"order_name"`
+	AuthenticationId string                 `json:"authentication_id"`
+	ClientIp         string                 `json:"client_ip,omitempty"`
+	AuthenticateType string                 `json:"authenticate_type,omitempty"` // "sms" or "pass"
+	Extra            map[string]interface{} `json:"extra,omitempty"`
+	User             User                   `json:"user,omitempty"`
+	Metadata         map[string]interface{} `json:"metadata,omitempty"`
 }
 
 
