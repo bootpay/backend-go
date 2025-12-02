@@ -15,7 +15,7 @@ const (
 	PRODUCTION  string = "https://api.bootpay.co.kr/v2"
 
 	API_VERSION string = "5.0.0"
-	SDK_VERSION string = "2.1.5"
+	SDK_VERSION string = "2.2.0"
 )
 const defaultHTTPTimeout = 10 * time.Second
 
@@ -61,7 +61,8 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 	return req, nil
 }
 
-func (api Api) New(applicationId string, privateKey string, client *http.Client, mode string) *Api {
+// NewAPI creates a new PG API instance (recommended)
+func NewAPI(applicationId string, privateKey string, client *http.Client, mode string) *Api {
 	if client == nil {
 		client = &http.Client{
 			Timeout: defaultHTTPTimeout,
@@ -82,6 +83,11 @@ func (api Api) New(applicationId string, privateKey string, client *http.Client,
 		applicationId: applicationId,
 		privateKey:    privateKey,
 		baseUrl:       baseUrl,
-		client:    	   client,
+		client:        client,
 	}
+}
+
+// New creates a new PG API instance (deprecated: use NewAPI instead)
+func (api Api) New(applicationId string, privateKey string, client *http.Client, mode string) *Api {
+	return NewAPI(applicationId, privateKey, client, mode)
 }

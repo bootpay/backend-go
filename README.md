@@ -34,9 +34,6 @@
     - [9-2. 현금영수증 발행 취소](#9-2-현금영수증-발행-취소)
     - [9-3. 별건 현금영수증 발행](#9-3-별건-현금영수증-발행)
     - [9-4. 별건 현금영수증 발행 취소](#9-4-별건-현금영수증-발행-취소)
-  - [10. 지갑 결제](#10-지갑-결제)
-    - [10-1. 지갑 목록 조회](#10-1-지갑-목록-조회)
-    - [10-2. 지갑 결제 요청](#10-2-지갑-결제-요청)
 - [Example 프로젝트](#example-프로젝트)
 - [Documentation](#documentation)
 - [기술문의](#기술문의)
@@ -652,56 +649,6 @@ func RequestCashReceiptCancel(api *bootpay.Api) {
 
 ---
 
-### 10. 지갑 결제
-
-#### 10-1. 지갑 목록 조회
-
-사용자에게 등록된 지갑 목록을 조회합니다.
-
-```go
-func GetUserWallets(api *bootpay.Api) {
-    userId := "bootpay"
-    sandbox := true
-
-    result, err := api.GetUserWallets(userId, sandbox)
-    if err != nil {
-        fmt.Println("error:", err.Error())
-        return
-    }
-    fmt.Println(result)
-}
-```
-
-#### 10-2. 지갑 결제 요청
-
-등록된 지갑으로 결제를 요청합니다.
-
-```go
-func RequestWalletPayment(api *bootpay.Api) {
-    payload := bootpay.WalletRequest{
-        UserId:    "bootpay",
-        OrderName: "테스트 결제",
-        OrderId:   fmt.Sprintf("%d", time.Now().UnixMilli()),
-        Price:     100,
-        Sandbox:   true,
-        User: bootpay.User{
-            Phone:    "01012345678",
-            Username: "홍길동",
-            Email:    "test@bootpay.co.kr",
-        },
-    }
-
-    result, err := api.RequestWalletPayment(payload)
-    if err != nil {
-        fmt.Println("error:", err.Error())
-        return
-    }
-    fmt.Println(result)
-}
-```
-
----
-
 ## 응답 타입
 
 Go SDK는 상세 응답 타입을 제공합니다. `types.go` 파일에서 확인할 수 있습니다:
@@ -711,7 +658,6 @@ Go SDK는 상세 응답 타입을 제공합니다. `types.go` 파일에서 확�
 - `CertificateResponse` - 본인인증 응답
 - `SubscriptionBillingResponse` - 빌링키 응답
 - `UserTokenResponse` - 사용자 토큰 응답
-- `WalletPaymentResponse` - 지갑 결제 응답
 - 등...
 
 ---

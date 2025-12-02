@@ -6,9 +6,25 @@ import (
 	"time"
 )
 
-// 테스트용 API 인스턴스 생성
+// 테스트용 키 (PG API)
+const (
+	// Production 환경
+	productionApplicationId = "5b8f6a4d396fa665fdc2b5ea"
+	productionPrivateKey    = "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw="
+
+	// Development 환경
+	devApplicationId = "59bfc738e13f337dbd6ca48a"
+	devPrivateKey    = "pDc0NwlkEX3aSaHTp/PPL/i8vn5E/CqRChgyEp/gHD0="
+)
+
+// 테스트용 API 인스턴스 생성 (Development - 기본 사용)
 func getTestApi() *Api {
-	return Api{}.New("5b8f6a4d396fa665fdc2b5ea", "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", nil, "")
+	return Api{}.New(devApplicationId, devPrivateKey, nil, "development")
+}
+
+// 테스트용 API 인스턴스 생성 (Production)
+func getProductionTestApi() *Api {
+	return Api{}.New(productionApplicationId, productionPrivateKey, nil, "")
 }
 
 // =====================================================
@@ -22,7 +38,6 @@ func TestFunctions(t *testing.T) {
 	GetToken(bootpay)
 
 	// 추가 테스트 (읽기 전용 API)
-	GetUserWallets(bootpay)
 	RequestUserToken(bootpay)
 
 	// 아래 테스트들은 필요에 따라 주석 해제하여 실행
@@ -50,7 +65,6 @@ func TestFunctions(t *testing.T) {
 	// RealarmAuthentication(bootpay)
 	// RequestSubscribeAutomaticTransferBillingKey(bootpay)
 	// PublishAutomaticTransferBillingKey(bootpay)
-	// RequestWalletPayment(bootpay)
 }
 
 // =====================================================
@@ -76,9 +90,9 @@ func GetBillingKey(api *Api) {
 	subscriptId := fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond)))
 	payload := BillingKeyPayload{
 		SubscriptionId:  subscriptId,
-		Pg:              "nicepay",
+		Pg:              "라이트페이",
 		OrderName:       "정기결제 테스트 아이템",
-		CardNo:          "5570********1074",
+		CardNo:          "5570**********1074",
 		CardPw:          "**",
 		CardExpireYear:  "**",
 		CardExpireMonth: "**",
@@ -94,7 +108,7 @@ func GetBillingKey(api *Api) {
 }
 
 func LookupBillingKey(api *Api) {
-	receiptId := "62afccb3cf9f6d001b7d101d"
+	receiptId := "6317e646d01c7e0024170b47"
 	fmt.Println("--------------- LookupBillingKey() Start ---------------")
 	verify, err := api.LookupBillingKey(receiptId)
 	if err != nil {
@@ -118,7 +132,7 @@ func LookupBillingKeyByKey(api *Api) {
 }
 
 func DestroyBillingKey(api *Api) {
-	billingKey := "62afc52dcf9f6d001d7d1035"
+	billingKey := "628b2644d01c7e00209b6092"
 	fmt.Println("--------------- DestroyBillingKey() Start ---------------")
 	res, err := api.DestroyBillingKey(billingKey)
 
@@ -135,8 +149,8 @@ func DestroyBillingKey(api *Api) {
 
 func RequestSubscribe(api *Api) {
 	payload := SubscribePayload{
-		BillingKey: "62afc52dcf9f6d001d7d1035",
-		OrderName:  "정기결제 테스트",
+		BillingKey: "692e6f9abe3f0224ea4ce8e1",
+		OrderName:  "아이템01",
 		OrderId:    fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		Price:      1000,
 		Items: []Item{
@@ -160,10 +174,10 @@ func RequestSubscribe(api *Api) {
 }
 
 func ReserveSubscribe(api *Api) {
-	s10 := time.Now().Add(time.Second * 100).Format("2006-01-02T15:04:05-07:00")
+	s10 := time.Now().Add(time.Second * 10).Format("2006-01-02T15:04:05-07:00")
 	payload := SubscribePayload{
-		BillingKey:       "62aff193cf9f6d001a7d10be",
-		OrderName:        "정기결제 테스트",
+		BillingKey:       "692e6f9abe3f0224ea4ce8e1",
+		OrderName:        "아이템01",
 		OrderId:          fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		ReserveExecuteAt: s10,
 		Price:            1000,
@@ -193,7 +207,7 @@ func ReserveSubscribeLookup(api *Api) {
 }
 
 func ReserveCancel(api *Api) {
-	reserveId := "62aff2a0cf9f6d001a7d10c4"
+	reserveId := "692e701288acd62032ef1645"
 	fmt.Println("--------------- ReserveCancel() Start ---------------")
 	res, err := api.ReserveCancelSubscribe(reserveId)
 
@@ -209,7 +223,7 @@ func ReserveCancel(api *Api) {
 // =====================================================
 
 func GetReceipt(api *Api) {
-	receiptId := "62afc194e38c300021b345d4"
+	receiptId := "62b12f4b6262500007629fec"
 	fmt.Println("--------------- GetReceipt() Start ---------------")
 	verify, err := api.GetReceipt(receiptId)
 	if err != nil {
@@ -221,7 +235,7 @@ func GetReceipt(api *Api) {
 }
 
 func GetVerify(api *Api) {
-	receiptId := "62afc3c5cf9f6d001b7d101a"
+	receiptId := "62b12f4b6262500007629fec"
 	fmt.Println("--------------- GetVerify() Start ---------------")
 	verify, err := api.GetReceipt(receiptId)
 	if err != nil {
@@ -234,10 +248,10 @@ func GetVerify(api *Api) {
 
 func ReceiptCancel(api *Api) {
 	payload := CancelData{
-		ReceiptId:      "62afc3c5cf9f6d001b7d101a",
+		ReceiptId:      "664ae6621a10a75af2b4b085",
 		CancelId:       fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
-		CancelUsername: "관리자",
-		CancelMessage:  "테스트 결제 취소를 테스트",
+		CancelUsername: "관리자3",
+		CancelMessage:  "테스트 결제3",
 	}
 	fmt.Println("--------------- ReceiptCancel() Start ---------------")
 	res, err := api.ReceiptCancel(payload)
@@ -250,7 +264,7 @@ func ReceiptCancel(api *Api) {
 }
 
 func ServerConfirm(api *Api) {
-	receiptId := "62afda41cf9f6d001f7d105f"
+	receiptId := "62876963d01c7e00209b6028"
 	fmt.Println("--------------- ServerConfirm() Start ---------------")
 	res, err := api.ServerConfirm(receiptId)
 
@@ -262,7 +276,7 @@ func ServerConfirm(api *Api) {
 }
 
 func Certificate(api *Api) {
-	receiptId := "6285ffa6cf9f6d0022c4346b"
+	receiptId := "628ae7ffd01c7e001e9b6066"
 	fmt.Println("--------------- Certificate() Start ---------------")
 	res, err := api.Certificate(receiptId)
 
@@ -279,7 +293,7 @@ func Certificate(api *Api) {
 
 func GetUserToken(api *Api) {
 	payload := EasyUserTokenPayload{
-		UserId: "user_1234",
+		UserId: "1234",
 		Email:  "test1234@gmail.com",
 		Name:   "홍길동",
 		Gender: 0,
@@ -299,7 +313,7 @@ func GetUserToken(api *Api) {
 
 func RequestUserToken(api *Api) {
 	payload := UserTokenRequest{
-		UserId: "gosomi1",
+		UserId: "1234",
 		Phone:  "01012345678",
 	}
 
@@ -320,7 +334,6 @@ func RequestUserToken(api *Api) {
 func ShippingStart(api *Api) {
 	shipping := Shipping{
 		ReceiptId:      "628ae7ffd01c7e001e9b6066",
-		ReceiptUrl:     "https://example.com/receipt",
 		TrackingNumber: "123456",
 		DeliveryCorp:   "CJ대한통운",
 		User: ShippingUser{
@@ -366,8 +379,8 @@ func RequestCashReceiptByBootpay(api *Api) {
 func RequestCashReceiptCancelByBootpay(api *Api) {
 	cancelData := CancelData{
 		ReceiptId:      "62e0f11f1fc192036b1b3c92",
-		CancelUsername: "테스트",
-		CancelMessage:  "테스트 관리자",
+		CancelUsername: "테스트 관리자",
+		CancelMessage:  "테스트 결제",
 	}
 
 	fmt.Println("--------------- RequestCashReceiptCancelByBootpay() Start ---------------")
@@ -390,7 +403,6 @@ func RequestCashReceipt(api *Api) {
 		IdentityNo:      "01000000000",
 		OrderId:         fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		PurchasedAt:     purchasedAt,
-		Currency:        "KRW",
 	}
 
 	fmt.Println("--------------- RequestCashReceipt() Start ---------------")
@@ -404,9 +416,9 @@ func RequestCashReceipt(api *Api) {
 
 func RequestCashReceiptCancel(api *Api) {
 	cancelData := CancelData{
-		ReceiptId:      "62f4be7f1fc192036f9f4bc6",
-		CancelUsername: "테스트",
-		CancelMessage:  "테스트 관리자",
+		ReceiptId:      "62f48ae41fc192036f9f4b54",
+		CancelUsername: "테스트 관리자",
+		CancelMessage:  "테스트 결제",
 	}
 
 	fmt.Println("--------------- RequestCashReceiptCancel() Start ---------------")
@@ -448,8 +460,8 @@ func RequestAuthentication(api *Api) {
 
 func ConfirmAuthentication(api *Api) {
 	authParams := AuthenticationParams{
-		ReceiptId: "636a020d1fc1920373e6d8ff",
-		Otp:       "613026",
+		ReceiptId: "636a0bc4d01c7e00331cd25e",
+		Otp:       "556659",
 	}
 
 	fmt.Println("--------------- ConfirmAuthentication() Start ---------------")
@@ -463,7 +475,7 @@ func ConfirmAuthentication(api *Api) {
 
 func RealarmAuthentication(api *Api) {
 	authParams := AuthenticationParams{
-		ReceiptId: "636a020d1fc1920373e6d8ff",
+		ReceiptId: "6369dc33d01c7e00271cccad",
 	}
 
 	fmt.Println("--------------- RealarmAuthentication() Start ---------------")
@@ -486,12 +498,12 @@ func RequestSubscribeAutomaticTransferBillingKey(api *Api) {
 
 	payload := BillingKeyPayload{
 		SubscriptionId:        subscriptId,
-		Pg:                    "nicepay",
-		OrderName:             "정기결제 테스트 아이템",
+		Pg:                    "나이스페이",
+		OrderName:             "테스트 결제",
 		Username:              "홍길동",
 		AuthType:              "ARS",
 		BankName:              "국민",
-		BankAccount:           "6756123412342472",
+		BankAccount:           "67512341234472",
 		IdentityNo:            "901014",
 		CashReceiptType:       "소득공제",
 		CashReceiptIdentityNo: "01012341234",
@@ -509,52 +521,11 @@ func RequestSubscribeAutomaticTransferBillingKey(api *Api) {
 func PublishAutomaticTransferBillingKey(api *Api) {
 	fmt.Println("--------------- PublishAutomaticTransferBillingKey() Start ---------------")
 
-	res, err := api.PublishAutomaticTransferBillingKey("6655069ca691573f1bb9c28a")
+	res, err := api.PublishAutomaticTransferBillingKey("66541bc4ca4517e69343e24c")
 
 	fmt.Println(res)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
 	fmt.Println("--------------- PublishAutomaticTransferBillingKey() End ---------------")
-}
-
-// =====================================================
-// Wallet API (신규 추가)
-// =====================================================
-
-func GetUserWallets(api *Api) {
-	fmt.Println("--------------- GetUserWallets() Start ---------------")
-
-	res, err := api.GetUserWallets("bootpay", true)
-
-	fmt.Println(res)
-	if err != nil {
-		fmt.Println("error: " + err.Error())
-	}
-	fmt.Println("--------------- GetUserWallets() End ---------------")
-}
-
-func RequestWalletPayment(api *Api) {
-	fmt.Println("--------------- RequestWalletPayment() Start ---------------")
-
-	payload := WalletRequest{
-		UserId:    "bootpay",
-		OrderName: "테스트 결제",
-		OrderId:   fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
-		Price:     100,
-		Sandbox:   true,
-		User: User{
-			Phone:    "01012341234",
-			Username: "홍길동",
-			Email:    "test@bootpay.co.kr",
-		},
-	}
-
-	res, err := api.RequestWalletPayment(payload)
-
-	fmt.Println(res)
-	if err != nil {
-		fmt.Println("error: " + err.Error())
-	}
-	fmt.Println("--------------- RequestWalletPayment() End ---------------")
 }

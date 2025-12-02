@@ -1,3 +1,18 @@
+### 2.2.0
+- Commerce API 추가
+  - User 모듈 (Token, Join, CheckExist, Login, List, Detail, Update, Delete, AuthenticationData)
+  - UserGroup 모듈 (Create, List, Detail, Update, UserCreate, UserDelete, Limit, AggregateTransaction)
+  - Product 모듈 (List, Create, CreateSimple, Detail, Update, Status, Delete)
+  - Invoice 모듈 (List, Create, Detail, Notify)
+  - Order 모듈 (List, Detail, Month)
+  - OrderCancel 모듈 (List, Request, Withdraw, Approve, Reject)
+  - OrderSubscription 모듈 (List, Detail, Update, RequestIng.Pause/Resume/CalculateTerminationFee/Termination)
+  - OrderSubscriptionBill 모듈 (List, Detail, Update)
+  - OrderSubscriptionAdjustment 모듈 (Create, Update, Delete)
+- NewAPI() 함수 추가 (Go 표준 팩토리 패턴)
+- NewCommerceAPI() 함수 추가
+- 기존 Api{}.New() 및 NewCommerceApi() 하위 호환성 유지
+
 ### 2.1.5
 - 배송등록 api 필드 추가 
 
