@@ -7,7 +7,7 @@
 ## 목차
 
 - [설치하기](#설치하기)
-- [사용하기](#사용하기)
+- [PG API 사용하기](#사용하기)
 - [API 목록](#api-목록)
   - [1. 토큰 발급](#1-토큰-발급)
   - [2. 결제 단건 조회](#2-결제-단건-조회)
@@ -34,6 +34,13 @@
     - [9-2. 현금영수증 발행 취소](#9-2-현금영수증-발행-취소)
     - [9-3. 별건 현금영수증 발행](#9-3-별건-현금영수증-발행)
     - [9-4. 별건 현금영수증 발행 취소](#9-4-별건-현금영수증-발행-취소)
+- [Commerce API 사용하기](#10-commerce-api)
+  - [10-1. Commerce API 초기화](#10-1-commerce-api-초기화)
+  - [10-2. 사용자 관리](#10-2-사용자-관리)
+  - [10-3. 상품 관리](#10-3-상품-관리)
+  - [10-4. 주문 관리](#10-4-주문-관리)
+  - [10-5. 정기구독 관리](#10-5-정기구독-관리)
+  - [10-6. 청구서 관리](#10-6-청구서-관리)
 - [Example 프로젝트](#example-프로젝트)
 - [Documentation](#documentation)
 - [기술문의](#기술문의)
@@ -659,6 +666,153 @@ Go SDK는 상세 응답 타입을 제공합니다. `types.go` 파일에서 확�
 - `SubscriptionBillingResponse` - 빌링키 응답
 - `UserTokenResponse` - 사용자 토큰 응답
 - 등...
+
+---
+
+## 10. Commerce API
+
+부트페이 Commerce API를 사용하여 사용자, 상품, 주문, 정기구독 등을 관리할 수 있습니다.
+
+### 10-1. Commerce API 초기화
+
+```go
+import (
+    commerce "github.com/bootpay/backend-go/v2/commerce"
+)
+
+func main() {
+    api := commerce.ApiCommerce{}.New(
+        "hxS-Up--5RvT6oU6QJE0JA",           // client_key
+        "r5zxvDcQJiAP2PBQ0aJjSHQtblNmYFt6uFoEMhti_mg=", // secret_key
+        nil,  // http.Client (nil이면 기본값 사용)
+        "development", // mode: "", "development", "stage"
+    )
+
+    // 토큰 발급
+    token, err := api.GetToken()
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+### 10-2. 사용자 관리
+
+```go
+// 사용자 목록 조회
+users, err := api.UserList(map[string]interface{}{
+    "page":  1,
+    "limit": 10,
+})
+
+// 사용자 상세 조회
+user, err := api.UserDetail("USER_ID")
+
+// 회원가입
+newUser, err := api.UserJoin(map[string]interface{}{
+    "login_id": "test@example.com",
+    "login_pw": "password123",
+    "name":     "홍길동",
+    "email":    "test@example.com",
+    "phone":    "010-1234-5678",
+})
+
+// 사용자 정보 수정
+updatedUser, err := api.UserUpdate(map[string]interface{}{
+    "user_id": "USER_ID",
+    "name":    "수정된 이름",
+})
+```
+
+### 10-3. 상품 관리
+
+```go
+// 상품 목록 조회
+products, err := api.ProductList(map[string]interface{}{
+    "page":  1,
+    "limit": 10,
+})
+
+// 상품 생성
+product, err := api.ProductCreate(map[string]interface{}{
+    "name":        "테스트 상품",
+    "price":       10000,
+    "description": "상품 설명",
+})
+
+// 상품 상세 조회
+productDetail, err := api.ProductDetail("PRODUCT_ID")
+
+// 상품 수정
+updatedProduct, err := api.ProductUpdate(map[string]interface{}{
+    "product_id": "PRODUCT_ID",
+    "name":       "수정된 상품명",
+    "price":      15000,
+})
+```
+
+### 10-4. 주문 관리
+
+```go
+// 주문 목록 조회
+orders, err := api.OrderList(map[string]interface{}{
+    "page":  1,
+    "limit": 10,
+})
+
+// 주문 상세 조회
+order, err := api.OrderDetail("ORDER_ID")
+
+// 월별 주문 조회
+monthOrders, err := api.OrderMonth("USER_GROUP_ID", "2024-12")
+```
+
+### 10-5. 정기구독 관리
+
+```go
+// 정기구독 목록 조회
+subscriptions, err := api.OrderSubscriptionList(nil)
+
+// 정기구독 상세 조회
+subscription, err := api.OrderSubscriptionDetail("ORDER_SUBSCRIPTION_ID")
+
+// 정기구독 일시정지
+err = api.OrderSubscriptionPause(map[string]interface{}{
+    "order_subscription_id": "ORDER_SUBSCRIPTION_ID",
+    "pause_days":            30,
+    "reason":                "일시정지 사유",
+})
+
+// 정기구독 재개
+err = api.OrderSubscriptionResume(map[string]interface{}{
+    "order_subscription_id": "ORDER_SUBSCRIPTION_ID",
+})
+
+// 정기구독 해지
+err = api.OrderSubscriptionTermination(map[string]interface{}{
+    "order_subscription_id": "ORDER_SUBSCRIPTION_ID",
+    "reason":                "해지 사유",
+})
+```
+
+### 10-6. 청구서 관리
+
+```go
+// 청구서 목록 조회
+invoices, err := api.InvoiceList(nil)
+
+// 청구서 생성
+invoice, err := api.InvoiceCreate(map[string]interface{}{
+    "user_id": "USER_ID",
+    "amount":  50000,
+    "title":   "청구서 제목",
+})
+
+// 청구서 알림 전송
+err = api.InvoiceNotify("INVOICE_ID", []int{1, 2}) // 1: SMS, 2: Email
+```
+
+더 자세한 Commerce API 사용 예제는 [commerce_test](./commerce_test) 디렉토리를 참고해주세요.
 
 ---
 

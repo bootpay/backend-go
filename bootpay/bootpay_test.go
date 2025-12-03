@@ -6,33 +6,12 @@ import (
 	"time"
 )
 
-// 테스트용 키 (PG API)
-const (
-	// Production 환경
-	productionApplicationId = "5b8f6a4d396fa665fdc2b5ea"
-	productionPrivateKey    = "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw="
-
-	// Development 환경
-	devApplicationId = "59bfc738e13f337dbd6ca48a"
-	devPrivateKey    = "pDc0NwlkEX3aSaHTp/PPL/i8vn5E/CqRChgyEp/gHD0="
-)
-
-// 테스트용 API 인스턴스 생성 (Development - 기본 사용)
-func getTestApi() *Api {
-	return Api{}.New(devApplicationId, devPrivateKey, nil, "development")
-}
-
-// 테스트용 API 인스턴스 생성 (Production)
-func getProductionTestApi() *Api {
-	return Api{}.New(productionApplicationId, productionPrivateKey, nil, "")
-}
-
 // =====================================================
 // 메인 테스트 함수
 // =====================================================
 
 func TestFunctions(t *testing.T) {
-	bootpay := getTestApi()
+	bootpay := CreatePgApi()
 
 	// 토큰 발급 (필수)
 	GetToken(bootpay)
@@ -108,9 +87,8 @@ func GetBillingKey(api *Api) {
 }
 
 func LookupBillingKey(api *Api) {
-	receiptId := "6317e646d01c7e0024170b47"
 	fmt.Println("--------------- LookupBillingKey() Start ---------------")
-	verify, err := api.LookupBillingKey(receiptId)
+	verify, err := api.LookupBillingKey(TestReceiptIdBilling)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -120,9 +98,8 @@ func LookupBillingKey(api *Api) {
 }
 
 func LookupBillingKeyByKey(api *Api) {
-	billingKey := "66542dfb4d18d5fc7b43e1b6"
 	fmt.Println("--------------- LookupBillingKeyByKey() Start ---------------")
-	verify, err := api.LookupBillingKeyByKey(billingKey)
+	verify, err := api.LookupBillingKeyByKey(TestBillingKey2)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -132,9 +109,8 @@ func LookupBillingKeyByKey(api *Api) {
 }
 
 func DestroyBillingKey(api *Api) {
-	billingKey := "628b2644d01c7e00209b6092"
 	fmt.Println("--------------- DestroyBillingKey() Start ---------------")
-	res, err := api.DestroyBillingKey(billingKey)
+	res, err := api.DestroyBillingKey(TestBillingKey)
 
 	fmt.Println(res)
 	if err != nil {
@@ -149,7 +125,7 @@ func DestroyBillingKey(api *Api) {
 
 func RequestSubscribe(api *Api) {
 	payload := SubscribePayload{
-		BillingKey: "692e6f9abe3f0224ea4ce8e1",
+		BillingKey: TestBillingKey,
 		OrderName:  "아이템01",
 		OrderId:    fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		Price:      1000,
@@ -176,7 +152,7 @@ func RequestSubscribe(api *Api) {
 func ReserveSubscribe(api *Api) {
 	s10 := time.Now().Add(time.Second * 10).Format("2006-01-02T15:04:05-07:00")
 	payload := SubscribePayload{
-		BillingKey:       "692e6f9abe3f0224ea4ce8e1",
+		BillingKey:       TestBillingKey,
 		OrderName:        "아이템01",
 		OrderId:          fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
 		ReserveExecuteAt: s10,
@@ -194,10 +170,8 @@ func ReserveSubscribe(api *Api) {
 }
 
 func ReserveSubscribeLookup(api *Api) {
-	reserveId := "6490149ca575b40024f0b70d"
-
 	fmt.Println("--------------- ReserveSubscribeLookup() Start ---------------")
-	res, err := api.ReserveSubscribeLookup(reserveId)
+	res, err := api.ReserveSubscribeLookup(TestReserveId)
 
 	fmt.Println(res)
 	if err != nil {
@@ -207,9 +181,8 @@ func ReserveSubscribeLookup(api *Api) {
 }
 
 func ReserveCancel(api *Api) {
-	reserveId := "692e701288acd62032ef1645"
 	fmt.Println("--------------- ReserveCancel() Start ---------------")
-	res, err := api.ReserveCancelSubscribe(reserveId)
+	res, err := api.ReserveCancelSubscribe(TestReserveId)
 
 	fmt.Println(res)
 	if err != nil {
@@ -223,9 +196,8 @@ func ReserveCancel(api *Api) {
 // =====================================================
 
 func GetReceipt(api *Api) {
-	receiptId := "62b12f4b6262500007629fec"
 	fmt.Println("--------------- GetReceipt() Start ---------------")
-	verify, err := api.GetReceipt(receiptId)
+	verify, err := api.GetReceipt(TestReceiptId)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -235,9 +207,8 @@ func GetReceipt(api *Api) {
 }
 
 func GetVerify(api *Api) {
-	receiptId := "62b12f4b6262500007629fec"
 	fmt.Println("--------------- GetVerify() Start ---------------")
-	verify, err := api.GetReceipt(receiptId)
+	verify, err := api.GetReceipt(TestReceiptId)
 	if err != nil {
 		fmt.Println("error: " + err.Error())
 	}
@@ -248,10 +219,10 @@ func GetVerify(api *Api) {
 
 func ReceiptCancel(api *Api) {
 	payload := CancelData{
-		ReceiptId:      "664ae6621a10a75af2b4b085",
+		ReceiptId:      TestReceiptId,
 		CancelId:       fmt.Sprintf("%+8d", (time.Now().UnixNano() / int64(time.Millisecond))),
-		CancelUsername: "관리자3",
-		CancelMessage:  "테스트 결제3",
+		CancelUsername: "관리자",
+		CancelMessage:  "테스트 결제 취소",
 	}
 	fmt.Println("--------------- ReceiptCancel() Start ---------------")
 	res, err := api.ReceiptCancel(payload)
@@ -264,9 +235,8 @@ func ReceiptCancel(api *Api) {
 }
 
 func ServerConfirm(api *Api) {
-	receiptId := "62876963d01c7e00209b6028"
 	fmt.Println("--------------- ServerConfirm() Start ---------------")
-	res, err := api.ServerConfirm(receiptId)
+	res, err := api.ServerConfirm(TestReceiptIdConfirm)
 
 	fmt.Println(res)
 	if err != nil {
@@ -276,9 +246,8 @@ func ServerConfirm(api *Api) {
 }
 
 func Certificate(api *Api) {
-	receiptId := "628ae7ffd01c7e001e9b6066"
 	fmt.Println("--------------- Certificate() Start ---------------")
-	res, err := api.Certificate(receiptId)
+	res, err := api.Certificate(TestCertificateReceiptId)
 
 	fmt.Println(res)
 	if err != nil {
@@ -293,7 +262,7 @@ func Certificate(api *Api) {
 
 func GetUserToken(api *Api) {
 	payload := EasyUserTokenPayload{
-		UserId: "1234",
+		UserId: TestUserId,
 		Email:  "test1234@gmail.com",
 		Name:   "홍길동",
 		Gender: 0,
@@ -313,7 +282,7 @@ func GetUserToken(api *Api) {
 
 func RequestUserToken(api *Api) {
 	payload := UserTokenRequest{
-		UserId: "1234",
+		UserId: TestUserId,
 		Phone:  "01012345678",
 	}
 
@@ -333,7 +302,7 @@ func RequestUserToken(api *Api) {
 
 func ShippingStart(api *Api) {
 	shipping := Shipping{
-		ReceiptId:      "628ae7ffd01c7e001e9b6066",
+		ReceiptId:      TestReceiptIdEscrow,
 		TrackingNumber: "123456",
 		DeliveryCorp:   "CJ대한통운",
 		User: ShippingUser{
@@ -359,7 +328,7 @@ func ShippingStart(api *Api) {
 
 func RequestCashReceiptByBootpay(api *Api) {
 	cashReceipt := CashReceiptData{
-		ReceiptId:       "62e0f11f1fc192036b1b3c92",
+		ReceiptId:       TestReceiptIdCash,
 		Username:        "테스트",
 		Email:           "test@bootpay.co.kr",
 		Phone:           "01000000000",
@@ -378,7 +347,7 @@ func RequestCashReceiptByBootpay(api *Api) {
 
 func RequestCashReceiptCancelByBootpay(api *Api) {
 	cancelData := CancelData{
-		ReceiptId:      "62e0f11f1fc192036b1b3c92",
+		ReceiptId:      TestReceiptIdCash,
 		CancelUsername: "테스트 관리자",
 		CancelMessage:  "테스트 결제",
 	}
@@ -416,7 +385,7 @@ func RequestCashReceipt(api *Api) {
 
 func RequestCashReceiptCancel(api *Api) {
 	cancelData := CancelData{
-		ReceiptId:      "62f48ae41fc192036f9f4b54",
+		ReceiptId:      TestReceiptIdCash,
 		CancelUsername: "테스트 관리자",
 		CancelMessage:  "테스트 결제",
 	}
@@ -521,7 +490,7 @@ func RequestSubscribeAutomaticTransferBillingKey(api *Api) {
 func PublishAutomaticTransferBillingKey(api *Api) {
 	fmt.Println("--------------- PublishAutomaticTransferBillingKey() Start ---------------")
 
-	res, err := api.PublishAutomaticTransferBillingKey("66541bc4ca4517e69343e24c")
+	res, err := api.PublishAutomaticTransferBillingKey(TestReceiptIdTransfer)
 
 	fmt.Println(res)
 	if err != nil {
