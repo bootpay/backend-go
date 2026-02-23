@@ -2,6 +2,7 @@ package bootpay
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"errors"
 	"io"
 	"net/http"
@@ -47,8 +48,12 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 	}
 	if api.token != "" {
 		req.Header.Set("Authorization", "Bearer " + api.token)
-	} 
-	
+	} else if api.applicationId != "" && api.privateKey != "" {
+		credentials := api.applicationId + ":" + api.privateKey
+		encoded := base64.StdEncoding.EncodeToString([]byte(credentials))
+		req.Header.Set("Authorization", "Basic "+encoded)
+	}
+
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept-Charset", "utf-8")
