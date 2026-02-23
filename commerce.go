@@ -46,12 +46,20 @@ func (api *Api) commerceWrite(method string, path string, payload interface{}) (
 }
 
 // Store
-func (api *Api) StoreInfo() (APIResponse, error) {
+func (api *Api) GetStore() (APIResponse, error) {
 	return api.commerceGet("/store")
 }
 
-func (api *Api) StoreDetail() (APIResponse, error) {
+func (api *Api) StoreInfo() (APIResponse, error) {
+	return api.GetStore()
+}
+
+func (api *Api) GetStoreDetail() (APIResponse, error) {
 	return api.commerceGet("/store/detail")
+}
+
+func (api *Api) StoreDetail() (APIResponse, error) {
+	return api.GetStoreDetail()
 }
 
 // User
