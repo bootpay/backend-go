@@ -55,10 +55,6 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 	} else if api.applicationId != "" {
 		if api.token != "" {
 			req.Header.Set("Authorization", "Bearer " + api.token)
-		} else if api.privateKey != "" {
-			credentials := api.applicationId + ":" + api.privateKey
-			encoded := base64.StdEncoding.EncodeToString([]byte(credentials))
-			req.Header.Set("Authorization", "Basic "+encoded)
 		}
 	}
 
