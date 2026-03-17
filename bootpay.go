@@ -36,6 +36,8 @@ type Api struct {
 	token         string
 	applicationId string
 	privateKey    string
+	clientKey     string
+	secretKey     string
 	baseUrl       string
 	client        *http.Client
 }
@@ -46,18 +48,29 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 		errors.New("Cannot create Bootpay request: " + err.Error())
 		return nil, err
 	}
-	if api.token != "" {
-		req.Header.Set("Authorization", "Bearer " + api.token)
-	} else if api.applicationId != "" && api.privateKey != "" {
-		credentials := api.applicationId + ":" + api.privateKey
+	if api.clientKey != "" && api.secretKey != "" {
+		credentials := api.clientKey + ":" + api.secretKey
 		encoded := base64.StdEncoding.EncodeToString([]byte(credentials))
 		req.Header.Set("Authorization", "Basic "+encoded)
+	} else if api.applicationId != "" {
+		if api.token != "" {
+			req.Header.Set("Authorization", "Bearer " + api.token)
+		} else if api.privateKey != "" {
+			credentials := api.applicationId + ":" + api.privateKey
+			encoded := base64.StdEncoding.EncodeToString([]byte(credentials))
+			req.Header.Set("Authorization", "Basic "+encoded)
+		}
 	}
 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept-Charset", "utf-8")
 	return req, nil
+}
+
+func (api *Api) SetClientConfiguration(clientKey string, secretKey string) {
+	api.clientKey = clientKey
+	api.secretKey = secretKey
 }
 
 func (api Api) New(applicationId string, privateKey string, client *http.Client, mode string) *Api {
