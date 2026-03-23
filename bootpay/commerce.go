@@ -40,6 +40,7 @@ type CommerceApi struct {
 	OrderSubscription           *OrderSubscriptionModule
 	OrderSubscriptionBill       *OrderSubscriptionBillModule
 	OrderSubscriptionAdjustment *OrderSubscriptionAdjustmentModule
+	Store                       *StoreModule
 }
 
 // CommerceResponse is the common response structure for Commerce API
@@ -103,6 +104,7 @@ func NewCommerceAPI(clientKey string, secretKey string, client *http.Client, mod
 	}
 	api.OrderSubscriptionBill = &OrderSubscriptionBillModule{api: api}
 	api.OrderSubscriptionAdjustment = &OrderSubscriptionAdjustmentModule{api: api}
+	api.Store = &StoreModule{api: api}
 
 	return api
 }

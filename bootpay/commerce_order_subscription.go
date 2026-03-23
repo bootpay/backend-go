@@ -101,3 +101,40 @@ func (m *OrderSubscriptionModule) Update(params OrderSubscriptionUpdateParams) (
 	}
 	return m.api.Put(fmt.Sprintf("order_subscriptions/%s", params.OrderSubscriptionId), params)
 }
+
+// SupervisorApprove approves a subscription request (supervisor role)
+func (m *OrderSubscriptionModule) SupervisorApprove(orderSubscriptionId string, params *SupervisorOrderSubscriptionApproveParams) (map[string]interface{}, error) {
+	if params == nil {
+		params = &SupervisorOrderSubscriptionApproveParams{}
+	}
+	return m.api.Put(fmt.Sprintf("order_subscriptions/%s/approve", orderSubscriptionId), params)
+}
+
+// SupervisorReject rejects a subscription request (supervisor role)
+func (m *OrderSubscriptionModule) SupervisorReject(orderSubscriptionId string, params *SupervisorOrderSubscriptionRejectParams) (map[string]interface{}, error) {
+	if params == nil {
+		params = &SupervisorOrderSubscriptionRejectParams{}
+	}
+	return m.api.Put(fmt.Sprintf("order_subscriptions/%s/reject", orderSubscriptionId), params)
+}
+
+// SupervisorTerminate terminates a subscription (supervisor role)
+func (m *OrderSubscriptionModule) SupervisorTerminate(orderSubscriptionId string, params *SupervisorOrderSubscriptionTerminateParams) (map[string]interface{}, error) {
+	if params == nil {
+		params = &SupervisorOrderSubscriptionTerminateParams{}
+	}
+	return m.api.Put(fmt.Sprintf("order_subscriptions/%s/terminate", orderSubscriptionId), params)
+}
+
+// SupervisorPause pauses a subscription (supervisor role)
+func (m *OrderSubscriptionModule) SupervisorPause(orderSubscriptionId string, params SupervisorOrderSubscriptionPauseParams) (map[string]interface{}, error) {
+	return m.api.Put(fmt.Sprintf("order_subscriptions/%s/pause", orderSubscriptionId), params)
+}
+
+// SupervisorResume resumes a subscription (supervisor role)
+func (m *OrderSubscriptionModule) SupervisorResume(orderSubscriptionId string, params *SupervisorOrderSubscriptionResumeParams) (map[string]interface{}, error) {
+	if params == nil {
+		params = &SupervisorOrderSubscriptionResumeParams{}
+	}
+	return m.api.Put(fmt.Sprintf("order_subscriptions/%s/resume", orderSubscriptionId), params)
+}

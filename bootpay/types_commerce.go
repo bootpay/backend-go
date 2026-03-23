@@ -702,6 +702,40 @@ type CalcTerminateFeeResponse struct {
 	FinalFee            int `json:"final_fee,omitempty"`
 }
 
+// Supervisor OrderSubscription Types
+
+// SupervisorOrderSubscriptionApproveParams represents supervisor approve parameters
+type SupervisorOrderSubscriptionApproveParams struct {
+	Reason string `json:"reason,omitempty"`
+}
+
+// SupervisorOrderSubscriptionRejectParams represents supervisor reject parameters
+type SupervisorOrderSubscriptionRejectParams struct {
+	Reason string `json:"reason,omitempty"`
+}
+
+// SupervisorOrderSubscriptionTerminateParams represents supervisor terminate parameters
+type SupervisorOrderSubscriptionTerminateParams struct {
+	Reason              string `json:"reason,omitempty"`
+	TerminationFee      int    `json:"termination_fee,omitempty"`
+	LastBillRefundPrice int    `json:"last_bill_refund_price,omitempty"`
+	FinalFee            int    `json:"final_fee,omitempty"`
+	ServiceEndAt        string `json:"service_end_at,omitempty"`
+	CancelDate          string `json:"cancel_date,omitempty"`
+}
+
+// SupervisorOrderSubscriptionPauseParams represents supervisor pause parameters
+type SupervisorOrderSubscriptionPauseParams struct {
+	Reason           string `json:"reason,omitempty"`
+	PausedAt         string `json:"paused_at"`
+	ExpectedResumeAt string `json:"expected_resume_at,omitempty"`
+}
+
+// SupervisorOrderSubscriptionResumeParams represents supervisor resume parameters
+type SupervisorOrderSubscriptionResumeParams struct {
+	Reason string `json:"reason,omitempty"`
+}
+
 // ============================================
 // OrderSubscriptionBill Types
 // ============================================
