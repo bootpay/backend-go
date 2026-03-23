@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -24,7 +23,6 @@ func (api *Api) RequestUserToken(request UserTokenRequest) (APIResponse, error) 
 
 	req, err := api.NewRequest(http.MethodPost, "/request/user/token", body)
 	if err != nil {
-		errors.New("bootpay: RequestUserToken error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)

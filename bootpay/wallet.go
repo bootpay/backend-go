@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -56,7 +55,6 @@ func (api *Api) GetUserWallets(userId string, sandbox bool) (APIResponse, error)
 	url := fmt.Sprintf("/wallet?user_id=%s&sandbox=%s", userId, sandboxStr)
 	req, err := api.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		errors.New("bootpay: GetUserWallets error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
@@ -81,7 +79,6 @@ func (api *Api) RequestWalletPayment(request WalletRequest) (APIResponse, error)
 
 	req, err := api.NewRequest(http.MethodPost, "/wallet/payment", body)
 	if err != nil {
-		errors.New("bootpay: RequestWalletPayment error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)

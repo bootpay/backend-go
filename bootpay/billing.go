@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -153,10 +152,12 @@ func (api *Api) GetBillingKey(payload BillingKeyPayload) (APIResponse, error) {
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/request/subscribe", body)
 	if err != nil {
-		errors.New("bootpay: GetBillingKey error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -172,10 +173,12 @@ func (api *Api) LookupBillingKey(receiptId string) (APIResponse, error) {
 
 	req, err := api.NewRequest(http.MethodGet, "/subscribe/billing_key/" + receiptId, nil)
 	if err != nil {
-		errors.New("bootpay: LookupBillingKey error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -189,10 +192,12 @@ func (api *Api) LookupBillingKeyByKey(billingKey string) (APIResponse, error) {
 
 	req, err := api.NewRequest(http.MethodGet, "/billing_key/" + billingKey, nil)
 	if err != nil {
-		errors.New("bootpay: LookupBillingKeyByKey error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -206,11 +211,12 @@ func (api *Api) LookupBillingKeyByKey(billingKey string) (APIResponse, error) {
 func (api *Api) DestroyBillingKey(billingKey string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodDelete, "/subscribe/billing_key/" + billingKey, nil)
 	if err != nil {
-		errors.New("bootpay: DestroyBillingKey error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -231,10 +237,12 @@ func (api *Api) RequestSubscribe(payload SubscribePayload) (APIResponse, error) 
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/subscribe/payment", body)
 	if err != nil {
-		errors.New("bootpay: RequestSubscribe error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -247,13 +255,15 @@ func (api *Api) RequestSubscribe(payload SubscribePayload) (APIResponse, error) 
 func (api *Api) ReserveSubscribe(payload SubscribePayload) (APIResponse, error) {
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
-	
+
 	req, err := api.NewRequest(http.MethodPost, "/subscribe/payment/reserve", body)
 	if err != nil {
-		errors.New("bootpay: ReserveSubscribe error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -264,14 +274,16 @@ func (api *Api) ReserveSubscribe(payload SubscribePayload) (APIResponse, error) 
 }
 
 
-func (api *Api) ReserveSubscribeLookup(reserveId string) (APIResponse, error) {	 
+func (api *Api) ReserveSubscribeLookup(reserveId string) (APIResponse, error) {
 
 	req, err := api.NewRequest(http.MethodGet, "/subscribe/payment/reserve/" + reserveId, nil)
 	if err != nil {
-		errors.New("bootpay: ReserveSubscribe error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -284,11 +296,12 @@ func (api *Api) ReserveSubscribeLookup(reserveId string) (APIResponse, error) {
 func (api *Api) ReserveCancelSubscribe(reserveId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodDelete, "/subscribe/payment/reserve/" + reserveId, nil)
 	if err != nil {
-		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -304,10 +317,12 @@ func (api *Api) RequestSubscribeAutomaticTransferBillingKey(payload BillingKeyPa
 
     req, err := api.NewRequest(http.MethodPost, "/request/subscribe/automatic-transfer", body)
 	if err != nil {
-		errors.New("bootpay: requestSubscribeAutomaticTransferBillingKey error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -328,10 +343,12 @@ func (api *Api) PublishAutomaticTransferBillingKey(receiptId string) (APIRespons
 
     req, err := api.NewRequest(http.MethodPost, "/request/subscribe/automatic-transfer/publish", body)
 	if err != nil {
-		errors.New("bootpay: publishAutomaticTransferBillingKey error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}

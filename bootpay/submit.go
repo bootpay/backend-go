@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -23,11 +22,12 @@ func (api *Api) ServerSubmit(receiptId string) (APIResponse, error) {
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/submit", body)
 	if err != nil {
-		errors.New("bootpay: Submit error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}

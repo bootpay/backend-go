@@ -2,7 +2,6 @@ package bootpay
 
 import (
 	"crypto/tls"
-	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -45,7 +44,6 @@ type Api struct {
 func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest(method, api.baseUrl+url, body)
 	if err != nil {
-		errors.New("Cannot create Bootpay request: " + err.Error())
 		return nil, err
 	}
 	if api.token != "" {

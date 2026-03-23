@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 type TokenData struct {
@@ -21,12 +20,14 @@ func (api *Api) GetToken() (APIResponse, error) {
 	postBody, _ := json.Marshal(config)
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/request/token", body)
-	
+
 	if err != nil {
-		errors.New("bootpay: getToken error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}

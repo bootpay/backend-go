@@ -2,7 +2,6 @@ package bootpay
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -63,11 +62,12 @@ import (
 func (api *Api) GetReceipt(receiptId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodGet, "/receipt/" + receiptId, nil)
 	if err != nil {
-		errors.New("bootpay: Verify error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -84,11 +84,12 @@ func (api *Api) GetReceiptWithUserData(receiptId string, lookupUserData bool) (A
 	}
 	req, err := api.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		errors.New("bootpay: Verify error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -144,11 +145,12 @@ func (api *Api) GetReceiptWithUserData(receiptId string, lookupUserData bool) (A
 func (api *Api) Certificate(receiptId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodGet, "/certificate/" + receiptId, nil)
 	if err != nil {
-		errors.New("bootpay: Certificate error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}

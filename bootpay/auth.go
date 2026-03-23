@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -39,11 +38,12 @@ func (api *Api) RequestAuthentication(authentication Authentication) (APIRespons
 
 	req, err := api.NewRequest(http.MethodPost, "/request/authentication", body)
 	if err != nil {
-		errors.New("bootpay: RequestAuthentication error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -60,11 +60,12 @@ func (api *Api) ConfirmAuthentication(params AuthenticationParams) (APIResponse,
 
 	req, err := api.NewRequest(http.MethodPost, "/authenticate/confirm", body)
 	if err != nil {
-		errors.New("bootpay: ConfirmAuthentication error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
@@ -82,11 +83,12 @@ func (api *Api) RealarmAuthentication(params AuthenticationParams) (APIResponse,
 
 	req, err := api.NewRequest(http.MethodPost, "/authenticate/realarm", body)
 	if err != nil {
-		errors.New("bootpay: RealarmAuthentication error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}

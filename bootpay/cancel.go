@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -61,11 +60,12 @@ func (api *Api) ReceiptCancel(cancelData CancelData) (APIResponse, error) {
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/cancel", body)
 	if err != nil {
-		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
