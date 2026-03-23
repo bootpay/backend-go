@@ -8,8 +8,12 @@ import (
 )
 
 type Payload struct {
-	RestConfig
-	Pg        string   `json:"pg"`
+	// ApplicationId and PrivateKey are kept for backward compatibility but
+	// suppressed from JSON serialization (json:"-"). Authentication is handled
+	// via the Authorization header, not the request body.
+	ApplicationId string `json:"-"`
+	PrivateKey    string `json:"-"`
+	Pg            string `json:"pg"`
 	Method    string   `json:"method"`
 	Methods   []string `json:"methods"`
 	Price     float64  `json:"price"`
@@ -67,12 +71,6 @@ type BrowserOpenType struct {
 
 
 func (api *Api) RequestLink(payload Payload) (APIResponse, error) {
-	if payload.ApplicationId == "" {
-		payload.ApplicationId = api.applicationId
-	}
-	if payload.PrivateKey == "" {
-		payload.PrivateKey = api.privateKey
-	}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/request/payment", body)
