@@ -24,7 +24,7 @@ type Payload struct {
 	User      User     `json:"user"`
 	Items     []Item   `json:"items"`
 	//ReturnUrl string   `json:"return_url"`
-	Extra     Extra    `json:"extra""`
+	Extra     Extra    `json:"extra"`
 	//UserInfo            User           `json:"user_info"`
 }
 
