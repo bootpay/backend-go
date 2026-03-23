@@ -77,6 +77,27 @@ func (api *Api) GetReceipt(receiptId string) (APIResponse, error) {
 	return result, nil
 }
 
+func (api *Api) GetReceiptWithUserData(receiptId string, lookupUserData bool) (APIResponse, error) {
+	url := "/receipt/" + receiptId
+	if lookupUserData {
+		url += "?lookup_user_data=true"
+	}
+	req, err := api.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		errors.New("bootpay: Verify error: " + err.Error())
+		return APIResponse{}, err
+	}
+	res, err := api.client.Do(req)
+
+	defer res.Body.Close()
+
+	result := APIResponse{}
+	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
+	return result, nil
+}
+
 //type Certificate struct {
 //	APIResponse
 //	Data struct {

@@ -20,7 +20,7 @@ func (api *Api) GetToken() (APIResponse, error) {
 	config := RestConfig{api.applicationId, api.privateKey}
 	postBody, _ := json.Marshal(config)
 	body := bytes.NewBuffer(postBody)
-	req, err := api.NewRequest(http.MethodPost, "/request/token.json", body)
+	req, err := api.NewRequest(http.MethodPost, "/request/token", body)
 	
 	if err != nil {
 		errors.New("bootpay: getToken error: " + err.Error())

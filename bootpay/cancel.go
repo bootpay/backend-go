@@ -31,7 +31,7 @@ type CancelData struct {
 type RefundData struct {
 	BankAccount       string `json:"bank_account"`
 	BankUsername      string `json:"bank_username"`
-	Bankcode          string `json:"bankcode"`
+	BankCode          string `json:"bank_code"`
 }
 //type Cancel struct {
 //	APIResponse
