@@ -5,45 +5,11 @@ import (
 	"testing"
 )
 
-// 테스트용 키 (Commerce API)
-const (
-	// Development 환경
-	commerceDevClientKey = "hxS-Up--5RvT6oU6QJE0JA"
-	commerceDevSecretKey = "r5zxvDcQJiAP2PBQ0aJjSHQtblNmYFt6uFoEMhti_mg="
-
-	// Production 환경
-	commerceProdClientKey = "sEN72kYZBiyMNytA8nUGxQ"
-	commerceProdSecretKey = "rnZLJamENRgfwTccwmI_Uu9cxsPpAV9X2W-Htg73yfU="
-)
-
-// getCommerceTestApi returns Commerce API client for development
-func getCommerceTestApi() *CommerceApi {
-	return NewCommerceApi(commerceDevClientKey, commerceDevSecretKey, nil, "development")
-}
-
-// getCommerceProductionApi returns Commerce API client for production
-func getCommerceProductionApi() *CommerceApi {
-	return NewCommerceApi(commerceProdClientKey, commerceProdSecretKey, nil, "production")
-}
-
-// TestCommerceGetAccessToken tests the GetAccessToken method
-func TestCommerceGetAccessToken(t *testing.T) {
-	commerce := getCommerceTestApi()
-
-	result, err := commerce.GetAccessToken()
-	if err != nil {
-		t.Logf("GetAccessToken error (expected with test keys): %v", err)
-		return
-	}
-
-	fmt.Printf("Access Token Response: %+v\n", result)
-}
-
 // ExampleNewCommerceApi demonstrates how to create a Commerce API client
 func ExampleNewCommerceApi() {
 	// Create Commerce API client (Development)
-	commerce := NewCommerceApi(commerceDevClientKey, commerceDevSecretKey, nil, "development")
-	// Production: NewCommerceApi(commerceProdClientKey, commerceProdSecretKey, nil, "production")
+	commerce := NewCommerceApi(DevClientKey, DevSecretKey, nil, "development")
+	// Production: NewCommerceApi(ProductionClientKey, ProductionSecretKey, nil, "production")
 
 	// Get access token
 	_, _ = commerce.GetAccessToken()
@@ -57,7 +23,7 @@ func ExampleNewCommerceApi() {
 
 // ExampleCommerceApi_User demonstrates User module usage
 func ExampleCommerceApi_User() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get user token
@@ -65,11 +31,11 @@ func ExampleCommerceApi_User() {
 
 	// Create new user
 	newUser := CommerceUser{
-		LoginId:  "testuser@example.com",
-		LoginPw:  "password123",
-		Name:     "Test User",
-		Email:    "testuser@example.com",
-		Phone:    "010-1234-5678",
+		LoginId: "testuser@example.com",
+		LoginPw: "password123",
+		Name:    "Test User",
+		Email:   "testuser@example.com",
+		Phone:   "010-1234-5678",
 	}
 	_, _ = commerce.User.Join(newUser)
 
@@ -103,7 +69,7 @@ func ExampleCommerceApi_User() {
 
 // ExampleCommerceApi_UserGroup demonstrates UserGroup module usage
 func ExampleCommerceApi_UserGroup() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Create user group
@@ -152,7 +118,7 @@ func ExampleCommerceApi_UserGroup() {
 
 // ExampleCommerceApi_Product demonstrates Product module usage
 func ExampleCommerceApi_Product() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get product list
@@ -172,9 +138,6 @@ func ExampleCommerceApi_Product() {
 		Type:         1,
 	}
 	_, _ = commerce.Product.CreateSimple(newProduct)
-
-	// Create product (with images)
-	// _, _ = commerce.Product.Create(newProduct, []string{"/path/to/image1.jpg", "/path/to/image2.jpg"})
 
 	// Get product detail
 	_, _ = commerce.Product.Detail("product_123")
@@ -204,7 +167,7 @@ func ExampleCommerceApi_Product() {
 
 // ExampleCommerceApi_Invoice demonstrates Invoice module usage
 func ExampleCommerceApi_Invoice() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get invoice list
@@ -238,7 +201,7 @@ func ExampleCommerceApi_Invoice() {
 
 // ExampleCommerceApi_Order demonstrates Order module usage
 func ExampleCommerceApi_Order() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get order list
@@ -264,7 +227,7 @@ func ExampleCommerceApi_Order() {
 
 // ExampleCommerceApi_OrderCancel demonstrates OrderCancel module usage
 func ExampleCommerceApi_OrderCancel() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get cancel request list
@@ -302,7 +265,7 @@ func ExampleCommerceApi_OrderCancel() {
 
 // ExampleCommerceApi_OrderSubscription demonstrates OrderSubscription module usage
 func ExampleCommerceApi_OrderSubscription() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get subscription list
@@ -353,7 +316,7 @@ func ExampleCommerceApi_OrderSubscription() {
 
 // ExampleCommerceApi_OrderSubscriptionBill demonstrates OrderSubscriptionBill module usage
 func ExampleCommerceApi_OrderSubscriptionBill() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Get subscription bill list
@@ -381,7 +344,7 @@ func ExampleCommerceApi_OrderSubscriptionBill() {
 
 // ExampleCommerceApi_OrderSubscriptionAdjustment demonstrates OrderSubscriptionAdjustment module usage
 func ExampleCommerceApi_OrderSubscriptionAdjustment() {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Create subscription adjustment
@@ -407,9 +370,9 @@ func ExampleCommerceApi_OrderSubscriptionAdjustment() {
 	// Output: OrderSubscriptionAdjustment module examples completed
 }
 
-// ExampleCommerceApi_RoleChaining demonstrates role chaining
-func ExampleCommerceApi_RoleChaining() {
-	commerce := getCommerceTestApi()
+// ExampleCommerceApi_SetRole demonstrates role chaining
+func ExampleCommerceApi_SetRole() {
+	commerce := CreateCommerceApi()
 	commerce.GetAccessToken()
 
 	// Method chaining for role setting
@@ -428,7 +391,7 @@ func ExampleCommerceApi_RoleChaining() {
 
 // TestCommerceAllEndpoints tests all Commerce API endpoints for 404 errors
 func TestCommerceAllEndpoints(t *testing.T) {
-	commerce := getCommerceTestApi()
+	commerce := CreateCommerceApi()
 
 	// Get access token first
 	tokenResult, err := commerce.GetAccessToken()
@@ -444,11 +407,11 @@ func TestCommerceAllEndpoints(t *testing.T) {
 			return
 		}
 		if msg, ok := result["message"].(string); ok && msg == "Not Found" {
-			fmt.Printf("[%s] ❌ 404 NOT FOUND\n", name)
+			fmt.Printf("[%s] 404 NOT FOUND\n", name)
 		} else if errCode, ok := result["error_code"].(float64); ok && errCode == 404 {
-			fmt.Printf("[%s] ❌ 404 NOT FOUND\n", name)
+			fmt.Printf("[%s] 404 NOT FOUND\n", name)
 		} else {
-			fmt.Printf("[%s] ✅ OK - %+v\n", name, result)
+			fmt.Printf("[%s] OK - %+v\n", name, result)
 		}
 	}
 
