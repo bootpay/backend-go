@@ -32,6 +32,11 @@ type RefundData struct {
 	BankUsername      string `json:"bank_username"`
 	BankCode          string `json:"bank_code"`
 }
+
+// Deprecated: Use BankCode instead.
+func (r *RefundData) SetBankcode(code string) {
+	r.BankCode = code
+}
 //type Cancel struct {
 //	APIResponse
 //	Data    struct {
