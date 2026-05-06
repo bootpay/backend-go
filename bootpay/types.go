@@ -10,7 +10,9 @@ import "time"
 type AccessTokenResponse struct {
 	ExpireIn    int    `json:"expire_in"`
 	AccessToken string `json:"access_token"`
-	HttpStatus  int    `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정.
+	// 성공 여부는 error 반환값 / Status 필드로 판단하세요. 기존 사용 코드는 그대로 동작합니다.
+	HttpStatus int `json:"http_status"`
 }
 
 // ReceiptResponse represents the receipt/payment response
@@ -48,7 +50,8 @@ type ReceiptResponse struct {
 	PaycoPointData     *PointDataResponse     `json:"payco_point_data,omitempty"`
 	TossPointData      *PointDataResponse     `json:"toss_point_data,omitempty"`
 	Currency           string                 `json:"currency,omitempty"`
-	HttpStatus         int                    `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Status 필드로 판단하세요.
+	HttpStatus int `json:"http_status"`
 }
 
 // CardDataResponse represents card payment data
@@ -123,7 +126,8 @@ type CertificateResponse struct {
 	Status             int                  `json:"status"`
 	StatusLocale       string               `json:"status_locale"`
 	AuthenticateData   AuthenticateDataResp `json:"authenticate_data"`
-	HttpStatus         int                  `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Status 필드로 판단하세요.
+	HttpStatus int `json:"http_status"`
 }
 
 // AuthenticateDataResp represents authentication data in response
@@ -158,7 +162,8 @@ type SubscriptionBillingResponse struct {
 	BillingExpireAt    time.Time        `json:"billing_expire_at"`
 	Status             int              `json:"status"`
 	StatusLocale       string           `json:"status_locale,omitempty"`
-	HttpStatus         int              `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Status 필드로 판단하세요.
+	HttpStatus int `json:"http_status"`
 }
 
 // BillingDataResp represents billing data in response
@@ -174,28 +179,32 @@ type BillingDataResp struct {
 // DestroySubscribeResponse represents the response when destroying a billing key
 type DestroySubscribeResponse struct {
 	BillingKey string `json:"billing_key"`
-	HttpStatus int    `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정.
+	HttpStatus int `json:"http_status"`
 }
 
 // UserTokenResponse represents user token response
 type UserTokenResponse struct {
-	UserToken  string    `json:"user_token"`
-	ExpiredAt  time.Time `json:"expired_at"`
-	HttpStatus int       `json:"http_status"`
+	UserToken string    `json:"user_token"`
+	ExpiredAt time.Time `json:"expired_at"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정.
+	HttpStatus int `json:"http_status"`
 }
 
 // SubscribePaymentReserveResponse represents reserve payment response
 type SubscribePaymentReserveResponse struct {
 	ReserveId        string    `json:"reserve_id"`
 	ReserveExecuteAt time.Time `json:"reserve_execute_at"`
-	HttpStatus       int       `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정.
+	HttpStatus int `json:"http_status"`
 }
 
 // CancelSubscribeReserveResponse represents cancel reserve response
 type CancelSubscribeReserveResponse struct {
-	ReserveId  string `json:"reserve_id"`
-	Success    bool   `json:"success"`
-	HttpStatus int    `json:"http_status"`
+	ReserveId string `json:"reserve_id"`
+	Success   bool   `json:"success"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Success 필드 사용.
+	HttpStatus int `json:"http_status"`
 }
 
 // SubscribePaymentLookupResponse represents reserve payment lookup response
@@ -218,7 +227,8 @@ type SubscribePaymentLookupResponse struct {
 	ReserveFinishedAt  string      `json:"reserve_finished_at"`
 	ReserveRevokedAt   string      `json:"reserve_revoked_at"`
 	Status             int         `json:"status"`
-	HttpStatus         int         `json:"http_status"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Status 필드 사용.
+	HttpStatus int `json:"http_status"`
 }
 
 // WalletPaymentResponse represents wallet payment response
@@ -243,6 +253,7 @@ type WalletPaymentResponse struct {
 	Pg                 string                 `json:"pg"`
 	StatusLocale       string                 `json:"status_locale"`
 	Currency           string                 `json:"currency"`
+	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Status 필드 사용.
 	HttpStatus         int                    `json:"http_status"`
 	OrderId            string                 `json:"order_id"`
 	RequestedAt        string                 `json:"requested_at"`

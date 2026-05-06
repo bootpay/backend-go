@@ -1,3 +1,9 @@
+### Unreleased
+- `HttpStatus` 응답 struct 필드 (10개 response 타입) 와 `result["http_status"]` map key 를 deprecated 처리.
+  - 동작 변경 없음 — 필드/map key 모두 그대로 유지하며 `go vet` / IDE 에서 사용 시 경고만 표시.
+  - 성공 여부는 함수 반환 `error` 값 또는 응답 `Status` 필드로 판단 권장.
+  - 다음 메이저 버전(v3) 에서 제거 예정. 기존 가맹점 코드는 그대로 컴파일·동작.
+
 ### 2.2.0
 - Commerce API 추가
   - User 모듈 (Token, Join, CheckExist, Login, List, Detail, Update, Delete, AuthenticationData)
