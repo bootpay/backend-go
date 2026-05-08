@@ -8,10 +8,9 @@ import (
 
 func TestPgRequestAuthentication(t *testing.T) {
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	authData := Authentication{
 		Pg:               "danal",
@@ -39,10 +38,9 @@ func TestPgConfirmAuthentication(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id and OTP from a real authentication request")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	params := AuthenticationParams{
 		ReceiptId: "636a0bc4d01c7e00331cd25e",
@@ -61,10 +59,9 @@ func TestPgRealarmAuthentication(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id from a real authentication request")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	params := AuthenticationParams{
 		ReceiptId: "6369dc33d01c7e00271cccad",

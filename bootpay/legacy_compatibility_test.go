@@ -1,7 +1,6 @@
 package bootpay
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -24,8 +23,8 @@ func TestLegacyNewAPICompatibility(t *testing.T) {
 	if api.privateKey != "legacy_private_key" {
 		t.Fatalf("privateKey mismatch: %s", api.privateKey)
 	}
-	if api.clientKey != "" || api.serverKey != "" {
-		t.Fatalf("legacy API should not set client/server keys")
+	if api.clientKey != "" || api.secretKey != "" {
+		t.Fatalf("legacy API should not set client/secret keys")
 	}
 	if !strings.HasPrefix(api.baseUrl, DEVELOPMENT) {
 		t.Fatalf("development base URL mismatch: %s", api.baseUrl)
@@ -75,8 +74,8 @@ func TestLegacyGetTokenOmitsAuthorizationAndUsesLegacyPayload(t *testing.T) {
 	if capturedPayload.ApplicationId != "legacy_application_id" || capturedPayload.PrivateKey != "legacy_private_key" {
 		t.Fatalf("legacy payload mismatch: %+v", capturedPayload)
 	}
-	if capturedPayload.ClientKey != "" || capturedPayload.ServerKey != "" {
-		t.Fatalf("legacy payload should not include client/server keys: %+v", capturedPayload)
+	if capturedPayload.ClientKey != "" || capturedPayload.SecretKey != "" {
+		t.Fatalf("legacy payload should not include client/secret keys: %+v", capturedPayload)
 	}
 	if api.token != "legacy_access_token" {
 		t.Fatalf("legacy token was not stored: %q", api.token)
@@ -87,40 +86,33 @@ func TestLegacyGetTokenOmitsAuthorizationAndUsesLegacyPayload(t *testing.T) {
 	}
 }
 
-func TestClientKeyGetTokenUsesBasicAuthorizationAndClientPayload(t *testing.T) {
-	var capturedAuth string
-	var capturedPayload RestConfig
+func TestClientKeyGetTokenSkipsHTTPCallAndReturnsSyntheticResponse(t *testing.T) {
+	// client_key/secret_key 모드에서는 매 요청에 Basic Auth 헤더가 자동 부착되므로
+	// request/token 호출이 불필요하다. GetToken() 은 네트워크 호출 없이 합성 응답을 돌려준다.
+	called := false
 	client := &http.Client{
 		Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
-			capturedAuth = req.Header.Get("Authorization")
-			if err := json.NewDecoder(req.Body).Decode(&capturedPayload); err != nil {
-				t.Fatalf("decode payload failed: %v", err)
-			}
-			return &http.Response{
-				StatusCode: http.StatusOK,
-				Body:       io.NopCloser(strings.NewReader(`{"access_token":"client_key_access_token"}`)),
-				Header:     make(http.Header),
-			}, nil
+			called = true
+			return nil, nil
 		}),
 	}
 	api := NewAPIWithClientKey("ck", "sk", client, "development")
 
-	if _, err := api.GetToken(); err != nil {
+	result, err := api.GetToken()
+	if err != nil {
 		t.Fatal(err)
 	}
-
-	expectedAuth := "Basic " + base64.StdEncoding.EncodeToString([]byte("ck:sk"))
-	if capturedAuth != expectedAuth {
-		t.Fatalf("Basic Authorization mismatch: got %q want %q", capturedAuth, expectedAuth)
+	if called {
+		t.Fatal("ck/sk 경로에서는 request/token HTTP 호출이 발생하면 안 된다")
 	}
-	if capturedPayload.ClientKey != "ck" || capturedPayload.ServerKey != "sk" {
-		t.Fatalf("client payload mismatch: %+v", capturedPayload)
+	if result["access_token"] != "" {
+		t.Fatalf("synthetic access_token should be empty string, got %+v", result["access_token"])
 	}
-	if capturedPayload.ApplicationId != "" || capturedPayload.PrivateKey != "" {
-		t.Fatalf("client payload should not include legacy keys: %+v", capturedPayload)
+	if result["http_status"] != http.StatusOK {
+		t.Fatalf("synthetic http_status should be 200, got %+v", result["http_status"])
 	}
-	if api.token != "client_key_access_token" {
-		t.Fatalf("client key token was not stored: %q", api.token)
+	if api.token != "" {
+		t.Fatalf("ck/sk 경로의 token 값은 사용되지 않으므로 비어 있어야 한다: %q", api.token)
 	}
 }
 

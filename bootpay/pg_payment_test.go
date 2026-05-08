@@ -10,10 +10,9 @@ func TestPgGetReceipt(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id from a real payment")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.GetReceipt(TestReceiptId)
 	if err != nil {
@@ -27,10 +26,9 @@ func TestPgGetReceiptWithUserData(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id from a real payment")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.GetReceiptWithUserData(TestReceiptId, true)
 	if err != nil {
@@ -44,10 +42,9 @@ func TestPgCancelPayment(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id from a real payment to cancel")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	cancelData := CancelData{
 		ReceiptId:      TestReceiptId,
@@ -68,10 +65,9 @@ func TestPgConfirmPayment(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id pending confirmation")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.ServerConfirm(TestReceiptIdConfirm)
 	if err != nil {
@@ -85,10 +81,9 @@ func TestPgCertificate(t *testing.T) {
 	t.Skip("Skipping: requires a valid certificate receipt_id")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.Certificate(TestCertificateReceiptId)
 	if err != nil {
@@ -100,10 +95,9 @@ func TestPgCertificate(t *testing.T) {
 
 func TestPgRequestUserToken(t *testing.T) {
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	payload := UserTokenRequest{
 		UserId: TestUserId,

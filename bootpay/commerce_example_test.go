@@ -7,9 +7,10 @@ import (
 
 // ExampleNewCommerceApi demonstrates how to create a Commerce API client
 func ExampleNewCommerceApi() {
-	// Create Commerce API client (Development)
-	commerce := NewCommerceApi(DevClientKey, DevSecretKey, nil, "development")
-	// Production: NewCommerceApi(ProductionClientKey, ProductionSecretKey, nil, "production")
+	// Create Commerce API client (Production default).
+	// Keys must be provided via .env / environment variables (see .env.example).
+	clientKey, secretKey := GetCommerceKeys()
+	commerce := NewCommerceApi(clientKey, secretKey, nil, "production")
 
 	// Get access token
 	_, _ = commerce.GetAccessToken()

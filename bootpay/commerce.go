@@ -162,6 +162,9 @@ func (api *CommerceApi) SetToken(token string) {
 
 // getBasicAuthHeader returns Basic Auth header value
 func (api *CommerceApi) getBasicAuthHeader() string {
+	if api.clientKey == "" || api.secretKey == "" {
+		return ""
+	}
 	credentials := fmt.Sprintf("%s:%s", api.clientKey, api.secretKey)
 	encoded := base64.StdEncoding.EncodeToString([]byte(credentials))
 	return fmt.Sprintf("Basic %s", encoded)
@@ -174,8 +177,8 @@ func (api *CommerceApi) newRequest(method string, url string, body io.Reader) (*
 		return nil, errors.New("cannot create Commerce API request: " + err.Error())
 	}
 
-	if api.token != "" {
-		req.Header.Set("Authorization", "Bearer "+api.token)
+	if basic := api.getBasicAuthHeader(); basic != "" {
+		req.Header.Set("Authorization", basic)
 	}
 
 	req.Header.Set("Content-Type", "application/json")

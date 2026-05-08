@@ -56,7 +56,8 @@ CGO_ENABLED=0 go test -v -run ExampleCommerceApi_Product
 
 ```go
 func getTestApi() *Api {
-    return NewAPI("YOUR_APPLICATION_ID", "YOUR_PRIVATE_KEY", nil, "development")
+    // Legacy fallback: return NewAPI("YOUR_APPLICATION_ID", "YOUR_PRIVATE_KEY", nil, "production")
+    return NewAPIWithClientKey("YOUR_CLIENT_KEY", "YOUR_SECRET_KEY", nil, "production")
 }
 ```
 
@@ -72,10 +73,10 @@ import (
 
 func main() {
     // 새로운 방식 (권장)
-    api := bootpay.NewAPI("application_id", "private_key", nil, "development")
+    api := bootpay.NewAPIWithClientKey("client_key", "secret_key", nil, "production")
 
     // 기존 방식 (하위 호환성)
-    // api := bootpay.Api{}.New("application_id", "private_key", nil, "development")
+    // Legacy fallback: api := bootpay.NewAPI("application_id", "private_key", nil, "production")
 
     // 토큰 발급
     token, err := api.GetToken()
@@ -120,10 +121,10 @@ import (
 
 func main() {
     // 새로운 방식 (권장)
-    commerce := bootpay.NewCommerceAPI("client_key", "secret_key", nil, "development")
+    commerce := bootpay.NewCommerceAPI("client_key", "secret_key", nil, "production")
 
     // 기존 방식 (하위 호환성)
-    // commerce := bootpay.NewCommerceApi("client_key", "secret_key", nil, "development")
+    // commerce := bootpay.NewCommerceApi("client_key", "secret_key", nil, "production")
 
     // 토큰 발급
     result, err := commerce.GetAccessToken()
@@ -154,7 +155,7 @@ func main() {
 ### User 모듈
 
 ```go
-commerce := bootpay.NewCommerceAPI("client_key", "secret_key", nil, "development")
+commerce := bootpay.NewCommerceAPI("client_key", "secret_key", nil, "production")
 commerce.GetAccessToken()
 
 // 사용자 토큰 발급
@@ -406,7 +407,7 @@ commerce.OrderSubscriptionAdjustment.Delete("subscription_id", "adjustment_id")
 Commerce API는 역할(Role)에 따라 접근 권한이 다릅니다:
 
 ```go
-commerce := bootpay.NewCommerceAPI("client_key", "secret_key", nil, "development")
+commerce := bootpay.NewCommerceAPI("client_key", "secret_key", nil, "production")
 commerce.GetAccessToken()
 
 // Method chaining으로 Role 설정
@@ -428,24 +429,24 @@ fmt.Println(commerce.GetRole())
 
 ```go
 // Development
-api := bootpay.NewAPI(appId, privateKey, nil, "development")
+api := bootpay.NewAPIWithClientKey(clientKey, secretKey, nil, "production")
 
 // Test
-api := bootpay.NewAPI(appId, privateKey, nil, "test")
+api := bootpay.NewAPIWithClientKey(clientKey, secretKey, nil, "test")
 
 // Stage
-api := bootpay.NewAPI(appId, privateKey, nil, "stage")
+api := bootpay.NewAPIWithClientKey(clientKey, secretKey, nil, "stage")
 
 // Production (기본값)
-api := bootpay.NewAPI(appId, privateKey, nil, "production")
-api := bootpay.NewAPI(appId, privateKey, nil, "")
+api := bootpay.NewAPIWithClientKey(clientKey, secretKey, nil, "production")
+api := bootpay.NewAPIWithClientKey(clientKey, secretKey, nil, "")
 ```
 
 ### Commerce API
 
 ```go
 // Development
-commerce := bootpay.NewCommerceAPI(clientKey, secretKey, nil, "development")
+commerce := bootpay.NewCommerceAPI(clientKey, secretKey, nil, "production")
 
 // Stage
 commerce := bootpay.NewCommerceAPI(clientKey, secretKey, nil, "stage")

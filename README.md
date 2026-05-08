@@ -56,7 +56,33 @@ go get -u github.com/bootpay/backend-go/v2
 
 ---
 
-## 사용하기
+#
+## 환경변수 설정
+
+예제와 테스트는 각 SDK 루트의 `.env` 파일을 우선 읽습니다. 먼저 `.env.example`을 복사한 뒤 필요한 키만 변경하세요. `.env`는 gitignore 처리되어 커밋되지 않습니다.
+
+```bash
+cp .env.example .env
+# BOOTPAY_ENV=production 또는 development
+```
+
+주요 변수:
+
+```env
+BOOTPAY_ENV=production
+BOOTPAY_PG_CLIENT_KEY_PROD=...
+BOOTPAY_PG_SECRET_KEY_PROD=...
+BOOTPAY_PG_CLIENT_KEY_DEV=...
+BOOTPAY_PG_SECRET_KEY_DEV=...
+BOOTPAY_COMMERCE_CLIENT_KEY_PROD=...
+BOOTPAY_COMMERCE_SECRET_KEY_PROD=...
+BOOTPAY_COMMERCE_CLIENT_KEY_PROD=...
+BOOTPAY_COMMERCE_SECRET_KEY_PROD=...
+```
+
+변수가 없으면 SDK 테스트용 기본값(NodeJS 기준 ck/sk)으로 fallback 합니다.
+
+# 사용하기
 
 ```go
 import (
@@ -64,15 +90,16 @@ import (
 )
 
 func main() {
-    // API 인스턴스 생성
-    api := bootpay.Api{}.New(
-        "5b8f6a4d396fa665fdc2b5ea",           // application_id
-        "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=", // private_key
+    // 권장: client_key/secret_key 방식
+    api := bootpay.NewAPIWithClientKey(
+        os.Getenv("BOOTPAY_PG_CLIENT_KEY_PROD"),
+        os.Getenv("BOOTPAY_PG_SECRET_KEY_PROD"),
         nil,  // http.Client (nil이면 기본값 사용)
         "",   // mode: "", "development", "test", "stage"
     )
+    // legacy application_id/private_key 방식도 NewAPI로 계속 지원됩니다.
 
-    // 토큰 발급 (필수)
+    // 토큰 발급
     token, err := api.GetToken()
     if err != nil {
         panic(err)
@@ -682,10 +709,10 @@ import (
 
 func main() {
     api := commerce.ApiCommerce{}.New(
-        "hxS-Up--5RvT6oU6QJE0JA",           // client_key
-        "r5zxvDcQJiAP2PBQ0aJjSHQtblNmYFt6uFoEMhti_mg=", // secret_key
+        os.Getenv("BOOTPAY_COMMERCE_CLIENT_KEY_PROD"),
+        os.Getenv("BOOTPAY_COMMERCE_SECRET_KEY_PROD"),
         nil,  // http.Client (nil이면 기본값 사용)
-        "development", // mode: "", "development", "stage"
+        "production", // mode: "production", "development", "stage"
     )
 
     // 토큰 발급

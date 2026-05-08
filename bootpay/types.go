@@ -231,7 +231,10 @@ type SubscribePaymentLookupResponse struct {
 	HttpStatus int `json:"http_status"`
 }
 
-// WalletPaymentResponse represents wallet payment response
+// WalletPaymentResponse represents wallet payment response.
+//
+// Deprecated: 다음 메이저 버전에서 제거 예정. wallet 엔드포인트는 폐기 예정이며,
+// 결제는 wallet_id + user_token 흐름으로 전환하세요.
 type WalletPaymentResponse struct {
 	CancelledPrice     float64                `json:"cancelled_price"`
 	WalletData         WalletDataResp         `json:"wallet_data"`
@@ -254,13 +257,15 @@ type WalletPaymentResponse struct {
 	StatusLocale       string                 `json:"status_locale"`
 	Currency           string                 `json:"currency"`
 	// Deprecated: HTTP status code 노출 필드. 다음 메이저 버전에서 제거 예정. 성공 여부는 Status 필드 사용.
-	HttpStatus         int                    `json:"http_status"`
-	OrderId            string                 `json:"order_id"`
-	RequestedAt        string                 `json:"requested_at"`
-	Status             int                    `json:"status"`
+	HttpStatus  int    `json:"http_status"`
+	OrderId     string `json:"order_id"`
+	RequestedAt string `json:"requested_at"`
+	Status      int    `json:"status"`
 }
 
-// WalletDataResp represents wallet data in response
+// WalletDataResp represents wallet data in response.
+//
+// Deprecated: WalletPaymentResponse 와 함께 다음 메이저 버전에서 제거 예정.
 type WalletDataResp struct {
 	Success WalletDataPart `json:"success"`
 	Failure []interface{}  `json:"failure"`

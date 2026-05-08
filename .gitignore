@@ -1,0 +1,8 @@
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Tool runtime dirs
+.omj/

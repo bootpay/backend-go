@@ -10,10 +10,9 @@ func TestPgRequestSubscribeBillingKey(t *testing.T) {
 	t.Skip("Skipping: requires real card information")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	subscriptionId := fmt.Sprintf("%+8d", time.Now().UnixNano()/int64(time.Millisecond))
 	payload := BillingKeyPayload{
@@ -39,10 +38,9 @@ func TestPgLookupBillingKey(t *testing.T) {
 	t.Skip("Skipping: requires a valid billing receipt_id")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.LookupBillingKey(TestReceiptIdBilling)
 	if err != nil {
@@ -56,10 +54,9 @@ func TestPgLookupBillingKeyByKey(t *testing.T) {
 	t.Skip("Skipping: requires a valid billing_key")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.LookupBillingKeyByKey(TestBillingKey2)
 	if err != nil {
@@ -73,10 +70,9 @@ func TestPgDestroyBillingKey(t *testing.T) {
 	t.Skip("Skipping: requires a valid billing_key to destroy")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.DestroyBillingKey(TestBillingKey)
 	if err != nil {
@@ -90,10 +86,9 @@ func TestPgRequestSubscribePayment(t *testing.T) {
 	t.Skip("Skipping: requires a valid billing_key")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	payload := SubscribePayload{
 		BillingKey: TestBillingKey,
@@ -122,10 +117,9 @@ func TestPgReserveSubscribePayment(t *testing.T) {
 	t.Skip("Skipping: requires a valid billing_key")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	executeAt := time.Now().Add(10 * time.Second).Format("2006-01-02T15:04:05-07:00")
 	payload := SubscribePayload{
@@ -148,10 +142,9 @@ func TestPgReserveSubscribeLookup(t *testing.T) {
 	t.Skip("Skipping: requires a valid reserve_id")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.ReserveSubscribeLookup(TestReserveId)
 	if err != nil {
@@ -165,10 +158,9 @@ func TestPgReserveCancelSubscribe(t *testing.T) {
 	t.Skip("Skipping: requires a valid reserve_id to cancel")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.ReserveCancelSubscribe(TestReserveId)
 	if err != nil {
@@ -182,10 +174,9 @@ func TestPgRequestSubscribeAutomaticTransferBillingKey(t *testing.T) {
 	t.Skip("Skipping: requires real bank account information")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	subscriptionId := fmt.Sprintf("%+8d", time.Now().UnixNano()/int64(time.Millisecond))
 	payload := BillingKeyPayload{
@@ -214,10 +205,9 @@ func TestPgPublishAutomaticTransferBillingKey(t *testing.T) {
 	t.Skip("Skipping: requires a valid receipt_id from automatic transfer request")
 
 	api := CreatePgApi()
-	_, err := api.GetToken()
-	if err != nil {
-		t.Fatalf("GetToken failed: %v", err)
-	}
+	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
+	// _, err := api.GetToken()
+	// if err != nil { t.Fatalf("GetToken failed: %v", err) }
 
 	result, err := api.PublishAutomaticTransferBillingKey(TestReceiptIdTransfer)
 	if err != nil {

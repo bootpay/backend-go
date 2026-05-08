@@ -2,6 +2,7 @@ package bootpay
 
 import (
 	"crypto/tls"
+	"encoding/base64"
 	"io"
 	"net/http"
 	"time"
@@ -13,8 +14,8 @@ const (
 	STAGE       string = "https://stage-api.bootpay.co.kr/v2"
 	PRODUCTION  string = "https://api.bootpay.co.kr/v2"
 
-	API_VERSION string = "5.0.0"
-	SDK_VERSION string = "2.2.0"
+	API_VERSION string = "5.1.0"
+	SDK_VERSION string = "2.3.0"
 )
 const defaultHTTPTimeout = 10 * time.Second
 
@@ -29,14 +30,18 @@ type APIResponse = map[string]interface{}
 //}
 
 type RestConfig struct {
-	ApplicationId string `json:"application_id"`
-	PrivateKey    string `json:"private_key"`
+	ApplicationId string `json:"application_id,omitempty"`
+	PrivateKey    string `json:"private_key,omitempty"`
+	ClientKey     string `json:"client_key,omitempty"`
+	SecretKey     string `json:"secret_key,omitempty"`
 }
 
 type Api struct {
 	token         string
 	applicationId string
 	privateKey    string
+	clientKey     string
+	secretKey     string
 	baseUrl       string
 	client        *http.Client
 }
@@ -46,9 +51,12 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 	if err != nil {
 		return nil, err
 	}
-	if api.token != "" {
-		req.Header.Set("Authorization", "Bearer " + api.token)
-	} 
+	if api.clientKey != "" && api.secretKey != "" {
+		credentials := base64.StdEncoding.EncodeToString([]byte(api.clientKey + ":" + api.secretKey))
+		req.Header.Set("Authorization", "Basic "+credentials)
+	} else if api.token != "" {
+		req.Header.Set("Authorization", "Bearer "+api.token)
+	}
 	req.Header.Set("BOOTPAY-API-VERSION", API_VERSION)
 	req.Header.Set("BOOTPAY-SDK-VERSION", SDK_VERSION)
 	req.Header.Set("BOOTPAY-SDK-TYPE", "305")
@@ -59,8 +67,7 @@ func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Requ
 	return req, nil
 }
 
-// NewAPI creates a new PG API instance (recommended)
-func NewAPI(applicationId string, privateKey string, client *http.Client, mode string) *Api {
+func newAPIBase(client *http.Client, mode string) (string, *http.Client) {
 	if client == nil {
 		client = &http.Client{
 			Timeout: defaultHTTPTimeout,
@@ -77,11 +84,30 @@ func NewAPI(applicationId string, privateKey string, client *http.Client, mode s
 	} else if mode == "stage" {
 		baseUrl = STAGE
 	}
+	return baseUrl, client
+}
+
+// NewAPI creates a new PG API instance using legacy application_id/private_key.
+// Deprecated credentials remain supported for backward compatibility.
+func NewAPI(applicationId string, privateKey string, client *http.Client, mode string) *Api {
+	baseUrl, httpClient := newAPIBase(client, mode)
 	return &Api{
 		applicationId: applicationId,
 		privateKey:    privateKey,
 		baseUrl:       baseUrl,
-		client:        client,
+		client:        httpClient,
+	}
+}
+
+// NewAPIWithClientKey creates a PG API instance using client_key/secret_key.
+// When client_key is present this Basic Auth flow takes precedence over legacy token auth.
+func NewAPIWithClientKey(clientKey string, secretKey string, client *http.Client, mode string) *Api {
+	baseUrl, httpClient := newAPIBase(client, mode)
+	return &Api{
+		clientKey: clientKey,
+		secretKey: secretKey,
+		baseUrl:   baseUrl,
+		client:    httpClient,
 	}
 }
 
