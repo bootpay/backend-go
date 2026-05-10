@@ -77,7 +77,7 @@ const (
 	TestReserveId            = "6490149ca575b40024f0b70d"
 	TestReserveId2           = "628b316cd01c7e00219b6081"
 	TestUserId               = "1234"
-	TestCertificateReceiptId = "61b009aaec81b4057e7f6ecd"
+	TestCertificateReceiptId = "69fd7187564d1f550535538c"
 )
 
 // GetPgKeys returns PG API keys based on environment
