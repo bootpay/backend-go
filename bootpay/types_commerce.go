@@ -840,3 +840,279 @@ type OrderSubscriptionAdjustmentUpdateParams struct {
 	Name                          string `json:"name,omitempty"`
 	Type                          int    `json:"type,omitempty"`
 }
+
+// ============================================
+// Category Types
+// ============================================
+
+// CommerceCategory represents a category
+type CommerceCategory struct {
+	CategoryId        string   `json:"category_id,omitempty"`
+	SellerId          string   `json:"seller_id,omitempty"`
+	ProjectId         string   `json:"project_id,omitempty"`
+	Name              string   `json:"name,omitempty"`
+	ParentCategoryId  string   `json:"parent_category_id,omitempty"`
+	ParentCategories  []string `json:"parent_categories,omitempty"`
+	StatusDisplay     *bool    `json:"status_display,omitempty"`
+	StatusBest        *bool    `json:"status_best,omitempty"`
+	FilterColor       int      `json:"filter_color,omitempty"`
+	FilterSize        int      `json:"filter_size,omitempty"`
+	Idx               int      `json:"idx,omitempty"`
+	CreatedAt         string   `json:"created_at,omitempty"`
+	UpdatedAt         string   `json:"updated_at,omitempty"`
+}
+
+// CategoryCreateParams represents category creation parameters
+type CategoryCreateParams struct {
+	Name             string `json:"name"`
+	ParentCategoryId string `json:"parent_category_id,omitempty"`
+	StatusDisplay    *bool  `json:"status_display,omitempty"`
+	StatusBest       *bool  `json:"status_best,omitempty"`
+	FilterColor      int    `json:"filter_color,omitempty"`
+	FilterSize       int    `json:"filter_size,omitempty"`
+}
+
+// CategoryUpdateParams represents category update parameters
+type CategoryUpdateParams struct {
+	CategoryId       string `json:"-"`
+	Name             string `json:"name,omitempty"`
+	ParentCategoryId string `json:"parent_category_id,omitempty"`
+	StatusDisplay    *bool  `json:"status_display,omitempty"`
+	StatusBest       *bool  `json:"status_best,omitempty"`
+	FilterColor      int    `json:"filter_color,omitempty"`
+	FilterSize       int    `json:"filter_size,omitempty"`
+}
+
+// CategoryUpdateBody represents the body sent to PUT categories/{id}
+type CategoryUpdateBody struct {
+	Name             string `json:"name,omitempty"`
+	ParentCategoryId string `json:"parent_category_id,omitempty"`
+	StatusDisplay    *bool  `json:"status_display,omitempty"`
+	StatusBest       *bool  `json:"status_best,omitempty"`
+	FilterColor      int    `json:"filter_color,omitempty"`
+	FilterSize       int    `json:"filter_size,omitempty"`
+}
+
+// ============================================
+// Coupon Types
+// ============================================
+
+// CommerceCoupon represents a coupon
+type CommerceCoupon struct {
+	CouponId          string `json:"coupon_id,omitempty"`
+	CouponTemplateId  string `json:"coupon_template_id,omitempty"`
+	UserId            string `json:"user_id,omitempty"`
+	ProjectId         string `json:"project_id,omitempty"`
+	Name              string `json:"name,omitempty"`
+	DiscountType      int    `json:"discount_type,omitempty"`
+	DiscountValue     int    `json:"discount_value,omitempty"`
+	MinOrderAmount    int    `json:"min_order_amount,omitempty"`
+	MaxDiscountAmount int    `json:"max_discount_amount,omitempty"`
+	Status            int    `json:"status,omitempty"`
+	IssuedAt          string `json:"issued_at,omitempty"`
+	UsedAt            string `json:"used_at,omitempty"`
+	ExpiresAt         string `json:"expires_at,omitempty"`
+	CreatedAt         string `json:"created_at,omitempty"`
+}
+
+// CouponListParams represents coupon list query parameters
+type CouponListParams struct {
+	Status string `json:"status,omitempty"`
+	Page   int    `json:"page,omitempty"`
+	Limit  int    `json:"limit,omitempty"`
+}
+
+// CouponDownloadParams represents coupon download parameters
+type CouponDownloadParams struct {
+	CouponTemplateId string `json:"coupon_template_id"`
+}
+
+// ============================================
+// Point Types
+// ============================================
+
+// PointBalance represents point balance
+type PointBalance struct {
+	AvailableBalance int  `json:"available_balance,omitempty"`
+	TotalEarned      int  `json:"total_earned,omitempty"`
+	TotalUsed        int  `json:"total_used,omitempty"`
+	IsNegative       bool `json:"is_negative,omitempty"`
+}
+
+// PointTransaction represents a point transaction
+type PointTransaction struct {
+	TransactionId    string `json:"transaction_id,omitempty"`
+	TransactionType  int    `json:"transaction_type,omitempty"`
+	Amount           int    `json:"amount,omitempty"`
+	BalanceAfter     int    `json:"balance_after,omitempty"`
+	Reason           string `json:"reason,omitempty"`
+	Type             int    `json:"type,omitempty"`
+	OrderId          string `json:"order_id,omitempty"`
+	ReviewId         string `json:"review_id,omitempty"`
+	EarnedAt         string `json:"earned_at,omitempty"`
+	ExpiresAt        string `json:"expires_at,omitempty"`
+	Expired          bool   `json:"expired,omitempty"`
+	RemainingBalance int    `json:"remaining_balance,omitempty"`
+	CreatedAt        string `json:"created_at,omitempty"`
+}
+
+// PointTransactionsResponse represents the response from point transactions
+type PointTransactionsResponse struct {
+	Transactions []PointTransaction `json:"transactions,omitempty"`
+	TotalCount   int                `json:"total_count,omitempty"`
+	Page         int                `json:"page,omitempty"`
+	Limit        int                `json:"limit,omitempty"`
+	TotalPages   int                `json:"total_pages,omitempty"`
+}
+
+// PointTransactionsParams represents point transactions query parameters
+type PointTransactionsParams struct {
+	Page            int `json:"page,omitempty"`
+	Limit           int `json:"limit,omitempty"`
+	TransactionType int `json:"transaction_type,omitempty"`
+}
+
+// ============================================
+// Cart Types
+// ============================================
+
+// CartItemPayload represents a cart item payload
+type CartItemPayload struct {
+	ProductId              string `json:"product_id"`
+	ProductOptionId        string `json:"product_option_id,omitempty"`
+	Quantity               int    `json:"quantity,omitempty"`
+	IsSubscription         bool   `json:"is_subscription,omitempty"`
+	SubscriptionPeriodId   string `json:"subscription_period_id,omitempty"`
+}
+
+// ShippingAddressPayload represents a shipping address payload
+type ShippingAddressPayload struct {
+	Zipcode string `json:"zipcode,omitempty"`
+}
+
+// OrderPreviewParams represents order preview parameters
+type OrderPreviewParams struct {
+	MemberMode      string                  `json:"member_mode,omitempty"`
+	CartItems       []CartItemPayload       `json:"cart_items,omitempty"`
+	ShippingAddress *ShippingAddressPayload `json:"shipping_address,omitempty"`
+	CouponIds       []string                `json:"coupon_ids,omitempty"`
+	PointAmount     int                     `json:"point_amount,omitempty"`
+	UserGroupId     string                  `json:"user_group_id,omitempty"`
+}
+
+// DeliveryGroupItem represents a delivery group item
+type DeliveryGroupItem struct {
+	CartItemId      string `json:"cart_item_id,omitempty"`
+	ProductId       string `json:"product_id"`
+	ProductOptionId string `json:"product_option_id,omitempty"`
+	ProductName     string `json:"product_name,omitempty"`
+	Quantity        int    `json:"quantity"`
+	Price           int    `json:"price"`
+	Subtotal        int    `json:"subtotal,omitempty"`
+}
+
+// DeliveryGroup represents a delivery group
+type DeliveryGroup struct {
+	GroupKey                 string              `json:"group_key,omitempty"`
+	SellerId                 string              `json:"seller_id,omitempty"`
+	DeliveryShippingId       string              `json:"delivery_shipping_id,omitempty"`
+	DeliveryShippingBundleId string              `json:"delivery_shipping_bundle_id,omitempty"`
+	BundleId                 string              `json:"bundle_id,omitempty"`
+	Items                    []DeliveryGroupItem `json:"items"`
+	TotalPrice               int                 `json:"total_price"`
+	TotalQuantity            int                 `json:"total_quantity"`
+	DeliveryFee              int                 `json:"delivery_fee"`
+	DeliveryExtraFeeJeju     int                 `json:"delivery_extra_fee_jeju,omitempty"`
+	DeliveryExtraFeeRemote   int                 `json:"delivery_extra_fee_remote,omitempty"`
+	ShippingAvailable        *bool               `json:"shipping_available,omitempty"`
+}
+
+// AppliedCouponSnapshot represents an applied coupon snapshot
+type AppliedCouponSnapshot struct {
+	CouponId             string                 `json:"coupon_id,omitempty"`
+	CouponTemplateId     string                 `json:"coupon_template_id,omitempty"`
+	Name                 string                 `json:"name,omitempty"`
+	DiscountType         int                    `json:"discount_type,omitempty"`
+	DiscountValue        int                    `json:"discount_value,omitempty"`
+	ActualDiscountAmount int                    `json:"actual_discount_amount,omitempty"`
+	Extra                map[string]interface{} `json:"-"`
+}
+
+// OrderPreviewSummary represents an order preview summary
+type OrderPreviewSummary struct {
+	TotalItems              int                     `json:"total_items"`
+	TotalQuantity           int                     `json:"total_quantity"`
+	TotalProductPrice       int                     `json:"total_product_price"`
+	TotalDeliveryFee        int                     `json:"total_delivery_fee"`
+	TotalDeliveryExtraFee   int                     `json:"total_delivery_extra_fee"`
+	CouponDiscountAmount    int                     `json:"coupon_discount_amount"`
+	AppliedCoupons          []AppliedCouponSnapshot `json:"applied_coupons"`
+	PointUseAmount          int                     `json:"point_use_amount"`
+	PointMaxUsable          int                     `json:"point_max_usable"`
+	PointBalanceAfter       int                     `json:"point_balance_after"`
+	TotalOrderPrice         int                     `json:"total_order_price"`
+}
+
+// OrderPreviewUnavailableItem represents an unavailable item in order preview
+type OrderPreviewUnavailableItem struct {
+	CartItemId  string `json:"cart_item_id,omitempty"`
+	ProductId   string `json:"product_id"`
+	ProductName string `json:"product_name,omitempty"`
+	Reason      string `json:"reason,omitempty"`
+}
+
+// OrderPreviewResponse represents the response from order preview
+type OrderPreviewResponse struct {
+	CartId            string                        `json:"cart_id,omitempty"`
+	UserId            string                        `json:"user_id,omitempty"`
+	DeliveryGroups    []DeliveryGroup               `json:"delivery_groups"`
+	Summary           OrderPreviewSummary           `json:"summary"`
+	UnavailableItems  []OrderPreviewUnavailableItem `json:"unavailable_items,omitempty"`
+}
+
+// ============================================
+// OrderSubscriptionRequest Types
+// ============================================
+
+// OrderSubscriptionRequest represents an order subscription request
+type OrderSubscriptionRequest struct {
+	OrderSubscriptionRequestHistoryId string `json:"order_subscription_request_history_id,omitempty"`
+	OrderSubscriptionId               string `json:"order_subscription_id,omitempty"`
+	ProjectId                         string `json:"project_id,omitempty"`
+	UserId                            string `json:"user_id,omitempty"`
+	RequestType                       int    `json:"request_type,omitempty"`
+	Status                            int    `json:"status,omitempty"`
+	Reason                            string `json:"reason,omitempty"`
+	RequestedAt                       string `json:"requested_at,omitempty"`
+	ProcessedAt                       string `json:"processed_at,omitempty"`
+	CreatedAt                         string `json:"created_at,omitempty"`
+	UpdatedAt                         string `json:"updated_at,omitempty"`
+}
+
+// OrderSubscriptionRequestListParams represents request list query parameters
+type OrderSubscriptionRequestListParams struct {
+	ProjectId   string `json:"project_id,omitempty"`
+	Page        int    `json:"page,omitempty"`
+	Limit       int    `json:"limit,omitempty"`
+	RequestType int    `json:"request_type,omitempty"`
+	Status      int    `json:"status,omitempty"`
+	SAt         string `json:"s_at,omitempty"`
+	EAt         string `json:"e_at,omitempty"`
+	Keyword     string `json:"keyword,omitempty"`
+}
+
+// OrderSubscriptionRequestUpdateParams represents request update parameters (supervisor)
+// Approval values: "approve" | "reject"
+type OrderSubscriptionRequestUpdateParams struct {
+	OrderSubscriptionRequestHistoryId string                 `json:"-"`
+	Approval                          string                 `json:"approval"`
+	Reason                            string                 `json:"reason,omitempty"`
+	Extra                             map[string]interface{} `json:"-"`
+}
+
+// OrderSubscriptionRequestUpdateBody represents the request body sent to PUT order-subscription-requests/{id}
+type OrderSubscriptionRequestUpdateBody struct {
+	Approval string                 `json:"approval"`
+	Reason   string                 `json:"reason,omitempty"`
+	Extra    map[string]interface{} `json:"-"`
+}

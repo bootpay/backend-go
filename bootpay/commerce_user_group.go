@@ -58,12 +58,12 @@ func (m *UserGroupModule) UserCreate(userGroupId string, userId string) (map[str
 	data := map[string]string{
 		"user_id": userId,
 	}
-	return m.api.Post(fmt.Sprintf("user-groups/%s/add_user", userGroupId), data)
+	return m.api.Post(fmt.Sprintf("user-groups/%s/user", userGroupId), data)
 }
 
 // UserDelete removes a user from a group
 func (m *UserGroupModule) UserDelete(userGroupId string, userId string) (map[string]interface{}, error) {
-	return m.api.Delete(fmt.Sprintf("user-groups/%s/remove_user?user_id=%s", userGroupId, userId))
+	return m.api.Delete(fmt.Sprintf("user-groups/%s/user/%s", userGroupId, userId))
 }
 
 // Limit sets group limit settings
