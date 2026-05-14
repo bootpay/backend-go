@@ -1,4 +1,5 @@
 ### 2.3.0
+- 모듈 레이아웃 복원 — `bootpay/` 서브디렉토리에 있던 `go.mod` 와 모든 `.go` 파일을 repo root 로 이동. v2.0.9 시점 레이아웃 복원. 이전 v2.1.0 ~ v2.2.0 은 module path 와 디렉토리 구조 불일치로 Go module proxy 에 publish 되지 않음 (실제 사용자는 v2.0.9 에 묶여 있었음). v2.3.0 부터 다시 정상 publish.
 - 인증: client_key/secret_key Basic Auth 지원 (PG + Commerce 공통).
   - 기존 application_id/private_key Bearer 방식 하위 호환 유지.
   - PG: `NewAPIWithClientKey(clientKey, secretKey, client, mode)` 팩토리 추가.
