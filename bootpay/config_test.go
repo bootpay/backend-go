@@ -53,17 +53,6 @@ func getAuthMode() string {
 	return mode
 }
 
-// PG legacy application_id/private_key (kept for legacy auth tests; ck/sk는 .env 로 주입)
-const (
-	// Production
-	ProductionApplicationId = "5b8f6a4d396fa665fdc2b5ea"
-	ProductionPrivateKey    = "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw="
-
-	// Development
-	DevApplicationId = "59bfc738e13f337dbd6ca48a"
-	DevPrivateKey    = "pDc0NwlkEX3aSaHTp/PPL/i8vn5E/CqRChgyEp/gHD0="
-)
-
 // Test data
 const (
 	TestReceiptId            = "628b2206d01c7e00209b6087"
@@ -80,12 +69,14 @@ const (
 	TestCertificateReceiptId = "69fd7187564d1f550535538c"
 )
 
-// GetPgKeys returns PG API keys based on environment
+// GetPgKeys returns PG legacy application_id/private_key from .env / environment variables (see .env.example).
 func GetPgKeys() (string, string) {
 	if getEnv() == "production" {
-		return ProductionApplicationId, ProductionPrivateKey
+		return envOrDefault("BOOTPAY_PG_APPLICATION_ID_PROD", ""),
+			envOrDefault("BOOTPAY_PG_PRIVATE_KEY_PROD", "")
 	}
-	return DevApplicationId, DevPrivateKey
+	return envOrDefault("BOOTPAY_PG_APPLICATION_ID_DEV", ""),
+		envOrDefault("BOOTPAY_PG_PRIVATE_KEY_DEV", "")
 }
 
 // GetPgClientKeys returns recommended PG client_key/secret_key credentials based on environment.
