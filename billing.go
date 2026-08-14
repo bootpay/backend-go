@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 )
 
 //type BillingKeyCardData struct {
@@ -151,6 +152,22 @@ func (api *Api) LookupBillingKey(receiptId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodGet, "/subscribe/billing_key/" + receiptId, nil)
 	if err != nil {
 		errors.New("bootpay: LookupBillingKey error: " + err.Error())
+		return APIResponse{}, err
+	}
+	res, err := api.client.Do(req)
+	defer res.Body.Close()
+
+	result := APIResponse{}
+	json.NewDecoder(res.Body).Decode(&result)
+	return result, nil
+}
+
+// 우선순위 결제 빌링키 조회
+func (api *Api) LookupSequentialBillingKey(widgetKey string, billingKey string) (APIResponse, error) {
+	path := "/subscribe/sequential_billing_key/" + billingKey + "?widget_key=" + url.QueryEscape(widgetKey)
+	req, err := api.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		errors.New("bootpay: LookupSequentialBillingKey error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
