@@ -163,8 +163,11 @@ func (api *Api) LookupBillingKey(receiptId string) (APIResponse, error) {
 }
 
 // 우선순위 결제 빌링키 조회
-func (api *Api) LookupSequentialBillingKey(widgetKey string, billingKey string) (APIResponse, error) {
-	path := "/subscribe/sequential_billing_key/" + billingKey + "?widget_key=" + url.QueryEscape(widgetKey)
+// user_id는 빌링키를 발급한 구매자 식별자로, widget_key와 함께 필수로 전달한다
+func (api *Api) LookupSequentialBillingKey(widgetKey string, billingKey string, userId string) (APIResponse, error) {
+	path := "/subscribe/sequential_billing_key/" + billingKey +
+		"?widget_key=" + url.QueryEscape(widgetKey) +
+		"&user_id=" + url.QueryEscape(userId)
 	req, err := api.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		errors.New("bootpay: LookupSequentialBillingKey error: " + err.Error())
