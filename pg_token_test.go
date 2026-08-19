@@ -23,6 +23,10 @@ func TestPgGetTokenCkSkLeavesInternalTokenEmpty(t *testing.T) {
 	// ck/sk 모드에서는 매 요청 Basic Auth 로 인증하므로 GetToken 은 no-op 합성 응답을 반환하고
 	// 내부 token 은 비어 있는 상태를 유지한다. AUTH_MODE 토글과 무관하게 항상 ck/sk 인스턴스를 만든다.
 	clientKey, secretKey := GetPgClientKeys()
+	if clientKey == "" || secretKey == "" {
+		// 빈 ck/sk 는 GetToken 이 legacy 분기로 빠져 실서버 request/token 을 호출한다 — 키 없으면 skip.
+		t.Skip("PG client_key/secret_key 미설정 — 합성 응답 경로 검증 불가")
+	}
 	mode := ""
 	if getEnv() == "development" {
 		mode = "development"
