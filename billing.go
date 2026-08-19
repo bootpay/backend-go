@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"net/url"
 )
 
 //type BillingKeyCardData struct {
@@ -172,6 +173,27 @@ func (api *Api) GetBillingKey(payload BillingKeyPayload) (APIResponse, error) {
 func (api *Api) LookupBillingKey(receiptId string) (APIResponse, error) {
 
 	req, err := api.NewRequest(http.MethodGet, "/subscribe/billing_key/" + receiptId, nil)
+	if err != nil {
+		return APIResponse{}, err
+	}
+	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
+	defer res.Body.Close()
+
+	result := APIResponse{}
+	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
+	return result, nil
+}
+
+// LookupSequentialBillingKey 우선순위(순차) 결제 빌링키 조회
+// GET subscribe/sequential_billing_key/{billing_key}?widget_key={widget_key}&user_id={user_id}
+// userId 는 서버가 빌링키 소유자 검증에 사용한다.
+func (api *Api) LookupSequentialBillingKey(widgetKey string, billingKey string, userId string) (APIResponse, error) {
+	req, err := api.NewRequest(http.MethodGet, "/subscribe/sequential_billing_key/"+billingKey+"?widget_key="+url.QueryEscape(widgetKey)+"&user_id="+url.QueryEscape(userId), nil)
 	if err != nil {
 		return APIResponse{}, err
 	}

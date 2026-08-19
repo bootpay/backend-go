@@ -13,34 +13,38 @@ type OrderSubscriptionBillModule struct {
 }
 
 // List retrieves order subscription bill list
+// GET /v1/order_subscription_bills
+// ⚠️ The path is order_subscription_bills — underscores (not hyphens).
+// page/limit default to 1/20 when unset.
 func (m *OrderSubscriptionBillModule) List(params *OrderSubscriptionBillListParams) (map[string]interface{}, error) {
-	query := ""
-	if params != nil {
-		queryParams := url.Values{}
-		if params.Page > 0 {
-			queryParams.Set("page", strconv.Itoa(params.Page))
-		}
-		if params.Limit > 0 {
-			queryParams.Set("limit", strconv.Itoa(params.Limit))
-		}
-		if params.Keyword != "" {
-			queryParams.Set("keyword", params.Keyword)
-		}
-		if params.OrderSubscriptionId != "" {
-			queryParams.Set("order_subscription_id", params.OrderSubscriptionId)
-		}
-		if len(params.Status) > 0 {
-			statusStrs := make([]string, len(params.Status))
-			for i, s := range params.Status {
-				statusStrs[i] = strconv.Itoa(s)
-			}
-			queryParams.Set("status", strings.Join(statusStrs, ","))
-		}
-		if len(queryParams) > 0 {
-			query = "?" + queryParams.Encode()
-		}
+	if params == nil {
+		params = &OrderSubscriptionBillListParams{}
 	}
-	return m.api.Get("order_subscription_bills" + query)
+	queryParams := url.Values{}
+	if params.OrderSubscriptionId != "" {
+		queryParams.Set("order_subscription_id", params.OrderSubscriptionId)
+	}
+	page := params.Page
+	if page <= 0 {
+		page = 1
+	}
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 20
+	}
+	queryParams.Set("page", strconv.Itoa(page))
+	queryParams.Set("limit", strconv.Itoa(limit))
+	if params.Keyword != "" {
+		queryParams.Set("keyword", params.Keyword)
+	}
+	if len(params.Status) > 0 {
+		statusStrs := make([]string, len(params.Status))
+		for i, s := range params.Status {
+			statusStrs[i] = strconv.Itoa(s)
+		}
+		queryParams.Set("status", strings.Join(statusStrs, ","))
+	}
+	return m.api.getWithHeaders("order_subscription_bills?"+queryParams.Encode(), commerceRoleHeaders("user", params.IdempotencyKey))
 }
 
 // Detail retrieves order subscription bill details

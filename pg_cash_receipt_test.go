@@ -7,6 +7,7 @@ import (
 )
 
 func TestPgRequestCashReceipt(t *testing.T) {
+	skipUnlessDevelopment(t)
 	api := CreatePgApi()
 	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
 	// _, err := api.GetToken()
@@ -32,6 +33,7 @@ func TestPgRequestCashReceipt(t *testing.T) {
 }
 
 func TestPgCashReceiptPublishOnReceipt(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id from a real payment")
 
 	api := CreatePgApi()
@@ -57,6 +59,7 @@ func TestPgCashReceiptPublishOnReceipt(t *testing.T) {
 }
 
 func TestPgCashReceiptCancelOnReceipt(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id with a published cash receipt")
 
 	api := CreatePgApi()
@@ -79,6 +82,7 @@ func TestPgCashReceiptCancelOnReceipt(t *testing.T) {
 }
 
 func TestPgCashReceiptCancel(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id from a standalone cash receipt")
 
 	api := CreatePgApi()

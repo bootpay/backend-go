@@ -11,6 +11,7 @@ import (
 // =====================================================
 
 func TestFunctions(t *testing.T) {
+	skipUnlessDevelopment(t)
 	bootpay := CreatePgApi()
 
 	// 토큰 발급 (필수)

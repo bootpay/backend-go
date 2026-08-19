@@ -66,18 +66,24 @@ func (m *UserGroupModule) UserDelete(userGroupId string, userId string) (map[str
 	return m.api.Delete(fmt.Sprintf("user-groups/%s/user/%s", userGroupId, userId))
 }
 
-// Limit sets group limit settings
+// Limit sets group purchase limit settings (manager scope)
+// PUT /v1/user-groups/{user_group_id}/limit
+// ⚠️ Limits are never applied through Update — the server's user_groups_controller#update
+// explicitly strips use_limit / limit_message / limit_month_purchase / limit_week_purchase.
+// This dedicated route is the only way to change them. Server scope: manager:limit
 func (m *UserGroupModule) Limit(params UserGroupLimitParams) (map[string]interface{}, error) {
 	if params.UserGroupId == "" {
 		return nil, fmt.Errorf("user_group_id is required")
 	}
-	return m.api.Put(fmt.Sprintf("user-groups/%s/limit", params.UserGroupId), params)
+	return m.api.putWithHeaders(fmt.Sprintf("user-groups/%s/limit", params.UserGroupId), params, commerceRoleHeaders("manager", params.IdempotencyKey))
 }
 
-// AggregateTransaction sets group aggregate transaction settings
+// AggregateTransaction sets group aggregate transaction settings (manager scope)
+// PUT /v1/user-groups/{user_group_id}/aggregate-transaction
+// Update has same-named arguments but the server only processes this dedicated route.
 func (m *UserGroupModule) AggregateTransaction(params UserGroupAggregateTransactionParams) (map[string]interface{}, error) {
 	if params.UserGroupId == "" {
 		return nil, fmt.Errorf("user_group_id is required")
 	}
-	return m.api.Put(fmt.Sprintf("user-groups/%s/aggregate-transaction", params.UserGroupId), params)
+	return m.api.putWithHeaders(fmt.Sprintf("user-groups/%s/aggregate-transaction", params.UserGroupId), params, commerceRoleHeaders("manager", params.IdempotencyKey))
 }

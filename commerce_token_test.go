@@ -3,6 +3,7 @@ package bootpay
 import "testing"
 
 func TestCommerceGetAccessTokenIntegration(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 
 	result, err := commerce.GetAccessToken()
@@ -18,6 +19,7 @@ func TestCommerceGetAccessTokenIntegration(t *testing.T) {
 }
 
 func TestCommerceGetAccessTokenSetsInternalToken(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 
 	_, err := commerce.GetAccessToken()

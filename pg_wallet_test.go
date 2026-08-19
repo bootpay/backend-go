@@ -7,6 +7,7 @@ import (
 )
 
 func TestPgGetUserWallets(t *testing.T) {
+	skipUnlessDevelopment(t)
 	api := CreatePgApi()
 	_, err := api.GetToken()
 	if err != nil {
@@ -22,6 +23,7 @@ func TestPgGetUserWallets(t *testing.T) {
 }
 
 func TestPgRequestWalletPayment(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid user with wallet setup")
 
 	api := CreatePgApi()

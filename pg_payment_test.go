@@ -7,6 +7,7 @@ import (
 )
 
 func TestPgGetReceipt(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id from a real payment")
 
 	api := CreatePgApi()
@@ -23,6 +24,7 @@ func TestPgGetReceipt(t *testing.T) {
 }
 
 func TestPgGetReceiptWithUserData(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id from a real payment")
 
 	api := CreatePgApi()
@@ -39,6 +41,7 @@ func TestPgGetReceiptWithUserData(t *testing.T) {
 }
 
 func TestPgCancelPayment(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id from a real payment to cancel")
 
 	api := CreatePgApi()
@@ -62,6 +65,7 @@ func TestPgCancelPayment(t *testing.T) {
 }
 
 func TestPgConfirmPayment(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id pending confirmation")
 
 	api := CreatePgApi()
@@ -78,6 +82,7 @@ func TestPgConfirmPayment(t *testing.T) {
 }
 
 func TestPgCertificate(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid certificate receipt_id")
 
 	api := CreatePgApi()
@@ -94,6 +99,7 @@ func TestPgCertificate(t *testing.T) {
 }
 
 func TestPgRequestUserToken(t *testing.T) {
+	skipUnlessDevelopment(t)
 	api := CreatePgApi()
 	// (legacy) application_id 방식에서만 필요. ck/sk 는 매 요청 Basic Auth 헤더로 직접 인증되므로 호출 불필요.
 	// _, err := api.GetToken()

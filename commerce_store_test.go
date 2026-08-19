@@ -3,6 +3,7 @@ package bootpay
 import "testing"
 
 func TestCommerceStoreInfo(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {
@@ -18,6 +19,7 @@ func TestCommerceStoreInfo(t *testing.T) {
 }
 
 func TestCommerceStoreDetail(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {

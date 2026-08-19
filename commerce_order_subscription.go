@@ -12,13 +12,28 @@ type OrderSubscriptionRequestIngModule struct {
 }
 
 // Pause pauses a subscription
+// POST /v1/order_subscriptions/requests/ing/pause (user scope — buyer-side request)
 func (m *OrderSubscriptionRequestIngModule) Pause(params OrderSubscriptionPauseParams) (map[string]interface{}, error) {
-	return m.api.Post("order_subscriptions/requests/ing/pause", params)
+	return m.api.postWithHeaders("order_subscriptions/requests/ing/pause", params, commerceRoleHeaders("user", params.IdempotencyKey))
 }
 
 // Resume resumes a paused subscription
+// PUT /v1/order_subscriptions/requests/ing/resume
+// ⚠️ The only PUT in the requests/ing family — do not "fix" it to POST.
 func (m *OrderSubscriptionRequestIngModule) Resume(params OrderSubscriptionResumeParams) (map[string]interface{}, error) {
-	return m.api.Put("order_subscriptions/requests/ing/resume", params)
+	return m.api.putWithHeaders("order_subscriptions/requests/ing/resume", params, commerceRoleHeaders("user", params.IdempotencyKey))
+}
+
+// Purchase requests a mid-contract purchase
+// POST /v1/order_subscriptions/requests/ing/purchase
+func (m *OrderSubscriptionRequestIngModule) Purchase(params OrderSubscriptionPurchaseParams) (map[string]interface{}, error) {
+	return m.api.postWithHeaders("order_subscriptions/requests/ing/purchase", params, commerceRoleHeaders("user", params.IdempotencyKey))
+}
+
+// Transfer requests a subscription transfer/succession
+// POST /v1/order_subscriptions/requests/ing/transfer
+func (m *OrderSubscriptionRequestIngModule) Transfer(params OrderSubscriptionTransferParams) (map[string]interface{}, error) {
+	return m.api.postWithHeaders("order_subscriptions/requests/ing/transfer", params, commerceRoleHeaders("user", params.IdempotencyKey))
 }
 
 // CalculateTerminationFee calculates termination fee
@@ -30,11 +45,12 @@ func (m *OrderSubscriptionRequestIngModule) CalculateTerminationFee(orderSubscri
 	queryParams := url.Values{}
 	if orderSubscriptionId != "" {
 		queryParams.Set("order_subscription_id", orderSubscriptionId)
-	} else if orderNumber != "" {
+	}
+	if orderNumber != "" {
 		queryParams.Set("order_number", orderNumber)
 	}
 
-	return m.api.Get("order_subscriptions/requests/ing/calculate_termination_fee?" + queryParams.Encode())
+	return m.api.getWithHeaders("order_subscriptions/requests/ing/calculate_termination_fee?"+queryParams.Encode(), commerceRoleHeaders("user", ""))
 }
 
 // CalculateTerminationFeeByOrderNumber calculates termination fee by order number
@@ -43,8 +59,9 @@ func (m *OrderSubscriptionRequestIngModule) CalculateTerminationFeeByOrderNumber
 }
 
 // Termination terminates a subscription
+// POST /v1/order_subscriptions/requests/ing/termination
 func (m *OrderSubscriptionRequestIngModule) Termination(params OrderSubscriptionTerminationParams) (map[string]interface{}, error) {
-	return m.api.Post("order_subscriptions/requests/ing/termination", params)
+	return m.api.postWithHeaders("order_subscriptions/requests/ing/termination", params, commerceRoleHeaders("user", params.IdempotencyKey))
 }
 
 // OrderSubscriptionModule handles order subscription-related operations
@@ -67,6 +84,12 @@ func (m *OrderSubscriptionModule) List(params *OrderSubscriptionListParams) (map
 		if params.Keyword != "" {
 			queryParams.Set("keyword", params.Keyword)
 		}
+		if params.SearchDateFrom != "" {
+			queryParams.Set("search_date_from", params.SearchDateFrom)
+		}
+		if params.SearchDateTo != "" {
+			queryParams.Set("search_date_to", params.SearchDateTo)
+		}
 		if params.SAt != "" {
 			queryParams.Set("s_at", params.SAt)
 		}
@@ -78,6 +101,9 @@ func (m *OrderSubscriptionModule) List(params *OrderSubscriptionListParams) (map
 		}
 		if params.UserGroupId != "" {
 			queryParams.Set("user_group_id", params.UserGroupId)
+		}
+		if params.Status != nil {
+			queryParams.Set("status", strconv.Itoa(*params.Status))
 		}
 		if params.UserId != "" {
 			queryParams.Set("user_id", params.UserId)
@@ -94,12 +120,14 @@ func (m *OrderSubscriptionModule) Detail(orderSubscriptionId string) (map[string
 	return m.api.Get(fmt.Sprintf("order_subscriptions/%s", orderSubscriptionId))
 }
 
-// Update updates order subscription
+// Update updates the subscription contract (supervisor scope)
+// PUT /v1/order_subscriptions/{order_subscription_id}
+// Only changed values need to be sent (the server keeps the rest as-is).
 func (m *OrderSubscriptionModule) Update(params OrderSubscriptionUpdateParams) (map[string]interface{}, error) {
 	if params.OrderSubscriptionId == "" {
 		return nil, fmt.Errorf("order_subscription_id is required")
 	}
-	return m.api.Put(fmt.Sprintf("order_subscriptions/%s", params.OrderSubscriptionId), params)
+	return m.api.putWithHeaders(fmt.Sprintf("order_subscriptions/%s", params.OrderSubscriptionId), params, commerceRoleHeaders("supervisor", params.IdempotencyKey))
 }
 
 // SupervisorApprove approves a subscription request (supervisor role)
@@ -137,4 +165,24 @@ func (m *OrderSubscriptionModule) SupervisorResume(orderSubscriptionId string, p
 		params = &SupervisorOrderSubscriptionResumeParams{}
 	}
 	return m.api.Put(fmt.Sprintf("order_subscriptions/%s/resume", orderSubscriptionId), params)
+}
+
+// SupervisorCharge performs an on-demand charge_key payment (supervisor scope)
+// POST /v1/order_subscriptions/charge
+// ⚠️ charge_key is sent only in the body — never in the URL/query (access log exposure).
+func (m *OrderSubscriptionModule) SupervisorCharge(params SupervisorOrderSubscriptionChargeParams) (map[string]interface{}, error) {
+	if params.ChargeKey == "" {
+		return nil, fmt.Errorf("charge_key is required")
+	}
+	return m.api.postWithHeaders("order_subscriptions/charge", params, commerceRoleHeaders("supervisor", params.IdempotencyKey))
+}
+
+// SupervisorChargeRevoke revokes an on-demand charge_key (supervisor scope)
+// DELETE /v1/order_subscriptions/charge — charge_key is sent in the body
+// After revoking, the key can never be charged again.
+func (m *OrderSubscriptionModule) SupervisorChargeRevoke(params SupervisorOrderSubscriptionChargeRevokeParams) (map[string]interface{}, error) {
+	if params.ChargeKey == "" {
+		return nil, fmt.Errorf("charge_key is required")
+	}
+	return m.api.deleteWithHeaders("order_subscriptions/charge", params, commerceRoleHeaders("supervisor", params.IdempotencyKey))
 }

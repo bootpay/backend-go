@@ -3,6 +3,7 @@ package bootpay
 import "testing"
 
 func TestCommerceProductList(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {
@@ -23,6 +24,7 @@ func TestCommerceProductList(t *testing.T) {
 }
 
 func TestCommerceProductDetail(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid product_id in the Commerce system")
 
 	commerce := CreateCommerceApi()
@@ -40,6 +42,7 @@ func TestCommerceProductDetail(t *testing.T) {
 }
 
 func TestCommerceProductCreateSimpleAndDelete(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: creates and deletes a real product in the Commerce system")
 
 	commerce := CreateCommerceApi()

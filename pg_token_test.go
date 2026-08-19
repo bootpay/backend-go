@@ -3,6 +3,8 @@ package bootpay
 import "testing"
 
 func TestPgGetToken(t *testing.T) {
+	// AUTH_MODE=new 는 합성 응답(no-network)이지만 legacy 토글 시 실서버를 치므로 게이트
+	skipUnlessDevelopment(t)
 	api := CreatePgApi()
 
 	result, err := api.GetToken()
@@ -38,6 +40,7 @@ func TestPgGetTokenCkSkLeavesInternalTokenEmpty(t *testing.T) {
 }
 
 func TestPgGetTokenLegacyIssuesRealAccessToken(t *testing.T) {
+	skipUnlessDevelopment(t)
 	// legacy application_id/private_key 모드는 실제 request/token 호출 후 토큰을 발급받는다.
 	appId, privateKey := GetPgKeys()
 	mode := ""

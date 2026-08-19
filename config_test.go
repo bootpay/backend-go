@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"testing"
 )
 
 func init() {
@@ -41,6 +42,16 @@ func envOrDefault(key string, fallback string) string {
 // Defaults to "production" if not set.
 func getEnv() string {
 	return envOrDefault("BOOTPAY_ENV", "production")
+}
+
+// skipUnlessDevelopment 는 라이브(네트워크) 테스트 공용 가드다.
+// BOOTPAY_ENV=development 가 아니면 skip — 기본(production) 환경에서 go test 가
+// 실서버를 호출하는 사고를 막는다 (production 호출 금지 정책).
+func skipUnlessDevelopment(t *testing.T) {
+	t.Helper()
+	if getEnv() != "development" {
+		t.Skip("BOOTPAY_ENV=development 전용 라이브 테스트 — production 호출 금지")
+	}
 }
 
 // getAuthMode returns the active PG auth mode: "new" (ck/sk) 또는 "legacy" (application_id/private_key).

@@ -3,6 +3,7 @@ package bootpay
 import "testing"
 
 func TestCommerceUserToken(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {
@@ -18,6 +19,7 @@ func TestCommerceUserToken(t *testing.T) {
 }
 
 func TestCommerceUserList(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {
@@ -38,6 +40,7 @@ func TestCommerceUserList(t *testing.T) {
 }
 
 func TestCommerceUserDetail(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid user_id in the Commerce system")
 
 	commerce := CreateCommerceApi()
@@ -55,6 +58,7 @@ func TestCommerceUserDetail(t *testing.T) {
 }
 
 func TestCommerceUserCheckExist(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {
@@ -70,6 +74,7 @@ func TestCommerceUserCheckExist(t *testing.T) {
 }
 
 func TestCommerceUserJoinAndDelete(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: creates and deletes a real user in the Commerce system")
 
 	commerce := CreateCommerceApi()

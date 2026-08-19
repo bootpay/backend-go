@@ -35,6 +35,12 @@ func (m *OrderModule) List(params *OrderListParams) (map[string]interface{}, err
 		if params.CsType != "" {
 			queryParams.Set("cs_type", params.CsType)
 		}
+		if params.SearchDateFrom != "" {
+			queryParams.Set("search_date_from", params.SearchDateFrom)
+		}
+		if params.SearchDateTo != "" {
+			queryParams.Set("search_date_to", params.SearchDateTo)
+		}
 		if params.CssAt != "" {
 			queryParams.Set("css_at", params.CssAt)
 		}

@@ -19,7 +19,7 @@ func ExampleNewCommerceApi() {
 	commerce.AsManager()
 
 	fmt.Println("Commerce API client created")
-	// Output: Commerce API client created
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): Commerce API client created
 }
 
 // ExampleCommerceApi_User demonstrates User module usage
@@ -65,7 +65,7 @@ func ExampleCommerceApi_User() {
 	_, _ = commerce.User.Delete("user_123")
 
 	fmt.Println("User module examples completed")
-	// Output: User module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): User module examples completed
 }
 
 // ExampleCommerceApi_UserGroup demonstrates UserGroup module usage
@@ -114,7 +114,7 @@ func ExampleCommerceApi_UserGroup() {
 	})
 
 	fmt.Println("UserGroup module examples completed")
-	// Output: UserGroup module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): UserGroup module examples completed
 }
 
 // ExampleCommerceApi_Product demonstrates Product module usage
@@ -163,7 +163,7 @@ func ExampleCommerceApi_Product() {
 	_, _ = commerce.Product.Delete("product_123")
 
 	fmt.Println("Product module examples completed")
-	// Output: Product module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): Product module examples completed
 }
 
 // ExampleCommerceApi_Invoice demonstrates Invoice module usage
@@ -197,7 +197,7 @@ func ExampleCommerceApi_Invoice() {
 	_, _ = commerce.Invoice.Notify("invoice_123", []int{INVOICE_SEND_TYPE_SMS, INVOICE_SEND_TYPE_EMAIL})
 
 	fmt.Println("Invoice module examples completed")
-	// Output: Invoice module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): Invoice module examples completed
 }
 
 // ExampleCommerceApi_Order demonstrates Order module usage
@@ -223,7 +223,7 @@ func ExampleCommerceApi_Order() {
 	_, _ = commerce.Order.Month("group_123", "2024-01")
 
 	fmt.Println("Order module examples completed")
-	// Output: Order module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): Order module examples completed
 }
 
 // ExampleCommerceApi_OrderCancel demonstrates OrderCancel module usage
@@ -261,7 +261,7 @@ func ExampleCommerceApi_OrderCancel() {
 	})
 
 	fmt.Println("OrderCancel module examples completed")
-	// Output: OrderCancel module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): OrderCancel module examples completed
 }
 
 // ExampleCommerceApi_OrderSubscription demonstrates OrderSubscription module usage
@@ -312,7 +312,7 @@ func ExampleCommerceApi_OrderSubscription() {
 	})
 
 	fmt.Println("OrderSubscription module examples completed")
-	// Output: OrderSubscription module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): OrderSubscription module examples completed
 }
 
 // ExampleCommerceApi_OrderSubscriptionBill demonstrates OrderSubscriptionBill module usage
@@ -340,7 +340,7 @@ func ExampleCommerceApi_OrderSubscriptionBill() {
 	})
 
 	fmt.Println("OrderSubscriptionBill module examples completed")
-	// Output: OrderSubscriptionBill module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): OrderSubscriptionBill module examples completed
 }
 
 // ExampleCommerceApi_OrderSubscriptionAdjustment demonstrates OrderSubscriptionAdjustment module usage
@@ -368,7 +368,7 @@ func ExampleCommerceApi_OrderSubscriptionAdjustment() {
 	_, _ = commerce.OrderSubscriptionAdjustment.Delete("subscription_123", "adjustment_123")
 
 	fmt.Println("OrderSubscriptionAdjustment module examples completed")
-	// Output: OrderSubscriptionAdjustment module examples completed
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): OrderSubscriptionAdjustment module examples completed
 }
 
 // ExampleCommerceApi_SetRole demonstrates role chaining
@@ -387,11 +387,12 @@ func ExampleCommerceApi_SetRole() {
 	currentRole := commerce.GetRole()
 	fmt.Printf("Current role: %s\n", currentRole)
 
-	// Output: Current role: supervisor
+	// Example output (live 예제 — go test 실행 게이트로 Output 지시자 비활성화): Current role: supervisor
 }
 
 // TestCommerceAllEndpoints tests all Commerce API endpoints for 404 errors
 func TestCommerceAllEndpoints(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 
 	// Get access token first

@@ -3,6 +3,7 @@ package bootpay
 import "testing"
 
 func TestCommerceOrderList(t *testing.T) {
+	skipUnlessDevelopment(t)
 	commerce := CreateCommerceApi()
 	_, err := commerce.GetAccessToken()
 	if err != nil {
@@ -23,6 +24,7 @@ func TestCommerceOrderList(t *testing.T) {
 }
 
 func TestCommerceOrderDetail(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid order_id in the Commerce system")
 
 	commerce := CreateCommerceApi()
@@ -40,6 +42,7 @@ func TestCommerceOrderDetail(t *testing.T) {
 }
 
 func TestCommerceOrderMonth(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid user_group_id in the Commerce system")
 
 	commerce := CreateCommerceApi()

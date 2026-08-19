@@ -7,6 +7,7 @@ import (
 )
 
 func TestPgRequestSubscribeBillingKey(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires real card information")
 
 	api := CreatePgApi()
@@ -35,6 +36,7 @@ func TestPgRequestSubscribeBillingKey(t *testing.T) {
 }
 
 func TestPgLookupBillingKey(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid billing receipt_id")
 
 	api := CreatePgApi()
@@ -51,6 +53,7 @@ func TestPgLookupBillingKey(t *testing.T) {
 }
 
 func TestPgLookupBillingKeyByKey(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid billing_key")
 
 	api := CreatePgApi()
@@ -67,6 +70,7 @@ func TestPgLookupBillingKeyByKey(t *testing.T) {
 }
 
 func TestPgDestroyBillingKey(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid billing_key to destroy")
 
 	api := CreatePgApi()
@@ -83,6 +87,7 @@ func TestPgDestroyBillingKey(t *testing.T) {
 }
 
 func TestPgRequestSubscribePayment(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid billing_key")
 
 	api := CreatePgApi()
@@ -114,6 +119,7 @@ func TestPgRequestSubscribePayment(t *testing.T) {
 }
 
 func TestPgReserveSubscribePayment(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid billing_key")
 
 	api := CreatePgApi()
@@ -139,6 +145,7 @@ func TestPgReserveSubscribePayment(t *testing.T) {
 }
 
 func TestPgReserveSubscribeLookup(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid reserve_id")
 
 	api := CreatePgApi()
@@ -155,6 +162,7 @@ func TestPgReserveSubscribeLookup(t *testing.T) {
 }
 
 func TestPgReserveCancelSubscribe(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid reserve_id to cancel")
 
 	api := CreatePgApi()
@@ -171,6 +179,7 @@ func TestPgReserveCancelSubscribe(t *testing.T) {
 }
 
 func TestPgRequestSubscribeAutomaticTransferBillingKey(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires real bank account information")
 
 	api := CreatePgApi()
@@ -202,6 +211,7 @@ func TestPgRequestSubscribeAutomaticTransferBillingKey(t *testing.T) {
 }
 
 func TestPgPublishAutomaticTransferBillingKey(t *testing.T) {
+	skipUnlessDevelopment(t)
 	t.Skip("Skipping: requires a valid receipt_id from automatic transfer request")
 
 	api := CreatePgApi()
