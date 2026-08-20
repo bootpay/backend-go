@@ -3,39 +3,62 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"io"
 	"net/http"
 )
+
 type TokenData struct {
 	Token      string `json:"access_token"`
 	ServerTime int64  `json:"server_time"`
 	ExpiredAt  int64  `json:"expired_at"`
 }
-//type Token struct {
-//	Data interface{}
-//	//ExpireIn int64 `json:"expire_in"`
-//	//AccessToken string `json:"access_token"`
-//}
+
+//	type Token struct {
+//		Data interface{}
+//		//ExpireIn int64 `json:"expire_in"`
+//		//AccessToken string `json:"access_token"`
+//	}
 func (api *Api) GetToken() (APIResponse, error) {
-	config := RestConfig{api.applicationId, api.privateKey}
+	// client_key/secret_key 인증은 매 요청에 Basic Auth 헤더가 자동 부착되므로
+	// access token 발급이 불필요하다. 호환을 위해 합성 응답을 반환한다.
+	if api.clientKey != "" && api.secretKey != "" {
+		api.token = ""
+		return APIResponse{
+			"access_token": "",
+			"expire_in":    0,
+			"http_status":  http.StatusOK,
+		}, nil
+	}
+
+	config := RestConfig{}
+	config.ApplicationId = api.applicationId
+	config.PrivateKey = api.privateKey
 	postBody, _ := json.Marshal(config)
 	body := bytes.NewBuffer(postBody)
-	req, err := api.NewRequest(http.MethodPost, "/request/token.json", body)
-	
+	req, err := api.NewRequest(http.MethodPost, "/request/token", body)
+
 	if err != nil {
-		errors.New("bootpay: getToken error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
-	json.NewDecoder(res.Body).Decode(&result)
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil && err != io.EOF {
+		return APIResponse{}, err
+	}
+	if result == nil {
+		result = map[string]interface{}{}
+	}
+	result["http_status"] = res.StatusCode
 
-	result["http_status_code"] = res.StatusCode
-
-	if result["access_token"] != nil {
-		api.token = result["access_token"].(string)
+	if accessToken, ok := result["access_token"].(string); ok {
+		api.token = accessToken
+	} else {
+		api.token = ""
 	}
 
 	return result, nil

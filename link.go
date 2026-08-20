@@ -3,13 +3,16 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
 type Payload struct {
-	RestConfig
-	Pg        string   `json:"pg"`
+	// ApplicationId and PrivateKey are kept for backward compatibility but
+	// suppressed from JSON serialization (json:"-"). Authentication is handled
+	// via the Authorization header, not the request body.
+	ApplicationId string `json:"-"`
+	PrivateKey    string `json:"-"`
+	Pg            string `json:"pg"`
 	Method    string   `json:"method"`
 	Methods   []string `json:"methods"`
 	Price     float64  `json:"price"`
@@ -20,7 +23,7 @@ type Payload struct {
 	User      User     `json:"user"`
 	Items     []Item   `json:"items"`
 	//ReturnUrl string   `json:"return_url"`
-	Extra     Extra    `json:"extra""`
+	Extra     Extra    `json:"extra"`
 	//UserInfo            User           `json:"user_info"`
 }
 
@@ -67,24 +70,21 @@ type BrowserOpenType struct {
 
 
 func (api *Api) RequestLink(payload Payload) (APIResponse, error) {
-	if payload.ApplicationId == "" {
-		payload.ApplicationId = api.applicationId
-	}
-	if payload.PrivateKey == "" {
-		payload.PrivateKey = api.privateKey
-	}
 	postBody, _ := json.Marshal(payload)
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/request/payment", body)
 	if err != nil {
-		errors.New("bootpay: RequestLink error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }

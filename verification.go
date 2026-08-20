@@ -2,7 +2,6 @@ package bootpay
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -63,15 +62,40 @@ import (
 func (api *Api) GetReceipt(receiptId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodGet, "/receipt/" + receiptId, nil)
 	if err != nil {
-		errors.New("bootpay: Verify error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
+	return result, nil
+}
+
+func (api *Api) GetReceiptWithUserData(receiptId string, lookupUserData bool) (APIResponse, error) {
+	url := "/receipt/" + receiptId
+	if lookupUserData {
+		url += "?lookup_user_data=true"
+	}
+	req, err := api.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return APIResponse{}, err
+	}
+	res, err := api.client.Do(req)
+	if err != nil {
+		return APIResponse{}, err
+	}
+	defer res.Body.Close()
+
+	result := APIResponse{}
+	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
 
@@ -121,14 +145,17 @@ func (api *Api) GetReceipt(receiptId string) (APIResponse, error) {
 func (api *Api) Certificate(receiptId string) (APIResponse, error) {
 	req, err := api.NewRequest(http.MethodGet, "/certificate/" + receiptId, nil)
 	if err != nil {
-		errors.New("bootpay: Certificate error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }

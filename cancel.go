@@ -3,7 +3,6 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
@@ -31,7 +30,12 @@ type CancelData struct {
 type RefundData struct {
 	BankAccount       string `json:"bank_account"`
 	BankUsername      string `json:"bank_username"`
-	Bankcode          string `json:"bankcode"`
+	BankCode          string `json:"bank_code"`
+}
+
+// Deprecated: Use BankCode instead.
+func (r *RefundData) SetBankcode(code string) {
+	r.BankCode = code
 }
 //type Cancel struct {
 //	APIResponse
@@ -61,14 +65,17 @@ func (api *Api) ReceiptCancel(cancelData CancelData) (APIResponse, error) {
 	body := bytes.NewBuffer(postBody)
 	req, err := api.NewRequest(http.MethodPost, "/cancel", body)
 	if err != nil {
-		errors.New("bootpay: ReserveCancelSubscribe error: " + err.Error())
 		return APIResponse{}, err
-	} 
+	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }

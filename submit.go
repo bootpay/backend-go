@@ -6,23 +6,21 @@ import (
 	"net/http"
 )
 
-type Confirm struct {
-	//RestConfig
+// Submit represents the server submit request payload.
+// RestConfig embedding was removed because application_id and private_key
+// should not be sent in the POST body; authentication is handled via the
+// Authorization header set by NewRequest.
+type Submit struct {
 	ReceiptId string `json:"receipt_id"`
 }
 
-func (api *Api) ServerConfirm(receiptId string) (APIResponse, error) {
-	sub := Confirm{}
-	//if sub.ApplicationId == "" {
-	//	sub.ApplicationId = api.applicationId
-	//}
-	//if sub.PrivateKey == "" {
-	//	sub.PrivateKey = api.privateKey
-	//}
-	sub.ReceiptId = receiptId
+func (api *Api) ServerSubmit(receiptId string) (APIResponse, error) {
+	sub := Submit{
+		ReceiptId: receiptId,
+	}
 	postBody, _ := json.Marshal(sub)
 	body := bytes.NewBuffer(postBody)
-	req, err := api.NewRequest(http.MethodPost, "/confirm", body)
+	req, err := api.NewRequest(http.MethodPost, "/submit", body)
 	if err != nil {
 		return APIResponse{}, err
 	}

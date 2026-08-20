@@ -3,20 +3,19 @@ package bootpay
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 )
 
 
 type Shipping struct {
-	ReceiptId string `json:"receipt_id"`
-	DeliveryCorp string `json:"delivery_corp"`
-	TrackingNumber string `json:"tracking_number"`
-	//Data VerifyData `json:"data"`
-	ShippingPrepayment bool `json:"shipping_prepayment"`
-	ShippingDay bool `json:"shipping_day"`
-	User ShippingUser `json:"user"`
-	Company ShippingCompany `json:"company"`
+	ReceiptId          string          `json:"receipt_id"`
+	ReceiptUrl         string          `json:"receipt_url"`
+	DeliveryCorp       string          `json:"delivery_corp"`
+	TrackingNumber     string          `json:"tracking_number"`
+	ShippingPrepayment bool            `json:"shipping_prepayment,omitempty"`
+	ShippingDay        int             `json:"shipping_day,omitempty"`
+	User               ShippingUser    `json:"user,omitempty"`
+	Company            ShippingCompany `json:"company,omitempty"`
 }
 
 
@@ -37,21 +36,23 @@ type ShippingCompany struct {
 }
 
 
-func (api *Api) putShippingStart(shipping Shipping) (APIResponse, error) {
+func (api *Api) PutShippingStart(shipping Shipping) (APIResponse, error) {
 	putBody, _ := json.Marshal(shipping)
 	body := bytes.NewBuffer(putBody)
 
 	req, err := api.NewRequest(http.MethodPut, "/escrow/shipping/start/" + shipping.ReceiptId, body)
 	if err != nil {
-		errors.New("bootpay: putShippingStart error: " + err.Error())
 		return APIResponse{}, err
 	}
 	res, err := api.client.Do(req)
-
+	if err != nil {
+		return APIResponse{}, err
+	}
 	defer res.Body.Close()
 
 	result := APIResponse{}
 	json.NewDecoder(res.Body).Decode(&result)
+	if result == nil { result =  map[string]interface{}{} }
+	result["http_status"] = res.StatusCode
 	return result, nil
 }
- 
