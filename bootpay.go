@@ -3,6 +3,7 @@ package bootpay
 import (
 	"crypto/tls"
 	"encoding/base64"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -15,7 +16,7 @@ const (
 	PRODUCTION  string = "https://api.bootpay.co.kr/v2"
 
 	API_VERSION string = "5.1.0"
-	SDK_VERSION string = "2.4.0"
+	SDK_VERSION string = "2.5.0"
 )
 const defaultHTTPTimeout = 10 * time.Second
 
@@ -46,7 +47,23 @@ type Api struct {
 	client        *http.Client
 }
 
+func (api Api) validateCredentials() error {
+	if api.clientKey != "" || api.secretKey != "" {
+		if api.clientKey == "" || api.secretKey == "" {
+			return errors.New("bootpay: client_key and secret_key must be provided together")
+		}
+		return nil
+	}
+	if api.applicationId == "" || api.privateKey == "" {
+		return errors.New("bootpay: application_id and private_key must be provided together")
+	}
+	return nil
+}
+
 func (api Api) NewRequest(method string, url string, body io.Reader) (*http.Request, error) {
+	if err := api.validateCredentials(); err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(method, api.baseUrl+url, body)
 	if err != nil {
 		return nil, err

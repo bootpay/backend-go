@@ -54,16 +54,22 @@ func (m *UserGroupModule) Update(userGroup CommerceUserGroup) (map[string]interf
 }
 
 // UserCreate adds a user to a group
-func (m *UserGroupModule) UserCreate(userGroupId string, userId string) (map[string]interface{}, error) {
+// ⚠️ The server requires manager scope (scope_invalid!) — BOOTPAY-ROLE must be sent.
+// idempotencyKey is optional; when omitted a key is generated per call.
+func (m *UserGroupModule) UserCreate(userGroupId string, userId string, idempotencyKey ...string) (map[string]interface{}, error) {
 	data := map[string]string{
 		"user_id": userId,
 	}
-	return m.api.Post(fmt.Sprintf("user-groups/%s/user", userGroupId), data)
+	return m.api.postWithHeaders(fmt.Sprintf("user-groups/%s/user", userGroupId), data,
+		commerceRoleHeaders("manager", firstOrEmpty(idempotencyKey)))
 }
 
 // UserDelete removes a user from a group
-func (m *UserGroupModule) UserDelete(userGroupId string, userId string) (map[string]interface{}, error) {
-	return m.api.Delete(fmt.Sprintf("user-groups/%s/user/%s", userGroupId, userId))
+// ⚠️ The server requires manager scope (scope_invalid!) — BOOTPAY-ROLE must be sent.
+// idempotencyKey is optional; when omitted a key is generated per call.
+func (m *UserGroupModule) UserDelete(userGroupId string, userId string, idempotencyKey ...string) (map[string]interface{}, error) {
+	return m.api.deleteWithHeaders(fmt.Sprintf("user-groups/%s/user/%s", userGroupId, userId), nil,
+		commerceRoleHeaders("manager", firstOrEmpty(idempotencyKey)))
 }
 
 // Limit sets group purchase limit settings (manager scope)

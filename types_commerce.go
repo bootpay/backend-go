@@ -861,11 +861,15 @@ type CalcTerminateFeeResponse struct {
 // SupervisorOrderSubscriptionApproveParams represents supervisor approve parameters
 type SupervisorOrderSubscriptionApproveParams struct {
 	Reason string `json:"reason,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // SupervisorOrderSubscriptionRejectParams represents supervisor reject parameters
 type SupervisorOrderSubscriptionRejectParams struct {
 	Reason string `json:"reason,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // SupervisorOrderSubscriptionTerminateParams represents supervisor terminate parameters
@@ -876,6 +880,8 @@ type SupervisorOrderSubscriptionTerminateParams struct {
 	FinalFee            int    `json:"final_fee,omitempty"`
 	ServiceEndAt        string `json:"service_end_at,omitempty"`
 	CancelDate          string `json:"cancel_date,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // SupervisorOrderSubscriptionPauseParams represents supervisor pause parameters
@@ -883,11 +889,15 @@ type SupervisorOrderSubscriptionPauseParams struct {
 	Reason           string `json:"reason,omitempty"`
 	PausedAt         string `json:"paused_at"`
 	ExpectedResumeAt string `json:"expected_resume_at,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // SupervisorOrderSubscriptionResumeParams represents supervisor resume parameters
 type SupervisorOrderSubscriptionResumeParams struct {
 	Reason string `json:"reason,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // SupervisorOrderSubscriptionChargeParams represents on-demand charge_key payment parameters
@@ -1055,6 +1065,8 @@ type CategoryCreateParams struct {
 	StatusBest       *bool  `json:"status_best,omitempty"`
 	FilterColor      int    `json:"filter_color,omitempty"`
 	FilterSize       int    `json:"filter_size,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // CategoryUpdateParams represents category update parameters
@@ -1066,6 +1078,8 @@ type CategoryUpdateParams struct {
 	StatusBest       *bool  `json:"status_best,omitempty"`
 	FilterColor      int    `json:"filter_color,omitempty"`
 	FilterSize       int    `json:"filter_size,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
 }
 
 // CategoryUpdateBody represents the body sent to PUT categories/{id}

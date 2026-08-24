@@ -18,11 +18,14 @@ func (m *CategoryModule) Detail(categoryId string) (map[string]interface{}, erro
 }
 
 // Create creates a new category
+// ⚠️ The server requires supervisor scope (scope_invalid!) — BOOTPAY-ROLE must be sent.
 func (m *CategoryModule) Create(params CategoryCreateParams) (map[string]interface{}, error) {
-	return m.api.Post("categories", params)
+	return m.api.postWithHeaders("categories", params,
+		commerceRoleHeaders("supervisor", params.IdempotencyKey))
 }
 
 // Update updates a category
+// ⚠️ The server requires supervisor scope (scope_invalid!) — BOOTPAY-ROLE must be sent.
 func (m *CategoryModule) Update(params CategoryUpdateParams) (map[string]interface{}, error) {
 	if params.CategoryId == "" {
 		return nil, fmt.Errorf("category_id is required")
@@ -37,10 +40,14 @@ func (m *CategoryModule) Update(params CategoryUpdateParams) (map[string]interfa
 		FilterColor:      params.FilterColor,
 		FilterSize:       params.FilterSize,
 	}
-	return m.api.Put(fmt.Sprintf("categories/%s", categoryId), body)
+	return m.api.putWithHeaders(fmt.Sprintf("categories/%s", categoryId), body,
+		commerceRoleHeaders("supervisor", params.IdempotencyKey))
 }
 
 // Destroy deletes a category
-func (m *CategoryModule) Destroy(categoryId string) (map[string]interface{}, error) {
-	return m.api.Delete(fmt.Sprintf("categories/%s", categoryId))
+// ⚠️ The server requires supervisor scope (scope_invalid!) — BOOTPAY-ROLE must be sent.
+// idempotencyKey is optional; when omitted a key is generated per call.
+func (m *CategoryModule) Destroy(categoryId string, idempotencyKey ...string) (map[string]interface{}, error) {
+	return m.api.deleteWithHeaders(fmt.Sprintf("categories/%s", categoryId), nil,
+		commerceRoleHeaders("supervisor", firstOrEmpty(idempotencyKey)))
 }

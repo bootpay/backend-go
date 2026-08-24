@@ -1,3 +1,28 @@
+### 2.5.0
+
+#### Commerce scope(BOOTPAY-ROLE) 정합성 (동작 변경)
+
+서버(commerce-api)가 `scope_invalid!` 로 supervisor / manager scope 를 요구하는 10개 엔드포인트가 `BOOTPAY-ROLE: user` 로 나가고 있었다. 요청 단위로 올바른 scope 를 붙인다. Java SDK 3.3.0 · Ruby SDK 와 같은 규약이다.
+
+- `OrderSubscription` — `SupervisorApprove` / `SupervisorReject` / `SupervisorTerminate` / `SupervisorPause` / `SupervisorResume` → **supervisor**
+- `Category` — `Create` / `Update` / `Destroy` → **supervisor**
+- `UserGroup` — `UserCreate` / `UserDelete` → **manager**
+
+부수 효과로 이 10개 호출에 `Idempotency-Key` 가 자동 부착된다 (다른 supervisor 메서드·Ruby SDK 와 동일). 요청 경로·바디는 변경 없다.
+⚠️ 그동안 이 API 들은 올바른 키로도 scope 오류로 거절됐다. 우회하려고 role 을 직접 조작하던 코드가 있다면 제거해도 된다.
+
+- 파라미터 struct 에 `IdempotencyKey` 필드(`json:"-"`)를 추가했다 (순수 추가 — 기존 필드·JSON 바디 불변). `Category.Destroy(categoryId, idempotencyKey ...string)` / `UserGroup.UserCreate(userGroupId, userId, idempotencyKey ...string)` / `UserGroup.UserDelete(...)` 는 가변 인자로 받아 기존 호출부가 그대로 컴파일된다.
+
+#### Commerce 최상위 배열 응답 파싱 (버그 수정)
+
+- 일부 엔드포인트(`GET categories`, `GET coupon`, `GET coupon/available`)는 객체가 아니라 **최상위 JSON 배열**을 내려준다. 이전에는 `map[string]interface{}` 로만 디코드를 시도하고 그 에러를 버려서 **호출자가 빈 map 을 error=nil 로 받았다.**
+- 배열 응답은 `{"data": [...]}` 로 감싸 돌려준다 (Java SDK `BootpayStoreObject` 폴백과 동일). 객체 응답의 모양은 그대로다.
+- 빈 본문은 빈 map, JSON 이 아닌 본문(HTML 5xx 등)은 이제 **에러**를 낸다 — 조용한 빈 map 이 성공으로 보이던 문제를 없앤다.
+
+#### PG
+
+- `Api.GetAccessToken()` 추가 — `Api.GetToken()` 의 별칭. 같은 패키지에서 `Api.GetToken()` 은 토큰을 *발급*하고 `CommerceApi.GetToken()` 은 저장된 값을 *읽어서* 이름과 의미가 반대였다. 기존 `GetToken()` 은 그대로 유지된다.
+
 ### 2.4.0
 - NodeJS SDK 2.9.0 parity (2.7.0 ~ 2.9.0 변경분 반영). 기존 함수 시그니처·struct 필드는 모두 유지 — 신규 기능은 신규 메서드/optional 필드로만 추가.
 - PG: 우선순위(순차) 결제 빌링키 조회 `LookupSequentialBillingKey(widgetKey, billingKey, userId)` 추가 — `GET subscribe/sequential_billing_key/{billing_key}?widget_key=&user_id=` (QueryEscape 적용).

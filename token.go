@@ -18,7 +18,21 @@ type TokenData struct {
 //		//ExpireIn int64 `json:"expire_in"`
 //		//AccessToken string `json:"access_token"`
 //	}
+
+// GetAccessToken issues a PG access token — an alias of GetToken.
+//
+// 26-08-24: added because GetToken has opposite meanings across the two API surfaces.
+// Api.GetToken() *issues* a token while CommerceApi.GetToken() merely *reads* the stored
+// one. This name matches CommerceApi.GetAccessToken() and the other language SDKs.
+// GetToken is kept as-is for backward compatibility.
+func (api *Api) GetAccessToken() (APIResponse, error) {
+	return api.GetToken()
+}
+
 func (api *Api) GetToken() (APIResponse, error) {
+	if err := api.validateCredentials(); err != nil {
+		return APIResponse{}, err
+	}
 	// client_key/secret_key 인증은 매 요청에 Basic Auth 헤더가 자동 부착되므로
 	// access token 발급이 불필요하다. 호환을 위해 합성 응답을 반환한다.
 	if api.clientKey != "" && api.secretKey != "" {

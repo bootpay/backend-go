@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -175,6 +176,13 @@ func (api *CommerceApi) SetToken(token string) {
 	api.token = token
 }
 
+func (api *CommerceApi) validateCredentials() error {
+	if api.clientKey == "" || api.secretKey == "" {
+		return errors.New("commerce: client_key and secret_key must be provided together")
+	}
+	return nil
+}
+
 // getBasicAuthHeader returns Basic Auth header value
 func (api *CommerceApi) getBasicAuthHeader() string {
 	if api.clientKey == "" || api.secretKey == "" {
@@ -187,6 +195,9 @@ func (api *CommerceApi) getBasicAuthHeader() string {
 
 // newRequest creates a new HTTP request with common headers
 func (api *CommerceApi) newRequest(method string, url string, body io.Reader) (*http.Request, error) {
+	if err := api.validateCredentials(); err != nil {
+		return nil, err
+	}
 	req, err := http.NewRequest(method, api.baseUrl+"/"+url, body)
 	if err != nil {
 		return nil, errors.New("cannot create Commerce API request: " + err.Error())
@@ -207,8 +218,45 @@ func (api *CommerceApi) newRequest(method string, url string, body io.Reader) (*
 	return req, nil
 }
 
+// decodeCommerceBody parses a Commerce API response body into map[string]interface{}.
+//
+// 26-08-24: some endpoints (GET /v1/categories, /v1/coupon, /v1/coupon/available)
+// answer with a top-level JSON array. Decoding those straight into a map fails, and
+// the previous code discarded that error — callers silently received an empty map.
+// A top-level array is now wrapped as {"data": [...]}, mirroring the Java SDK's
+// BootpayStoreObject fallback. Object responses keep their exact previous shape.
+// An empty body stays an empty map; anything else that is not JSON returns an error
+// instead of a silent empty result (an HTML 5xx page used to look like success).
+func decodeCommerceBody(body io.Reader) (map[string]interface{}, error) {
+	raw, err := io.ReadAll(body)
+	if err != nil {
+		return nil, err
+	}
+	if len(bytes.TrimSpace(raw)) == 0 {
+		return map[string]interface{}{}, nil
+	}
+
+	result := make(map[string]interface{})
+	if err := json.Unmarshal(raw, &result); err == nil {
+		return result, nil
+	}
+
+	var list []interface{}
+	if listErr := json.Unmarshal(raw, &list); listErr == nil {
+		if list == nil {
+			list = []interface{}{}
+		}
+		return map[string]interface{}{"data": list}, nil
+	}
+
+	return nil, fmt.Errorf("commerce: cannot parse response body as JSON: %s", strings.TrimSpace(string(raw)))
+}
+
 // GetAccessToken obtains an access token using client_key and secret_key
 func (api *CommerceApi) GetAccessToken() (map[string]interface{}, error) {
+	if err := api.validateCredentials(); err != nil {
+		return nil, err
+	}
 	data := map[string]string{
 		"client_key": api.clientKey,
 		"secret_key": api.secretKey,
@@ -237,8 +285,10 @@ func (api *CommerceApi) GetAccessToken() (map[string]interface{}, error) {
 	}
 	defer res.Body.Close()
 
-	result := make(map[string]interface{})
-	json.NewDecoder(res.Body).Decode(&result)
+	result, err := decodeCommerceBody(res.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	if accessToken, ok := result["access_token"].(string); ok {
 		api.token = accessToken
@@ -280,10 +330,7 @@ func (api *CommerceApi) doRequestWithHeaders(method string, url string, data int
 	}
 	defer res.Body.Close()
 
-	result := make(map[string]interface{})
-	json.NewDecoder(res.Body).Decode(&result)
-
-	return result, nil
+	return decodeCommerceBody(res.Body)
 }
 
 // getWithHeaders performs a GET request with per-request headers
@@ -327,10 +374,7 @@ func (api *CommerceApi) postMultipart(url string, body io.Reader, contentType st
 	}
 	defer res.Body.Close()
 
-	result := make(map[string]interface{})
-	json.NewDecoder(res.Body).Decode(&result)
-
-	return result, nil
+	return decodeCommerceBody(res.Body)
 }
 
 // newIdempotencyKey generates a UUID v4 string for the Idempotency-Key header
@@ -387,4 +431,14 @@ func (api *CommerceApi) Put(url string, data interface{}) (map[string]interface{
 // Delete performs a DELETE request
 func (api *CommerceApi) Delete(url string) (map[string]interface{}, error) {
 	return api.doRequest(http.MethodDelete, url, nil)
+}
+
+// firstOrEmpty returns the first element of an optional variadic string argument.
+// Used by Commerce methods that accept an optional Idempotency-Key without breaking
+// the existing call signature.
+func firstOrEmpty(values []string) string {
+	if len(values) > 0 {
+		return values[0]
+	}
+	return ""
 }
