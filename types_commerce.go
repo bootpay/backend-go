@@ -783,6 +783,12 @@ type OrderSubscriptionUpdateParams struct {
 	Status              int    `json:"status,omitempty"`
 	PaymentNextAt       string `json:"payment_next_at,omitempty"`
 	ServiceEndAt        string `json:"service_end_at,omitempty"`
+	// Price is the base charge amount per billing cycle.
+	// Changing it immediately recalculates the amount of the READY (scheduled) cycle and
+	// every cycle created afterwards. Already-paid cycles are untouched.
+	// Values of 0 or less are rejected by the server (0 is therefore not sent).
+	// To add/subtract on specific cycles only, use OrderSubscriptionAdjustment.Create instead.
+	Price int `json:"price,omitempty"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
 	IdempotencyKey string `json:"-"`
 }
@@ -1010,6 +1016,12 @@ const (
 )
 
 // CommerceOrderSubscriptionAdjustment represents an order subscription adjustment
+//
+// Three ways to target the billing cycles (widest last) — see OrderSubscriptionAdjustmentModule.Create:
+//   - Duration: 5                       → the 5th cycle only
+//   - DurationFrom: 3, DurationTo: 7    → cycles 3~7, one record each (5 records)
+//   - DurationFrom: 3, IsUnlimited:true → from cycle 3 to the end of the contract
+//     (a single record, DurationTo is ignored)
 type CommerceOrderSubscriptionAdjustment struct {
 	OrderSubscriptionAdjustmentId string `json:"order_subscription_adjustment_id,omitempty"`
 	Duration                      int    `json:"duration,omitempty"`
@@ -1017,7 +1029,13 @@ type CommerceOrderSubscriptionAdjustment struct {
 	TaxFreePrice                  int    `json:"tax_free_price,omitempty"`
 	Name                          string `json:"name,omitempty"`
 	Type                          int    `json:"type,omitempty"`
-	CreatedAt                     string `json:"created_at,omitempty"`
+	// DurationFrom is the first cycle of the range (1-based, inclusive)
+	DurationFrom int `json:"duration_from,omitempty"`
+	// DurationTo is the last cycle of the range (inclusive, ignored when IsUnlimited is true)
+	DurationTo int `json:"duration_to,omitempty"`
+	// IsUnlimited applies the adjustment from DurationFrom to the end of the contract
+	IsUnlimited *bool  `json:"is_unlimited,omitempty"`
+	CreatedAt   string `json:"created_at,omitempty"`
 }
 
 // OrderSubscriptionAdjustmentUpdateParams represents subscription adjustment update parameters

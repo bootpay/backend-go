@@ -123,6 +123,12 @@ func (m *OrderSubscriptionModule) Detail(orderSubscriptionId string) (map[string
 // Update updates the subscription contract (supervisor scope)
 // PUT /v1/order_subscriptions/{order_subscription_id}
 // Only changed values need to be sent (the server keeps the rest as-is).
+//
+// Price is the base charge amount per billing cycle. Changing it immediately recalculates
+// the amount of the READY (scheduled) cycle, and every cycle created afterwards uses it too.
+// Already-paid cycles are untouched. Values of 0 or less are rejected by the server.
+// To add/subtract on specific cycles only, use OrderSubscriptionAdjustment.Create instead.
+// (Same implementation as the amount change in the admin console.)
 func (m *OrderSubscriptionModule) Update(params OrderSubscriptionUpdateParams) (map[string]interface{}, error) {
 	if params.OrderSubscriptionId == "" {
 		return nil, fmt.Errorf("order_subscription_id is required")

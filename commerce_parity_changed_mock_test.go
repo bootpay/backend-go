@@ -523,3 +523,115 @@ func TestCommerceProductStatusSalePeriodFields(t *testing.T) {
 		t.Fatalf("sale period fields must be sent: %+v", body)
 	}
 }
+
+// 구독 계약 기준금액(price) 변경 — PUT /order_subscriptions/:id 에 price 가 실려야 한다.
+func TestCommerceOrderSubscriptionUpdatePrice(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.OrderSubscription.Update(OrderSubscriptionUpdateParams{
+		OrderSubscriptionId: "sub_1",
+		Price:               29000,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.Method != http.MethodPut || req.URL != COMMERCE_DEVELOPMENT+"/order_subscriptions/sub_1" {
+		t.Fatalf("subscription update mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "supervisor" {
+		t.Fatalf("subscription update must use supervisor role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	}
+	body := decodeBody(t, req)
+	if body["price"] != float64(29000) {
+		t.Fatalf("price must be sent in body: %+v", body)
+	}
+
+	// price 미지정이면 바디에 실리지 않는다 (서버가 0 이하를 거절하므로 0 전송 금지)
+	if _, err := commerce.OrderSubscription.Update(OrderSubscriptionUpdateParams{
+		OrderSubscriptionId: "sub_1",
+		OrderName:           "구독 변경",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body = decodeBody(t, lastRequest(t, captured))
+	if _, exists := body["price"]; exists {
+		t.Fatalf("price must be omitted when unset: %+v", body)
+	}
+}
+
+// 범위로 회차조정 — duration / duration_from~duration_to / duration_from+is_unlimited 3가지 지정 방법
+func TestCommerceOrderSubscriptionAdjustmentDurationRange(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	// 1) 단건 — duration 만 전송, 범위 필드는 생략된다
+	if _, err := commerce.OrderSubscriptionAdjustment.Create("sub_1", CommerceOrderSubscriptionAdjustment{
+		Duration: 5,
+		Price:    -1000,
+		Name:     "5회차 할인",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body := decodeBody(t, lastRequest(t, captured))
+	if body["duration"] != float64(5) {
+		t.Fatalf("duration must be sent: %+v", body)
+	}
+	for _, key := range []string{"duration_from", "duration_to", "is_unlimited"} {
+		if _, exists := body[key]; exists {
+			t.Fatalf("%s must be omitted when unset: %+v", key, body)
+		}
+	}
+
+	// 2) 범위 — 3~7회차 각각 한 건씩
+	if _, err := commerce.OrderSubscriptionAdjustment.Create("sub_1", CommerceOrderSubscriptionAdjustment{
+		DurationFrom: 3,
+		DurationTo:   7,
+		Price:        -1000,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.Method != http.MethodPost || req.URL != COMMERCE_DEVELOPMENT+"/order_subscriptions/sub_1/adjustments" {
+		t.Fatalf("adjustment create mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "supervisor" {
+		t.Fatalf("adjustment must use supervisor role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	}
+	body = decodeBody(t, req)
+	if body["duration_from"] != float64(3) || body["duration_to"] != float64(7) {
+		t.Fatalf("duration range must be sent: %+v", body)
+	}
+	// duration 은 Ruby 와 동일하게 기본값 1 이 항상 실린다
+	if body["duration"] != float64(1) {
+		t.Fatalf("duration must still default to 1: %+v", body)
+	}
+
+	// 3) 무제한 — 3회차부터 계약 끝까지 (duration_to 는 서버가 무시)
+	isUnlimited := true
+	if _, err := commerce.OrderSubscriptionAdjustment.Create("sub_1", CommerceOrderSubscriptionAdjustment{
+		DurationFrom: 3,
+		IsUnlimited:  &isUnlimited,
+		Price:        -1000,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body = decodeBody(t, lastRequest(t, captured))
+	if body["duration_from"] != float64(3) || body["is_unlimited"] != true {
+		t.Fatalf("unlimited range must be sent: %+v", body)
+	}
+
+	// is_unlimited=false 도 명시 전송된다 (*bool 이므로 구분 가능)
+	notUnlimited := false
+	if _, err := commerce.OrderSubscriptionAdjustment.Create("sub_1", CommerceOrderSubscriptionAdjustment{
+		DurationFrom: 3,
+		DurationTo:   7,
+		IsUnlimited:  &notUnlimited,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body = decodeBody(t, lastRequest(t, captured))
+	if body["is_unlimited"] != false {
+		t.Fatalf("explicit is_unlimited=false must be sent: %+v", body)
+	}
+}

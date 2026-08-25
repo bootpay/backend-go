@@ -1,3 +1,24 @@
+### 2.5.1
+
+Ruby SDK `9832af9` (구독 가격 변경, 범위로 회차조정) 반영. 순수 추가 — 기존 필드·시그니처·JSON 바디 불변.
+
+#### 구독 계약 기준금액 변경
+
+- `OrderSubscriptionUpdateParams` 에 `Price` 추가 — `PUT order_subscriptions/{id}` 로 전송된다.
+- 회차별 결제 금액의 **기준금액**이다. 바꾸면 결제예정(READY) 회차의 청구액이 즉시 다시 계산되고, 이후 생성되는 회차도 이 금액을 쓴다. 이미 결제된 회차는 그대로다. (관리자 화면의 금액 변경과 같은 구현)
+- 서버가 0 이하를 거절하므로 미지정(0)이면 바디에 싣지 않는다. 특정 회차만 가감하려면 `OrderSubscriptionAdjustment.Create` 를 쓴다.
+
+#### 범위로 회차조정 (`OrderSubscriptionAdjustment.Create`)
+
+`CommerceOrderSubscriptionAdjustment` 에 `DurationFrom` / `DurationTo` / `IsUnlimited` 추가. 회차 지정 방법 3가지 (아래로 갈수록 넓다):
+
+- `Duration: 5` → 5회차 한 건만
+- `DurationFrom: 3, DurationTo: 7` → 3~7회차 각각 한 건씩 (총 5건)
+- `DurationFrom: 3, IsUnlimited: &t` → 3회차부터 계약 끝까지 (레코드는 1건, `DurationTo` 는 무시)
+
+상한은 계약 총회차이며, 총회차가 무제한인 계약은 60회차까지다. 이미 결제가 끝난 회차는 거절되고, 범위 중 한 회차라도 최종 금액이 음수면 전부 거절된다(부분 반영 없음).
+`IsUnlimited` 는 `*bool` 이라 명시적 `false` 도 전송된다. 미지정 필드는 Ruby 의 `.compact` 와 동일하게 바디에서 빠진다 — `duration` 은 기존대로 기본값 1 이 항상 실린다.
+
 ### 2.5.0
 
 #### Commerce scope(BOOTPAY-ROLE) 정합성 (동작 변경)

@@ -287,6 +287,13 @@ func ExampleCommerceApi_OrderSubscription() {
 		Status:              1,
 	})
 
+	// Change the base charge amount — the READY cycle is recalculated immediately
+	// and every cycle created afterwards uses this amount (paid cycles are untouched)
+	_, _ = commerce.OrderSubscription.Update(OrderSubscriptionUpdateParams{
+		OrderSubscriptionId: "subscription_123",
+		Price:               29000,
+	})
+
 	// Pause subscription
 	_, _ = commerce.OrderSubscription.RequestIng.Pause(OrderSubscriptionPauseParams{
 		OrderSubscriptionId: "subscription_123",
@@ -355,6 +362,23 @@ func ExampleCommerceApi_OrderSubscriptionAdjustment() {
 		TaxFreePrice: 0,
 		Duration:     3,
 		Type:         SUBSCRIPTION_ADJUSTMENT_TYPE_PERIOD_DISCOUNT,
+	})
+
+	// Create adjustments over a range — cycles 3~7, one record each
+	_, _ = commerce.OrderSubscriptionAdjustment.Create("subscription_123", CommerceOrderSubscriptionAdjustment{
+		Name:         "Range discount",
+		Price:        -5000,
+		DurationFrom: 3,
+		DurationTo:   7,
+	})
+
+	// Create an adjustment from cycle 3 to the end of the contract (a single record)
+	isUnlimited := true
+	_, _ = commerce.OrderSubscriptionAdjustment.Create("subscription_123", CommerceOrderSubscriptionAdjustment{
+		Name:         "Unlimited discount",
+		Price:        -5000,
+		DurationFrom: 3,
+		IsUnlimited:  &isUnlimited,
 	})
 
 	// Update subscription adjustment

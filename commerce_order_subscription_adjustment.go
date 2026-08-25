@@ -17,6 +17,16 @@ type OrderSubscriptionAdjustmentModule struct {
 // POST /v1/order_subscriptions/{order_subscription_id}/adjustments
 // price/duration/tax_free_price default to 0 / 1 / 0 when unset.
 // When type is omitted the server auto-detects: price > 0 → SETUP_PRICE, otherwise PERIOD_DISCOUNT.
+//
+// Three ways to target the billing cycles (widest last):
+//   - Duration: 5                        → the 5th cycle only
+//   - DurationFrom: 3, DurationTo: 7     → cycles 3~7, one record each (5 records)
+//   - DurationFrom: 3, IsUnlimited: true → from cycle 3 to the end of the contract
+//     (a single record, DurationTo is ignored)
+//
+// The upper bound is the contract's total duration; contracts with an unlimited total
+// stop at cycle 60. Already-paid cycles are rejected, and if any single cycle in the
+// range would end up with a negative amount the whole request is rejected (no partial apply).
 func (m *OrderSubscriptionAdjustmentModule) Create(orderSubscriptionId string, adjustment CommerceOrderSubscriptionAdjustment) (map[string]interface{}, error) {
 	duration := adjustment.Duration
 	if duration == 0 {
@@ -32,6 +42,15 @@ func (m *OrderSubscriptionAdjustmentModule) Create(orderSubscriptionId string, a
 	}
 	if adjustment.Type != 0 {
 		body["type"] = adjustment.Type
+	}
+	if adjustment.DurationFrom != 0 {
+		body["duration_from"] = adjustment.DurationFrom
+	}
+	if adjustment.DurationTo != 0 {
+		body["duration_to"] = adjustment.DurationTo
+	}
+	if adjustment.IsUnlimited != nil {
+		body["is_unlimited"] = *adjustment.IsUnlimited
 	}
 	return m.api.postWithHeaders(fmt.Sprintf("order_subscriptions/%s/adjustments", orderSubscriptionId), body, commerceRoleHeaders("supervisor", ""))
 }
