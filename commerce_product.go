@@ -76,6 +76,9 @@ func (m *ProductModule) Products(params *MallProductListParams) (map[string]inte
 	if params.CategoryId != "" {
 		queryParams.Set("category_id", params.CategoryId)
 	}
+	if params.ExUid != "" {
+		queryParams.Set("ex_uid", params.ExUid)
+	}
 	if params.Sort != "" {
 		queryParams.Set("sort", params.Sort)
 	}
@@ -195,6 +198,14 @@ func (m *ProductModule) Detail(productId string) (map[string]interface{}, error)
 // userJwt is the member JWT (attached as Bootpay-User-JWT only when present).
 // idempotencyKey is auto-generated when empty.
 func (m *ProductModule) ProductDetail(productId string, userJwt string, idempotencyKey string) (map[string]interface{}, error) {
+	return m.api.getWithHeaders(fmt.Sprintf("products/%s", productId), commerceMallHeaders(userJwt, idempotencyKey))
+}
+
+// LookupProduct retrieves product details (V1 Mall API)
+// GET /v1/products/{product_id}
+// ⚠️ Same uri and behaviour as ProductDetail — kept because existing callers may rely on the name.
+// New code should use ProductDetail.
+func (m *ProductModule) LookupProduct(productId string, userJwt string, idempotencyKey string) (map[string]interface{}, error) {
 	return m.api.getWithHeaders(fmt.Sprintf("products/%s", productId), commerceMallHeaders(userJwt, idempotencyKey))
 }
 

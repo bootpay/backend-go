@@ -635,3 +635,36 @@ func TestCommerceOrderSubscriptionAdjustmentDurationRange(t *testing.T) {
 		t.Fatalf("explicit is_unlimited=false must be sent: %+v", body)
 	}
 }
+
+// 회원 목록의 등급 필터 키 정정 — 서버(v1/users_controller#index)가 읽는 이름은 membership_type 이다.
+// member_type 은 조용히 무시됐으므로 레거시 별칭으로만 남기고 membership_type 으로 매핑한다.
+func TestCommerceUserListMembershipType(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.User.List(&UserListParams{MembershipType: 3}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/users?membership_type=3" {
+		t.Fatalf("membership_type URL mismatch: %s", req.URL)
+	}
+
+	// 레거시 member_type 은 membership_type 으로 매핑된다
+	if _, err := commerce.User.List(&UserListParams{MemberType: 2}); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/users?membership_type=2" {
+		t.Fatalf("legacy member_type must map onto membership_type: %s", req.URL)
+	}
+
+	// 둘 다 주면 membership_type 이 우선한다
+	if _, err := commerce.User.List(&UserListParams{MembershipType: 3, MemberType: 2}); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/users?membership_type=3" {
+		t.Fatalf("membership_type must win over member_type: %s", req.URL)
+	}
+}

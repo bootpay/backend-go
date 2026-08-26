@@ -1,3 +1,27 @@
+### 2.5.2
+
+Ruby SDK `d4c8989` (sdk 누락된 파라미터 추가) 반영. 서버는 이미 읽고 있었으나 SDK 에 인자가 없어 쓸 수 없던 파라미터를 채운다. 기존 시그니처·JSON 바디는 불변 — 단, 회원 등급 필터의 쿼리 키는 정정됐다(아래).
+
+#### 주문 목록 (`Order.List`)
+
+- `OrderListParams.OrderSubscriptionIds` / `SubscriptionBillingType` 은 이미 지원 중이라 변경 없다. Ruby 와 같이 `order_subscription_ids` 는 콤마로 join 되고, 빈 배열·미지정 값은 쿼리에 실리지 않는다 (`status=&payment_status=` 노이즈 제거). 회귀 테스트를 추가했다.
+
+#### 구독 (`OrderSubscription`)
+
+- `OrderSubscriptionListParams` 에 `OrderNumber` 추가 — `GET order_subscriptions?order_number=` 로 주문번호 역조회. 서버(`#index`)가 이미 `params[:order_number]` 를 읽고 있었다.
+- `OrderSubscriptionUpdateParams` 에 `Memo` 추가 — 변경이력(`SUBSCRIPTION_ACTION_UPDATE`)에 남길 사유다.
+
+#### 상품 (`Product`)
+
+- `MallProductListParams` 에 `ExUid` 추가 — `GET products?ex_uid=` 로 외부 UID 조회. 컨트롤러가 `params[:ex_uid]` 를 읽는다.
+- `Product.LookupProduct(productId, userJwt, idempotencyKey)` 추가 — Ruby `lookup_product` 대응. `ProductDetail` 과 uri·동작이 같다(중복이지만 이름을 쓰던 호출자를 위해 남긴다). 신규 코드는 `ProductDetail` 을 쓸 것. 기존 `Product.Detail(productId)` 는 그대로 유지된다.
+
+#### 회원 목록 (`User.List`) — 쿼리 키 정정
+
+- 서버(`v1/users_controller#index`)가 읽는 등급 필터 키는 `membership_type` 인데 `member_type` 을 보내고 있어 필터가 **에러 없이 조용히 무시**됐다(전체 목록이 돌아왔다).
+- `UserListParams` 에 `MembershipType` 을 추가하고, 기존 `MemberType` 은 레거시 별칭으로 남겨 `membership_type` 으로 매핑한다 (둘 다 주면 `MembershipType` 우선). 필드 제거 없음.
+- ⚠️ 그동안 `MemberType` 으로 걸리지 않던 필터가 이제 실제로 걸린다 — 전체 목록을 기대하던 코드가 있다면 확인이 필요하다.
+
 ### 2.5.1
 
 Ruby SDK `9832af9` (구독 가격 변경, 범위로 회차조정) 반영. 순수 추가 — 기존 필드·시그니처·JSON 바디 불변.

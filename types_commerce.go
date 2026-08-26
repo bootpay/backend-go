@@ -97,8 +97,13 @@ type CommerceUser struct {
 }
 
 // UserListParams represents user list query parameters
+// ⚠️ The membership filter key read by the server (v1/users_controller#index) is membership_type.
+// member_type was silently ignored (no error — the full list came back), so it is kept only as a
+// legacy alias and is mapped onto membership_type when MembershipType is unset.
 type UserListParams struct {
 	ListParams
+	MembershipType int `json:"membership_type,omitempty"`
+	// MemberType is the legacy alias of MembershipType (kept for backward compatibility)
 	MemberType int    `json:"member_type,omitempty"`
 	Type       string `json:"type,omitempty"`
 }
@@ -402,7 +407,9 @@ type ProductListParams struct {
 type MallProductListParams struct {
 	ProductListParams
 	CategoryId string `json:"category_id,omitempty"`
-	Sort       string `json:"sort,omitempty"`
+	// ExUid looks a product up by its external UID (read by the controller as params[:ex_uid])
+	ExUid string `json:"ex_uid,omitempty"`
+	Sort  string `json:"sort,omitempty"`
 	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
 	UserJwt string `json:"-"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
@@ -758,6 +765,8 @@ type OrderSubscriptionListParams struct {
 	RequestType string `json:"request_type,omitempty"`
 	UserGroupId string `json:"user_group_id,omitempty"`
 	UserId      string `json:"user_id,omitempty"`
+	// OrderNumber looks a subscription up in reverse from an order number (server #index reads params[:order_number])
+	OrderNumber string `json:"order_number,omitempty"`
 	// Status: explicit 0 must be sendable, so pointer type
 	Status *int `json:"status,omitempty"`
 }
@@ -789,6 +798,8 @@ type OrderSubscriptionUpdateParams struct {
 	// Values of 0 or less are rejected by the server (0 is therefore not sent).
 	// To add/subtract on specific cycles only, use OrderSubscriptionAdjustment.Create instead.
 	Price int `json:"price,omitempty"`
+	// Memo is the reason recorded on the change history (SUBSCRIPTION_ACTION_UPDATE)
+	Memo string `json:"memo,omitempty"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
 	IdempotencyKey string `json:"-"`
 }

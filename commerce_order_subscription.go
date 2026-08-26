@@ -108,6 +108,9 @@ func (m *OrderSubscriptionModule) List(params *OrderSubscriptionListParams) (map
 		if params.UserId != "" {
 			queryParams.Set("user_id", params.UserId)
 		}
+		if params.OrderNumber != "" {
+			queryParams.Set("order_number", params.OrderNumber)
+		}
 		if len(queryParams) > 0 {
 			query = "?" + queryParams.Encode()
 		}
@@ -129,6 +132,8 @@ func (m *OrderSubscriptionModule) Detail(orderSubscriptionId string) (map[string
 // Already-paid cycles are untouched. Values of 0 or less are rejected by the server.
 // To add/subtract on specific cycles only, use OrderSubscriptionAdjustment.Create instead.
 // (Same implementation as the amount change in the admin console.)
+//
+// Memo is the reason recorded on the change history (SUBSCRIPTION_ACTION_UPDATE).
 func (m *OrderSubscriptionModule) Update(params OrderSubscriptionUpdateParams) (map[string]interface{}, error) {
 	if params.OrderSubscriptionId == "" {
 		return nil, fmt.Errorf("order_subscription_id is required")

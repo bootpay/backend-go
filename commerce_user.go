@@ -106,8 +106,11 @@ func (m *UserModule) List(params *UserListParams) (map[string]interface{}, error
 		if params.Keyword != "" {
 			queryParams.Set("keyword", params.Keyword)
 		}
-		if params.MemberType > 0 {
-			queryParams.Set("member_type", strconv.Itoa(params.MemberType))
+		// ⚠️ The server reads membership_type — member_type is kept only as a legacy alias
+		if membershipType := params.MembershipType; membershipType > 0 {
+			queryParams.Set("membership_type", strconv.Itoa(membershipType))
+		} else if params.MemberType > 0 {
+			queryParams.Set("membership_type", strconv.Itoa(params.MemberType))
 		}
 		if params.Type != "" {
 			queryParams.Set("type", params.Type)

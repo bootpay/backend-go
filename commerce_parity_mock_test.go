@@ -745,3 +745,121 @@ func TestCommerceStoreIdempotency(t *testing.T) {
 		t.Fatalf("store lookup must keep the instance role, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 }
+
+// orders 의 구독 계약별·결제유형별 필터 — order_subscription_ids 는 콤마로 join 되고,
+// 빈 배열은 status=&payment_status= 같은 노이즈를 만들지 않아야 한다.
+func TestCommerceOrderListSubscriptionFilters(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.Order.List(&OrderListParams{
+		Status:                  []int{1, 2},
+		PaymentStatus:           []int{3},
+		OrderSubscriptionIds:    []string{"sub_1", "sub_2"},
+		SubscriptionBillingType: 2,
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	expected := COMMERCE_DEVELOPMENT + "/orders?order_subscription_ids=sub_1%2Csub_2&payment_status=3&status=1%2C2&subscription_billing_type=2"
+	if req.URL != expected {
+		t.Fatalf("order list filter URL mismatch:\n got %s\nwant %s", req.URL, expected)
+	}
+
+	// 값이 비었을 때는 키 자체가 실리지 않는다
+	if _, err := commerce.Order.List(&OrderListParams{
+		Status:               []int{},
+		PaymentStatus:        []int{},
+		OrderSubscriptionIds: []string{},
+		UserId:               "user_1",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/orders?user_id=user_1" {
+		t.Fatalf("empty filters must not be sent: %s", req.URL)
+	}
+}
+
+// order_subscriptions 의 주문번호 역조회 — 서버(#index)가 params[:order_number] 를 읽는다.
+func TestCommerceOrderSubscriptionListOrderNumber(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.OrderSubscription.List(&OrderSubscriptionListParams{
+		OrderNumber: "ORDER-1",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/order_subscriptions?order_number=ORDER-1" {
+		t.Fatalf("subscription list order_number mismatch: %s", req.URL)
+	}
+}
+
+// 구독 계약 변경의 memo — 변경이력(SUBSCRIPTION_ACTION_UPDATE)에 남길 사유다.
+func TestCommerceOrderSubscriptionUpdateMemo(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.OrderSubscription.Update(OrderSubscriptionUpdateParams{
+		OrderSubscriptionId: "sub_1",
+		Price:               19000,
+		Memo:                "프로모션 종료로 정상가 적용",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	body := decodeBody(t, req)
+	if body["memo"] != "프로모션 종료로 정상가 적용" {
+		t.Fatalf("memo must be sent: %+v", body)
+	}
+	if body["price"] != float64(19000) {
+		t.Fatalf("price mismatch: %+v", body)
+	}
+	// 미지정 값은 실리지 않는다
+	if _, exists := body["order_name"]; exists {
+		t.Fatalf("unset values must not be sent: %+v", body)
+	}
+}
+
+// 상품 목록의 ex_uid 필터 및 lookup_product 의 회원 컨텍스트 조회
+func TestCommerceMallProductsExUidAndLookup(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.Product.Products(&MallProductListParams{ExUid: "ex_1"}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/products?ex_uid=ex_1&limit=20&page=1" {
+		t.Fatalf("mall products ex_uid URL mismatch: %s", req.URL)
+	}
+
+	// LookupProduct 는 ProductDetail 과 동일하게 Bootpay-User-JWT 를 보낸다
+	if _, err := commerce.Product.LookupProduct("prod_1", "jwt-token", ""); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/products/prod_1" {
+		t.Fatalf("lookup product URL mismatch: %s", req.URL)
+	}
+	if req.Header.Get("Bootpay-User-JWT") != "jwt-token" {
+		t.Fatal("lookup product must send Bootpay-User-JWT when present")
+	}
+	if req.Header.Get("Idempotency-Key") == "" {
+		t.Fatal("lookup product must auto-attach Idempotency-Key")
+	}
+
+	// JWT 가 없으면 헤더 자체를 붙이지 않는다
+	if _, err := commerce.Product.LookupProduct("prod_1", "", "lookup-key"); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if _, exists := req.Header["Bootpay-User-Jwt"]; exists {
+		t.Fatalf("Bootpay-User-JWT must be omitted when absent: %+v", req.Header)
+	}
+	if req.Header.Get("Idempotency-Key") != "lookup-key" {
+		t.Fatalf("explicit Idempotency-Key must win: %q", req.Header.Get("Idempotency-Key"))
+	}
+}
