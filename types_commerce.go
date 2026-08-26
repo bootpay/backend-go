@@ -391,9 +391,25 @@ type CommerceProduct struct {
 	SubscriptionSetting *CommerceSubscriptionSetting `json:"subscription_setting,omitempty"`
 }
 
-// ProductListParams represents product list query parameters
+// ProductListParams represents product list query parameters (GET /v1/products)
+//
+// ⚠️ The server (v1/products_controller#index) reads only
+// page / limit / keyword / category_id / ex_uid / sort.
+// Type, PeriodType, SAt, EAt and CategoryCode are still sent for backward compatibility
+// but are silently ignored — the full list comes back, so do not mistake them for filters.
+// (Keyword takes effect from the 26-08-26 server change; older deployments ignore it.)
 type ProductListParams struct {
 	ListParams
+	// CategoryId filters by category (child categories included)
+	CategoryId string `json:"category_id,omitempty"`
+	// ExUid looks a product up by its external UID
+	ExUid string `json:"ex_uid,omitempty"`
+	// Sort key — position | created_at | -created_at | price | -price | -sold
+	Sort string `json:"sort,omitempty"`
+
+	// ── The server does not read the fields below (kept for backward compatibility) ──
+	// Type is numeric here, while the server's product type filter takes a string
+	// (subscription | discount | normal) — the value systems do not match.
 	Type         int    `json:"type,omitempty"`
 	PeriodType   string `json:"period_type,omitempty"`
 	SAt          string `json:"s_at,omitempty"`
@@ -403,9 +419,15 @@ type ProductListParams struct {
 
 // MallProductListParams represents V1 Mall API product list query parameters (GET products)
 // page/limit default to 1/20 when unset.
-// ⚠️ keyword is not read by the server (v1/products_controller#index) — kept for compatibility only.
+// ⚠️ The server (v1/products_controller#index) reads only
+// page / limit / keyword / category_id / ex_uid / sort — Type, PeriodType, SAt, EAt and
+// CategoryCode are silently ignored. Keyword takes effect from the 26-08-26 server change.
 type MallProductListParams struct {
 	ProductListParams
+	// CategoryId / ExUid / Sort are declared here as well as on the embedded
+	// ProductListParams. Removing them would break existing composite literals
+	// (Go forbids setting a promoted field in a struct literal), so they shadow the
+	// embedded ones. Products() prefers these and falls back to the embedded values.
 	CategoryId string `json:"category_id,omitempty"`
 	// ExUid looks a product up by its external UID (read by the controller as params[:ex_uid])
 	ExUid string `json:"ex_uid,omitempty"`

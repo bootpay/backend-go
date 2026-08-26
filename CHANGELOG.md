@@ -1,4 +1,21 @@
-### 2.5.2
+### 2.7.0
+
+#### `product.list` 의 조회 필터를 서버 실제 계약에 맞춤
+
+서버(`v1/products_controller#index`)가 읽는 것은 **page · limit · keyword · category_id · ex_uid · sort** 뿐인데,
+``Product.List()`` 은 정작 그중 `category_id` · `ex_uid` · `sort` 를 **보내지 않고**, 서버가 읽지 않는
+`type` · `period_type` · `s_at` · `e_at` · `category_code` 만 보내고 있었다.
+필터가 걸린 줄 알았는데 전체 목록이 돌아오는, `member_type` → `membership_type` 과 같은 조용한 실패였다.
+
+- ``ProductListParams`` 에 **`CategoryId` / `ExUid` / `Sort`** 추가 — 서버가 읽는 값이라 이제 실제로 필터가 걸린다.
+- 서버가 읽지 않는 `type` / `period_type` / `s_at` / `e_at` / `category_code` 는 **전송은 그대로 유지**하되(기존 호출 보호) 무시된다는 경고를 문서에 달았다.
+  `type` 은 서버의 상품 타입 필터가 문자열(`subscription`/`discount`/`normal`)이라 이 숫자 필드와 값 체계 자체가 다르다.
+- `MallProductListParams` 는 `CategoryId` / `ExUid` / `Sort` 를 **임베디드 `ProductListParams` 와 바깥 양쪽에** 들고 있다.
+  Go 는 composite literal 에서 승격 필드를 지정할 수 없어(`MallProductListParams{CategoryId: ...}` 컴파일 에러),
+  기존 호출을 깨지 않으려면 바깥 필드를 남겨야 했다. `Products()` 는 **바깥 값을 우선하고 비어 있으면 임베디드 값으로 폴백**한다.
+- ⚠️ `keyword` 는 **26-08-26 서버 변경부터** 실제로 적용된다 (그 이전 배포본에서는 무시된다).
+  같은 라운드에서 `GET /v1/products` 의 `sort` 가 항상 무시되던 서버 버그도 함께 고쳤다 — SDK 쪽 변경은 없다.
+
 
 Ruby SDK `d4c8989` (sdk 누락된 파라미터 추가) 반영. 서버는 이미 읽고 있었으나 SDK 에 인자가 없어 쓸 수 없던 파라미터를 채운다. 기존 시그니처·JSON 바디는 불변 — 단, 회원 등급 필터의 쿼리 키는 정정됐다(아래).
 
@@ -22,7 +39,7 @@ Ruby SDK `d4c8989` (sdk 누락된 파라미터 추가) 반영. 서버는 이미 
 - `UserListParams` 에 `MembershipType` 을 추가하고, 기존 `MemberType` 은 레거시 별칭으로 남겨 `membership_type` 으로 매핑한다 (둘 다 주면 `MembershipType` 우선). 필드 제거 없음.
 - ⚠️ 그동안 `MemberType` 으로 걸리지 않던 필터가 이제 실제로 걸린다 — 전체 목록을 기대하던 코드가 있다면 확인이 필요하다.
 
-### 2.5.1
+### 2.6.0
 
 Ruby SDK `9832af9` (구독 가격 변경, 범위로 회차조정) 반영. 순수 추가 — 기존 필드·시그니처·JSON 바디 불변.
 

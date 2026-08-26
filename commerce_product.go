@@ -18,6 +18,12 @@ type ProductModule struct {
 }
 
 // List retrieves product list
+// GET /v1/products
+//
+// ⚠️ The server (v1/products_controller#index) reads only
+// page / limit / keyword / category_id / ex_uid / sort.
+// Type, PeriodType, SAt, EAt and CategoryCode are still sent for backward compatibility
+// but are silently ignored — the full list comes back.
 func (m *ProductModule) List(params *ProductListParams) (map[string]interface{}, error) {
 	query := ""
 	if params != nil {
@@ -31,6 +37,16 @@ func (m *ProductModule) List(params *ProductListParams) (map[string]interface{},
 		if params.Keyword != "" {
 			queryParams.Set("keyword", params.Keyword)
 		}
+		if params.CategoryId != "" {
+			queryParams.Set("category_id", params.CategoryId)
+		}
+		if params.ExUid != "" {
+			queryParams.Set("ex_uid", params.ExUid)
+		}
+		if params.Sort != "" {
+			queryParams.Set("sort", params.Sort)
+		}
+		// The server does not read the values below — sent only to keep existing calls working
 		if params.Type > 0 {
 			queryParams.Set("type", strconv.Itoa(params.Type))
 		}
@@ -73,14 +89,28 @@ func (m *ProductModule) Products(params *MallProductListParams) (map[string]inte
 	}
 	queryParams.Set("page", strconv.Itoa(page))
 	queryParams.Set("limit", strconv.Itoa(limit))
-	if params.CategoryId != "" {
-		queryParams.Set("category_id", params.CategoryId)
+	// CategoryId / ExUid / Sort exist both here and on the embedded ProductListParams
+	// (see the type comment). Prefer the outer value, fall back to the embedded one.
+	categoryId := params.CategoryId
+	if categoryId == "" {
+		categoryId = params.ProductListParams.CategoryId
 	}
-	if params.ExUid != "" {
-		queryParams.Set("ex_uid", params.ExUid)
+	exUid := params.ExUid
+	if exUid == "" {
+		exUid = params.ProductListParams.ExUid
 	}
-	if params.Sort != "" {
-		queryParams.Set("sort", params.Sort)
+	sort := params.Sort
+	if sort == "" {
+		sort = params.ProductListParams.Sort
+	}
+	if categoryId != "" {
+		queryParams.Set("category_id", categoryId)
+	}
+	if exUid != "" {
+		queryParams.Set("ex_uid", exUid)
+	}
+	if sort != "" {
+		queryParams.Set("sort", sort)
 	}
 	if params.Keyword != "" {
 		queryParams.Set("keyword", params.Keyword)

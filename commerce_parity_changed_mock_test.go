@@ -129,6 +129,57 @@ func TestCommerceRequestIngChangedBehavior(t *testing.T) {
 }
 
 // 상품 쓰기(Update/Status/Delete)가 manager 헤더로 정렬됐는지 검증한다 (변경 기능 회귀).
+// Product.List 는 서버가 읽는 category_id / ex_uid / sort 를 실어야 한다.
+// (v1/products_controller#index 가 page/limit/keyword/category_id/ex_uid/sort 만 읽는다)
+func TestCommerceProductListSendsServerReadFilters(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.Product.List(&ProductListParams{
+		ListParams: ListParams{Page: 1, Limit: 10, Keyword: "커피"},
+		CategoryId: "cat1",
+		ExUid:      "EX-1",
+		Sort:       "-price",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	for _, fragment := range []string{"category_id=cat1", "ex_uid=EX-1", "sort=-price", "page=1", "limit=10"} {
+		if !strings.Contains(req.URL, fragment) {
+			t.Fatalf("product list query must contain %s: %s", fragment, req.URL)
+		}
+	}
+}
+
+// MallProductListParams 는 CategoryId 등을 바깥에도 들고 있다(하위호환).
+// 바깥이 비면 임베디드 값으로 폴백해야 한다.
+func TestCommerceProductsFallsBackToEmbeddedFilters(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	params := &MallProductListParams{}
+	params.ProductListParams.CategoryId = "cat-embedded"
+	params.ProductListParams.Sort = "price"
+	if _, err := commerce.Product.Products(params); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if !strings.Contains(req.URL, "category_id=cat-embedded") || !strings.Contains(req.URL, "sort=price") {
+		t.Fatalf("embedded filters must be used when the outer ones are empty: %s", req.URL)
+	}
+
+	// 바깥 값이 있으면 그것이 이긴다
+	outer := &MallProductListParams{CategoryId: "cat-outer"}
+	outer.ProductListParams.CategoryId = "cat-embedded"
+	if _, err := commerce.Product.Products(outer); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if !strings.Contains(req.URL, "category_id=cat-outer") {
+		t.Fatalf("outer field must win: %s", req.URL)
+	}
+}
+
 func TestCommerceProductWriteHeaders(t *testing.T) {
 	var captured []capturedCommerceRequest
 	commerce := newMockCommerceApi(&captured)
