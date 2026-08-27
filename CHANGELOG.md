@@ -1,3 +1,73 @@
+### 2.8.0
+
+Ruby SDK `8f1ee1e` (알림톡 v1 API 35종 SDK 메서드 추가) 반영. **순수 추가**로, 기존 모듈·시그니처·JSON 바디는 불변이다.
+
+Commerce API 인스턴스(`NewCommerceAPI`)에 알림톡 모듈 7개를 붙였다. 발신프로필(카카오채널) 등록부터
+템플릿 검수, 발송, 결과 조회, 수신거부, 전용 웹훅까지 알림톡 v1 API 전 계열을 덮는다.
+
+| 모듈 | 엔드포인트 | 메서드 |
+| --- | --- | --- |
+| `AlimtalkSender` | `/v1/alimtalk/categories` · `/senders` 계열 | `Categories` `Otp` `Create` `List` `Detail` `Release` `VariableExamples` |
+| `AlimtalkTemplate` | `/v1/alimtalk/templates` 계열 | `List` `Create` `Detail` `Update` `Delete` `Register` `Inspect` `Export` `Image` `HighlightImage` |
+| `AlimtalkOfficial` | `/v1/alimtalk/official` 계열 | `List` `Recommend` `Detail` |
+| `AlimtalkSend` | `/v1/alimtalk/send` 계열 | `Send` `Bulk` `Cancel` |
+| `AlimtalkMessage` | `/v1/alimtalk/messages` 계열 | `List` `Stats` `Detail` |
+| `AlimtalkOptout` | `/v1/alimtalk/optouts` 계열 | `List` `Create` `Check` `Release` |
+| `AlimtalkWebhook` | `/v1/alimtalk/webhook` 계열 | `Detail` `Update` `Test` `RotateSecret` `Deliveries` |
+
+#### ⚠️ 실제 부작용 — 샌드박스가 없다
+
+`AlimtalkSend.Send` / `Bulk` 은 **실제로 카카오톡이 발송되고 과금된다.** `AlimtalkSender.Otp` 는 채널
+관리자폰으로 문자를 실제 발송하고, `AlimtalkSender.Create` 는 카카오에 발신프로필을 실제 등록한다.
+`AlimtalkTemplate.Inspect` 는 카카오 검수 요청이라 **취소할 수 없다.**
+
+#### Idempotency-Key 를 붙이지 않는다
+
+다른 Commerce 모듈은 `commerceRoleHeaders` 로 `Idempotency-Key` 를 자동 생성해 싣지만, 알림톡 모듈은
+전용 `alimtalkHeaders()` 를 쓴다 — 알림톡 API 는 이 헤더를 **읽지 않기 때문**이다. 멱등은 발송의 `ref_id`
+로만 성립한다. 습관대로 붙이면 서버가 주지 않는 보장을 SDK 가 광고하는 꼴이 된다.
+`BOOTPAY-ROLE` 은 인스턴스 role 과 무관하게 항상 `user` 다 (알림톡 스코프 키가 전부 `user:alimtalk_*`).
+
+#### tri-state 필드는 pointer 다 — `bootpay.BoolPtr(false)`
+
+`omitempty` 는 `false` 를 지운다. 그런데 아래 값들은 **미지정(nil)과 false 의 의미가 다르다.**
+값 타입으로 뒀다면 "껐는데 그대로 동작하는" 조용한 실패가 된다.
+
+- `AlimtalkSendParams.Fallback` / `AlimtalkSendBulkParams.Fallback` — nil 이면 프로젝트 기본값,
+  `false` 는 문자(LMS) 대체발송을 명시적으로 끈다. (켜면 발신번호가 없을 때 3030 으로 거부된다)
+- `AlimtalkTemplateCreateParams.Register` — ⚠️ **nil 이면 생성 즉시 대행사·카카오에 실제 등록된다.**
+  초안만 만들려면 반드시 `BoolPtr(false)` 를 넘긴다.
+- `AlimtalkTemplate.Detail(id, sync)` — ⚠️ 서버 기본값이 **true** 라 nil 로 두면 조회만 해도 벤더
+  동기화가 일어난다. 초안 조회에는 `BoolPtr(false)` 를 권장한다.
+- `AlimtalkWebhookUpdateParams.Enabled`, `AlimtalkTemplateExportParams.IncludeContent`,
+  `AlimtalkSender.Detail(id, sync)` 도 같은 이유로 pointer 다.
+
+포인터를 인라인으로 만들기 위해 `bootpay.BoolPtr(v bool) *bool` 를 추가했다.
+
+#### CSV 응답은 파싱하지 않고 원문으로 돌려준다 (`AlimtalkTemplate.Export`)
+
+`decodeCommerceBody` 는 본문을 무조건 JSON 으로 파싱한다. 그래서 `format=csv` 를 그대로 태우면
+**성공한 요청이 파싱 에러로 보고되어** 원인을 찾을 수 없게 된다. 원문 경로(`CommerceApi.getRaw`)를
+따로 두고, csv 일 때만 그쪽으로 보낸다 — 결과는 `{"body": "<원문>", "content_type": "..."}` 다.
+서버 기본 format 은 csv 지만 **SDK 기본값은 json** 으로 둔다 (Ruby SDK 와 동일한 선택).
+
+#### 그 밖의 계약 정합
+
+- `AlimtalkOfficialListParams.Keyword` 는 쿼리 키 **`q`** 로 나간다. 서버가 `q` 를 먼저 보고 없으면
+  `keyword` 를 보는데, 정본 키로 보내야 의도한 경로를 탄다.
+- `AlimtalkTemplateCreateParams` / `UpdateParams` / `AlimtalkTemplateButton` 에 `Extra`
+  (Ruby `**attrs` 대응)를 뒀다. 타입 필드가 같은 이름의 Extra 키를 이긴다.
+  ⚠️ 템플릿 수정은 **부분 수정이 아니다** — 보내지 않은 필드는 nil 로 덮어써진다.
+  이미지 삭제처럼 **빈 값을 명시적으로** 보내야 할 때는 `Extra: {"storage_image_url": ""}` 를 쓴다
+  (`omitempty` 가 빈 문자열을 지우기 때문).
+- 이미지 업로드(`Image` · `HighlightImage`)는 multipart/form-data 이며 writer 가 만든 boundary 를
+  유지한다. ⚠️ 두 엔드포인트는 **규격이 다르다** — 본문 이미지는 가로 500px 이상 2:1,
+  하이라이트 썸네일은 가로 108px 이상 1:1 이다.
+- 알림톡 웹훅은 **주문·구독 통합 웹훅과 완전히 별개다.** 기존 `Webhook.SendTest` 는 주문 웹훅용이고,
+  `AlimtalkWebhook.Test` 는 알림톡 웹훅용이다.
+- 공식 템플릿 채택(`alimtalk_official_adopt`)은 서버에서 비활성화되어 SDK 에도 두지 않았다.
+  `AlimtalkSender.Create` 가 그룹키 등록까지 처리하므로 따로 채택할 것이 없다.
+
 ### 2.7.0
 
 #### `product.list` 의 조회 필터를 서버 실제 계약에 맞춤

@@ -183,13 +183,13 @@ type CommerceUserGroup struct {
 	LastUpdatedAt string `json:"last_updated_at,omitempty"`
 	Status        int    `json:"status,omitempty"`
 
-	Phone                string                 `json:"phone,omitempty"`
-	Email                string                 `json:"email,omitempty"`
-	Zipcode              string                 `json:"zipcode,omitempty"`
-	Address              string                 `json:"address,omitempty"`
-	AddressDetail        string                 `json:"address_detail,omitempty"`
-	CorporateExtension   map[string]interface{} `json:"corporate_extension,omitempty"`
-	AuthBank             bool                   `json:"auth_bank,omitempty"`
+	Phone              string                 `json:"phone,omitempty"`
+	Email              string                 `json:"email,omitempty"`
+	Zipcode            string                 `json:"zipcode,omitempty"`
+	Address            string                 `json:"address,omitempty"`
+	AddressDetail      string                 `json:"address_detail,omitempty"`
+	CorporateExtension map[string]interface{} `json:"corporate_extension,omitempty"`
+	AuthBank           bool                   `json:"auth_bank,omitempty"`
 
 	CompanyName          string `json:"company_name,omitempty"`
 	BusinessNumber       string `json:"business_number,omitempty"`
@@ -290,23 +290,23 @@ type CommerceProduct struct {
 
 	ExUid string `json:"ex_uid,omitempty"`
 
-	Name         string   `json:"name,omitempty"`
-	Description  string   `json:"description,omitempty"`
-	Images       []string `json:"images,omitempty"`
-	Type         int      `json:"type,omitempty"`
-	TaxType      int      `json:"tax_type,omitempty"`
-	UseStock     bool     `json:"use_stock,omitempty"`
-	Stock        int      `json:"stock,omitempty"`
-	UseOptionStock bool   `json:"use_option_stock,omitempty"`
-	UseStockSafe bool     `json:"use_stock_safe,omitempty"`
-	StockSafe    int      `json:"stock_safe,omitempty"`
+	Name           string   `json:"name,omitempty"`
+	Description    string   `json:"description,omitempty"`
+	Images         []string `json:"images,omitempty"`
+	Type           int      `json:"type,omitempty"`
+	TaxType        int      `json:"tax_type,omitempty"`
+	UseStock       bool     `json:"use_stock,omitempty"`
+	Stock          int      `json:"stock,omitempty"`
+	UseOptionStock bool     `json:"use_option_stock,omitempty"`
+	UseStockSafe   bool     `json:"use_stock_safe,omitempty"`
+	StockSafe      int      `json:"stock_safe,omitempty"`
 
-	DisplayPrice      int  `json:"display_price,omitempty"`
-	TaxFreePrice      int  `json:"tax_free_price,omitempty"`
-	UseDiscount       bool `json:"use_discount,omitempty"`
-	DiscountPrice     int  `json:"discount_price,omitempty"`
-	DiscountPriceType int  `json:"discount_price_type,omitempty"`
-	UseDiscountPeriod bool `json:"use_discount_period,omitempty"`
+	DisplayPrice      int    `json:"display_price,omitempty"`
+	TaxFreePrice      int    `json:"tax_free_price,omitempty"`
+	UseDiscount       bool   `json:"use_discount,omitempty"`
+	DiscountPrice     int    `json:"discount_price,omitempty"`
+	DiscountPriceType int    `json:"discount_price_type,omitempty"`
+	UseDiscountPeriod bool   `json:"use_discount_period,omitempty"`
 	DiscountStartAt   string `json:"discount_start_at,omitempty"`
 	DiscountEndAt     string `json:"discount_end_at,omitempty"`
 
@@ -314,14 +314,14 @@ type CommerceProduct struct {
 	AccumulationPoint     int  `json:"accumulation_point,omitempty"`
 	AccumulationPointType int  `json:"accumulation_point_type,omitempty"`
 
-	StatusDisplay      bool   `json:"status_display,omitempty"`
-	UseDisplayPeriod   bool   `json:"use_display_period,omitempty"`
-	DisplayStartAt     string `json:"display_start_at,omitempty"`
-	DisplayEndAt       string `json:"display_end_at,omitempty"`
-	StatusSale         bool   `json:"status_sale,omitempty"`
-	UseSalePeriod      bool   `json:"use_sale_period,omitempty"`
-	SaleStartAt        string `json:"sale_start_at,omitempty"`
-	SaleEndAt          string `json:"sale_end_at,omitempty"`
+	StatusDisplay    bool   `json:"status_display,omitempty"`
+	UseDisplayPeriod bool   `json:"use_display_period,omitempty"`
+	DisplayStartAt   string `json:"display_start_at,omitempty"`
+	DisplayEndAt     string `json:"display_end_at,omitempty"`
+	StatusSale       bool   `json:"status_sale,omitempty"`
+	UseSalePeriod    bool   `json:"use_sale_period,omitempty"`
+	SaleStartAt      string `json:"sale_start_at,omitempty"`
+	SaleEndAt        string `json:"sale_end_at,omitempty"`
 
 	CountSale   int `json:"count_sale,omitempty"`
 	CountQna    int `json:"count_qna,omitempty"`
@@ -364,11 +364,11 @@ type CommerceProduct struct {
 	ExpiredAt      string `json:"expired_at,omitempty"`
 	ManufacturedAt string `json:"manufactured_at,omitempty"`
 
-	UseSetupFee    bool   `json:"use_setup_fee,omitempty"`
-	SetupFeeValue  int    `json:"setup_fee_value,omitempty"`
-	SetupFeeType   int    `json:"setup_fee_type,omitempty"`
-	SetupFeeName   string `json:"setup_fee_name,omitempty"`
-	SetupFeeText   string `json:"setup_fee_text,omitempty"`
+	UseSetupFee   bool   `json:"use_setup_fee,omitempty"`
+	SetupFeeValue int    `json:"setup_fee_value,omitempty"`
+	SetupFeeType  int    `json:"setup_fee_type,omitempty"`
+	SetupFeeName  string `json:"setup_fee_name,omitempty"`
+	SetupFeeText  string `json:"setup_fee_text,omitempty"`
 
 	UseDeliveryShipping       bool   `json:"use_delivery_shipping,omitempty"`
 	DeliveryShippingFeeType   int    `json:"delivery_shipping_fee_type,omitempty"`
@@ -481,9 +481,9 @@ type CommerceInvoiceItem struct {
 
 // CommerceInvoice represents an invoice
 type CommerceInvoice struct {
-	InvoiceId   string `json:"invoice_id,omitempty"`
-	ProjectId   string `json:"project_id,omitempty"`
-	SellerId    string `json:"seller_id,omitempty"`
+	InvoiceId string `json:"invoice_id,omitempty"`
+	ProjectId string `json:"project_id,omitempty"`
+	SellerId  string `json:"seller_id,omitempty"`
 
 	Name        string `json:"name,omitempty"`
 	Title       string `json:"title,omitempty"`
@@ -679,11 +679,11 @@ type CancelOrderSubscriptionBill struct {
 
 // RequestCancelParameter represents cancel request parameters
 type RequestCancelParameter struct {
-	CancelProducts              []CancelProduct               `json:"cancel_products,omitempty"`
+	CancelProducts               []CancelProduct               `json:"cancel_products,omitempty"`
 	CancelOrderSubscriptionBills []CancelOrderSubscriptionBill `json:"cancel_order_subscription_bills,omitempty"`
-	CancelReason                string                        `json:"cancel_reason,omitempty"`
-	CancelType                  int                           `json:"cancel_type,omitempty"`
-	RefundPrice                 int                           `json:"refund_price,omitempty"`
+	CancelReason                 string                        `json:"cancel_reason,omitempty"`
+	CancelType                   int                           `json:"cancel_type,omitempty"`
+	RefundPrice                  int                           `json:"refund_price,omitempty"`
 }
 
 // OrderCancelParams represents order cancel parameters
@@ -782,11 +782,11 @@ type OrderSubscriptionListParams struct {
 	ListParams
 	SearchDateFrom string `json:"search_date_from,omitempty"`
 	SearchDateTo   string `json:"search_date_to,omitempty"`
-	SAt         string `json:"s_at,omitempty"`
-	EAt         string `json:"e_at,omitempty"`
-	RequestType string `json:"request_type,omitempty"`
-	UserGroupId string `json:"user_group_id,omitempty"`
-	UserId      string `json:"user_id,omitempty"`
+	SAt            string `json:"s_at,omitempty"`
+	EAt            string `json:"e_at,omitempty"`
+	RequestType    string `json:"request_type,omitempty"`
+	UserGroupId    string `json:"user_group_id,omitempty"`
+	UserId         string `json:"user_id,omitempty"`
 	// OrderNumber looks a subscription up in reverse from an order number (server #index reads params[:order_number])
 	OrderNumber string `json:"order_number,omitempty"`
 	// Status: explicit 0 must be sendable, so pointer type
@@ -796,7 +796,7 @@ type OrderSubscriptionListParams struct {
 // OrderSubscriptionUpdateParams represents order subscription contract update parameters
 // Only changed values need to be sent. The server requires supervisor scope.
 type OrderSubscriptionUpdateParams struct {
-	OrderSubscriptionId string `json:"order_subscription_id"`
+	OrderSubscriptionId       string `json:"order_subscription_id"`
 	ProductId                 string `json:"product_id,omitempty"`
 	ProductOptionId           string `json:"product_option_id,omitempty"`
 	OrderName                 string `json:"order_name,omitempty"`
@@ -809,11 +809,11 @@ type OrderSubscriptionUpdateParams struct {
 	UseFreeTrial              *bool  `json:"use_free_trial,omitempty"`
 	FreeTrialDay              int    `json:"free_trial_day,omitempty"`
 	ServiceStartAt            string `json:"service_start_at,omitempty"`
-	NextBillingAt       string `json:"next_billing_at,omitempty"`
-	BillingKey          string `json:"billing_key,omitempty"`
-	Status              int    `json:"status,omitempty"`
-	PaymentNextAt       string `json:"payment_next_at,omitempty"`
-	ServiceEndAt        string `json:"service_end_at,omitempty"`
+	NextBillingAt             string `json:"next_billing_at,omitempty"`
+	BillingKey                string `json:"billing_key,omitempty"`
+	Status                    int    `json:"status,omitempty"`
+	PaymentNextAt             string `json:"payment_next_at,omitempty"`
+	ServiceEndAt              string `json:"service_end_at,omitempty"`
 	// Price is the base charge amount per billing cycle.
 	// Changing it immediately recalculates the amount of the READY (scheduled) cycle and
 	// every cycle created afterwards. Already-paid cycles are untouched.
@@ -876,13 +876,13 @@ type OrderSubscriptionTransferParams struct {
 
 // OrderSubscriptionTerminationParams represents subscription termination parameters
 type OrderSubscriptionTerminationParams struct {
-	OrderSubscriptionId  string `json:"order_subscription_id,omitempty"`
-	OrderNumber          string `json:"order_number,omitempty"`
-	TerminationFee       int    `json:"termination_fee,omitempty"`
-	LastBillRefundPrice  int    `json:"last_bill_refund_price,omitempty"`
-	FinalFee             int    `json:"final_fee,omitempty"`
-	ServiceEndAt         string `json:"service_end_at,omitempty"`
-	Reason               string `json:"reason,omitempty"`
+	OrderSubscriptionId string `json:"order_subscription_id,omitempty"`
+	OrderNumber         string `json:"order_number,omitempty"`
+	TerminationFee      int    `json:"termination_fee,omitempty"`
+	LastBillRefundPrice int    `json:"last_bill_refund_price,omitempty"`
+	FinalFee            int    `json:"final_fee,omitempty"`
+	ServiceEndAt        string `json:"service_end_at,omitempty"`
+	Reason              string `json:"reason,omitempty"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
 	IdempotencyKey string `json:"-"`
 }
@@ -1009,12 +1009,12 @@ type CommerceOrderSubscriptionBill struct {
 	UserCompanyName    string `json:"user_company_name,omitempty"`
 	UserBusinessNumber string `json:"user_business_number,omitempty"`
 
-	ProductIds              []string `json:"product_ids,omitempty"`
-	ProductOptionIds        []string `json:"product_option_ids,omitempty"`
-	ProductSnapshotIds      []string `json:"product_snapshot_ids,omitempty"`
+	ProductIds               []string `json:"product_ids,omitempty"`
+	ProductOptionIds         []string `json:"product_option_ids,omitempty"`
+	ProductSnapshotIds       []string `json:"product_snapshot_ids,omitempty"`
 	ProductOptionSnapshotIds []string `json:"product_option_snapshot_ids,omitempty"`
-	ProductType             int      `json:"product_type,omitempty"`
-	Quantity                int      `json:"quantity,omitempty"`
+	ProductType              int      `json:"product_type,omitempty"`
+	Quantity                 int      `json:"quantity,omitempty"`
 
 	ReservePaymentAt string `json:"reserve_payment_at,omitempty"`
 	PurchasedAt      string `json:"purchased_at,omitempty"`
@@ -1075,14 +1075,14 @@ type CommerceOrderSubscriptionAdjustment struct {
 // The server replaces the adjustments of the given Duration (defaults to 1 when unset) as a whole —
 // pass the full Adjustments array for that duration.
 type OrderSubscriptionAdjustmentUpdateParams struct {
-	OrderSubscriptionId           string `json:"order_subscription_id"`
-	OrderSubscriptionAdjustmentId string `json:"order_subscription_adjustment_id,omitempty"`
-	Duration                      int    `json:"duration,omitempty"`
+	OrderSubscriptionId           string                                `json:"order_subscription_id"`
+	OrderSubscriptionAdjustmentId string                                `json:"order_subscription_adjustment_id,omitempty"`
+	Duration                      int                                   `json:"duration,omitempty"`
 	Adjustments                   []CommerceOrderSubscriptionAdjustment `json:"adjustments,omitempty"`
-	Price                         int    `json:"price,omitempty"`
-	TaxFreePrice                  int    `json:"tax_free_price,omitempty"`
-	Name                          string `json:"name,omitempty"`
-	Type                          int    `json:"type,omitempty"`
+	Price                         int                                   `json:"price,omitempty"`
+	TaxFreePrice                  int                                   `json:"tax_free_price,omitempty"`
+	Name                          string                                `json:"name,omitempty"`
+	Type                          int                                   `json:"type,omitempty"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
 	IdempotencyKey string `json:"-"`
 }
@@ -1093,19 +1093,19 @@ type OrderSubscriptionAdjustmentUpdateParams struct {
 
 // CommerceCategory represents a category
 type CommerceCategory struct {
-	CategoryId        string   `json:"category_id,omitempty"`
-	SellerId          string   `json:"seller_id,omitempty"`
-	ProjectId         string   `json:"project_id,omitempty"`
-	Name              string   `json:"name,omitempty"`
-	ParentCategoryId  string   `json:"parent_category_id,omitempty"`
-	ParentCategories  []string `json:"parent_categories,omitempty"`
-	StatusDisplay     *bool    `json:"status_display,omitempty"`
-	StatusBest        *bool    `json:"status_best,omitempty"`
-	FilterColor       int      `json:"filter_color,omitempty"`
-	FilterSize        int      `json:"filter_size,omitempty"`
-	Idx               int      `json:"idx,omitempty"`
-	CreatedAt         string   `json:"created_at,omitempty"`
-	UpdatedAt         string   `json:"updated_at,omitempty"`
+	CategoryId       string   `json:"category_id,omitempty"`
+	SellerId         string   `json:"seller_id,omitempty"`
+	ProjectId        string   `json:"project_id,omitempty"`
+	Name             string   `json:"name,omitempty"`
+	ParentCategoryId string   `json:"parent_category_id,omitempty"`
+	ParentCategories []string `json:"parent_categories,omitempty"`
+	StatusDisplay    *bool    `json:"status_display,omitempty"`
+	StatusBest       *bool    `json:"status_best,omitempty"`
+	FilterColor      int      `json:"filter_color,omitempty"`
+	FilterSize       int      `json:"filter_size,omitempty"`
+	Idx              int      `json:"idx,omitempty"`
+	CreatedAt        string   `json:"created_at,omitempty"`
+	UpdatedAt        string   `json:"updated_at,omitempty"`
 }
 
 // CategoryCreateParams represents category creation parameters
@@ -1228,11 +1228,11 @@ type PointTransactionsParams struct {
 
 // CartItemPayload represents a cart item payload
 type CartItemPayload struct {
-	ProductId              string `json:"product_id"`
-	ProductOptionId        string `json:"product_option_id,omitempty"`
-	Quantity               int    `json:"quantity,omitempty"`
-	IsSubscription         bool   `json:"is_subscription,omitempty"`
-	SubscriptionPeriodId   string `json:"subscription_period_id,omitempty"`
+	ProductId            string `json:"product_id"`
+	ProductOptionId      string `json:"product_option_id,omitempty"`
+	Quantity             int    `json:"quantity,omitempty"`
+	IsSubscription       bool   `json:"is_subscription,omitempty"`
+	SubscriptionPeriodId string `json:"subscription_period_id,omitempty"`
 }
 
 // ShippingAddressPayload represents a shipping address payload
@@ -1290,17 +1290,17 @@ type AppliedCouponSnapshot struct {
 
 // OrderPreviewSummary represents an order preview summary
 type OrderPreviewSummary struct {
-	TotalItems              int                     `json:"total_items"`
-	TotalQuantity           int                     `json:"total_quantity"`
-	TotalProductPrice       int                     `json:"total_product_price"`
-	TotalDeliveryFee        int                     `json:"total_delivery_fee"`
-	TotalDeliveryExtraFee   int                     `json:"total_delivery_extra_fee"`
-	CouponDiscountAmount    int                     `json:"coupon_discount_amount"`
-	AppliedCoupons          []AppliedCouponSnapshot `json:"applied_coupons"`
-	PointUseAmount          int                     `json:"point_use_amount"`
-	PointMaxUsable          int                     `json:"point_max_usable"`
-	PointBalanceAfter       int                     `json:"point_balance_after"`
-	TotalOrderPrice         int                     `json:"total_order_price"`
+	TotalItems            int                     `json:"total_items"`
+	TotalQuantity         int                     `json:"total_quantity"`
+	TotalProductPrice     int                     `json:"total_product_price"`
+	TotalDeliveryFee      int                     `json:"total_delivery_fee"`
+	TotalDeliveryExtraFee int                     `json:"total_delivery_extra_fee"`
+	CouponDiscountAmount  int                     `json:"coupon_discount_amount"`
+	AppliedCoupons        []AppliedCouponSnapshot `json:"applied_coupons"`
+	PointUseAmount        int                     `json:"point_use_amount"`
+	PointMaxUsable        int                     `json:"point_max_usable"`
+	PointBalanceAfter     int                     `json:"point_balance_after"`
+	TotalOrderPrice       int                     `json:"total_order_price"`
 }
 
 // OrderPreviewUnavailableItem represents an unavailable item in order preview
@@ -1313,11 +1313,11 @@ type OrderPreviewUnavailableItem struct {
 
 // OrderPreviewResponse represents the response from order preview
 type OrderPreviewResponse struct {
-	CartId            string                        `json:"cart_id,omitempty"`
-	UserId            string                        `json:"user_id,omitempty"`
-	DeliveryGroups    []DeliveryGroup               `json:"delivery_groups"`
-	Summary           OrderPreviewSummary           `json:"summary"`
-	UnavailableItems  []OrderPreviewUnavailableItem `json:"unavailable_items,omitempty"`
+	CartId           string                        `json:"cart_id,omitempty"`
+	UserId           string                        `json:"user_id,omitempty"`
+	DeliveryGroups   []DeliveryGroup               `json:"delivery_groups"`
+	Summary          OrderPreviewSummary           `json:"summary"`
+	UnavailableItems []OrderPreviewUnavailableItem `json:"unavailable_items,omitempty"`
 }
 
 // ============================================
@@ -1342,15 +1342,15 @@ type OrderSubscriptionRequest struct {
 // OrderSubscriptionRequestListParams represents request list query parameters
 // page/limit default to 1/20 when unset.
 type OrderSubscriptionRequestListParams struct {
-	ProjectId   string `json:"project_id,omitempty"`
+	ProjectId           string `json:"project_id,omitempty"`
 	OrderSubscriptionId string `json:"order_subscription_id,omitempty"`
-	Page        int    `json:"page,omitempty"`
-	Limit       int    `json:"limit,omitempty"`
-	RequestType int    `json:"request_type,omitempty"`
-	Status      int    `json:"status,omitempty"`
-	SAt         string `json:"s_at,omitempty"`
-	EAt         string `json:"e_at,omitempty"`
-	Keyword     string `json:"keyword,omitempty"`
+	Page                int    `json:"page,omitempty"`
+	Limit               int    `json:"limit,omitempty"`
+	RequestType         int    `json:"request_type,omitempty"`
+	Status              int    `json:"status,omitempty"`
+	SAt                 string `json:"s_at,omitempty"`
+	EAt                 string `json:"e_at,omitempty"`
+	Keyword             string `json:"keyword,omitempty"`
 	UserId              string `json:"user_id,omitempty"`
 	UserGroupId         string `json:"user_group_id,omitempty"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
@@ -1378,15 +1378,15 @@ type OrderSubscriptionRequestUpdateParams struct {
 
 // OrderSubscriptionRequestUpdateBody represents the request body sent to PUT order-subscription-requests/{id}
 type OrderSubscriptionRequestUpdateBody struct {
-	Approval string                 `json:"approval"`
-	Reason   string                 `json:"reason,omitempty"`
+	Approval            string                 `json:"approval"`
+	Reason              string                 `json:"reason,omitempty"`
 	Price               *int                   `json:"price,omitempty"`
 	TaxFreePrice        *int                   `json:"tax_free_price,omitempty"`
 	TerminationFee      *int                   `json:"termination_fee,omitempty"`
 	LastBillRefundPrice *int                   `json:"last_bill_refund_price,omitempty"`
 	FinalFee            *int                   `json:"final_fee,omitempty"`
 	ServiceEndAt        string                 `json:"service_end_at,omitempty"`
-	Extra    map[string]interface{} `json:"-"`
+	Extra               map[string]interface{} `json:"-"`
 }
 
 // MarshalJSON merges Extra into the serialized body — with the plain struct tags Extra was
@@ -1665,4 +1665,331 @@ type SendTestWebhookParams struct {
 	HeaderContentType *int `json:"header_content_type,omitempty"`
 	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
 	IdempotencyKey string `json:"-"`
+}
+
+// ============================================
+// Alimtalk Types
+// ============================================
+
+// AlimtalkMessageListParams represents alimtalk send-history query parameters
+// (GET /v1/alimtalk/messages)
+//
+// ⚠️ 유료 알림톡만 조회된다 (무료 커머스 알림톡은 포함되지 않는다).
+// ⚠️ 기간 기본값은 최근 30일이고 최대 조회 폭은 92일이다 — 초과분은 거부하지 않고
+//
+//	시작일을 당겨 잘라낸다. 실제 적용된 구간은 응답의 period 로 확인한다.
+type AlimtalkMessageListParams struct {
+	TemplateCode string `json:"template_code,omitempty"`
+	// requested · success · failed · canceled
+	Status string `json:"status,omitempty"`
+	// 발송 시 넘긴 멱등키
+	RefId string `json:"ref_id,omitempty"`
+	// 수신번호 (하이픈 무관, 정확 매칭)
+	To   string `json:"to,omitempty"`
+	SAt  string `json:"s_at,omitempty"`
+	EAt  string `json:"e_at,omitempty"`
+	Page int    `json:"page,omitempty"`
+	// 서버 기본 20, 최대 100
+	Limit int `json:"limit,omitempty"`
+}
+
+// AlimtalkOfficialListParams represents official template catalog search parameters
+// (GET /v1/alimtalk/official)
+type AlimtalkOfficialListParams struct {
+	// 본문·이름·분류를 부분일치(대소문자 무시)로 훑는다.
+	// 서버는 q 를 먼저 보고 없으면 keyword 를 본다 — 정본 키인 q 로 보낸다.
+	Keyword  string `json:"q,omitempty"`
+	Category string `json:"category,omitempty"`
+	// BA(기본형) · EX(부가정보형)만 존재한다 — 그룹 템플릿이라 AD/MI 는 쓸 수 없다.
+	MsgType string `json:"msg_type,omitempty"`
+	Page    int    `json:"page,omitempty"`
+	// 서버 기본 20, 최대 100 으로 clamp
+	Per int `json:"per,omitempty"`
+	// 주면 그 채널의 변수 예문 사전으로 variable_examples 를 채워 준다(표시용)
+	KspId string `json:"ksp_id,omitempty"`
+}
+
+// AlimtalkOfficialRecommendParams represents official template recommendation parameters
+// (POST /v1/alimtalk/official/recommend)
+type AlimtalkOfficialRecommendParams struct {
+	Text     string `json:"text"`
+	Category string `json:"category,omitempty"`
+	// 서버 기본 5
+	Limit int    `json:"limit,omitempty"`
+	KspId string `json:"ksp_id,omitempty"`
+}
+
+// AlimtalkOptoutListParams represents optout list query parameters
+// (GET /v1/alimtalk/optouts)
+// phone 은 숫자만 남겨 **부분일치**로 찾는다(정확 매칭이 아니다). 50건 단위로 페이징된다.
+type AlimtalkOptoutListParams struct {
+	Phone string `json:"phone,omitempty"`
+	Page  int    `json:"page,omitempty"`
+}
+
+// AlimtalkOptoutCreateParams represents optout registration parameters
+// (POST /v1/alimtalk/optouts)
+// 내 프로젝트 스코프로 등록된다(source: api). 같은 번호를 다시 등록해도 멱등이다.
+type AlimtalkOptoutCreateParams struct {
+	Phone  string `json:"phone"`
+	Reason string `json:"reason,omitempty"`
+}
+
+// AlimtalkOptoutCheckParams represents optout pre-check parameters
+// (POST /v1/alimtalk/optouts/check)
+// 단건(Phone)·다건(Phones) 모두 받는다.
+// ⚠️ 1회 최대 1,000건이고 넘으면 -48 이다 (중복은 서버가 제거).
+type AlimtalkOptoutCheckParams struct {
+	Phones []string `json:"phones,omitempty"`
+	Phone  string   `json:"phone,omitempty"`
+}
+
+// AlimtalkSendParams represents single alimtalk send parameters (POST /v1/alimtalk/send)
+//
+// ⚠️ 실제로 카카오톡이 발송되고 과금된다. 샌드박스가 없다.
+type AlimtalkSendParams struct {
+	TemplateCode string `json:"template_code"`
+	To           string `json:"to"`
+	// { "company_name": "부트페이몰", "user_name": "홍길동" } 형태의 치환값.
+	// 템플릿 응답의 required_variables 를 모두 채워야 한다 — 하나라도 비면 3017 로 거부된다.
+	Variables map[string]interface{} `json:"variables,omitempty"`
+	// 가맹점 발송 식별자 — **멱등 키**로 쓰인다
+	RefId string `json:"ref_id,omitempty"`
+	// 알림톡 실패 시 문자(LMS) 대체발송 여부.
+	// ⚠️ **미지정(nil)과 false 는 다르다** — nil 이면 프로젝트 기본값을 따르고, false 는 명시적으로 끈다.
+	// 그래서 pointer type 이다.
+	Fallback *bool `json:"fallback,omitempty"`
+	// 예약 발송 시각(ISO8601). 생략하면 즉시 발송
+	ReservedAt string `json:"reserved_at,omitempty"`
+	// 채널 공개키. 생략하면 프로젝트 연동 채널로 해석하며, 연동 채널이 둘 이상일 때만 필수다.
+	// (ksp_id 는 내부 문서 id 라 발송 API 에 쓰지 않는다)
+	SenderKey string `json:"sender_key,omitempty"`
+	UserId    string `json:"user_id,omitempty"`
+}
+
+// AlimtalkSendRecipient represents one recipient of a bulk alimtalk send
+type AlimtalkSendRecipient struct {
+	To        string                 `json:"to"`
+	RefId     string                 `json:"ref_id,omitempty"`
+	Variables map[string]interface{} `json:"variables,omitempty"`
+}
+
+// AlimtalkSendBulkParams represents bulk alimtalk send parameters (POST /v1/alimtalk/send/bulk)
+//
+// ⚠️ 수신자 수만큼 실제 발송되고 과금된다.
+//   - 쿼터를 넘으면 요청 시점에 **전체 거부**된다(3022) — 일부만 나가지 않는다.
+//   - 수신거부 번호는 skipped 이며 과금되지 않고 발송 기록도 만들지 않는다.
+//   - Fallback 은 요청 단위로 한 번만 판정한다 — 발신번호가 없으면 요청 전체가 3030 으로 거부된다.
+type AlimtalkSendBulkParams struct {
+	TemplateCode string                  `json:"template_code"`
+	Recipients   []AlimtalkSendRecipient `json:"recipients"`
+	// 미지정(nil)과 false 는 다르다 — AlimtalkSendParams.Fallback 주석 참고
+	Fallback   *bool  `json:"fallback,omitempty"`
+	ReservedAt string `json:"reserved_at,omitempty"`
+	SenderKey  string `json:"sender_key,omitempty"`
+	UserId     string `json:"user_id,omitempty"`
+}
+
+// AlimtalkSenderOtpParams represents channel-admin OTP request parameters
+// (POST /v1/alimtalk/senders/otp)
+// ⚠️ 실제로 문자가 나간다.
+type AlimtalkSenderOtpParams struct {
+	YellowId string `json:"yellow_id"`
+	Phone    string `json:"phone"`
+}
+
+// AlimtalkSenderCreateParams represents sender profile registration parameters
+// (POST /v1/alimtalk/senders)
+// ⚠️ 카카오에 발신프로필이 실제 등록된다. 같은 yellow_id 를 다시 등록하면 기존 프로필을 재사용한다(dedup).
+type AlimtalkSenderCreateParams struct {
+	Otp          string `json:"otp"`
+	YellowId     string `json:"yellow_id"`
+	Phone        string `json:"phone"`
+	CategoryCode string `json:"category_code"`
+}
+
+// AlimtalkTemplateListParams represents own-template list query parameters
+// (GET /v1/alimtalk/templates)
+// ⚠️ 페이지네이션이 없다 — 필터에 걸린 템플릿을 한 번에 모두 돌려준다.
+type AlimtalkTemplateListParams struct {
+	// 검수상태 필터 — 1 REG(등록) / 2 REQ(검수요청) / 3 APR(승인) / 4 KRR(등록거절) / 5 REJ(승인반려).
+	// 숫자문자열·벤더 문자열('APR' 등)을 모두 받는다. 해석 못 하는 값은 필터 없음으로 떨어진다.
+	Ins string `json:"ins,omitempty"`
+	// latest(기본) · oldest · code
+	Sort string `json:"sort,omitempty"`
+	// 코드·이름·본문·분류 부분일치
+	Keyword string `json:"keyword,omitempty"`
+}
+
+// AlimtalkTemplateButton represents a template button
+type AlimtalkTemplateButton struct {
+	Name          string `json:"name,omitempty"`
+	Type          string `json:"type,omitempty"`
+	UrlMobile     string `json:"url_mobile,omitempty"`
+	UrlPc         string `json:"url_pc,omitempty"`
+	SchemeIos     string `json:"scheme_ios,omitempty"`
+	SchemeAndroid string `json:"scheme_android,omitempty"`
+	// 서버가 읽는 그 밖의 키는 Extra 로 넘긴다
+	Extra map[string]interface{} `json:"-"`
+}
+
+// MarshalJSON merges Extra into the serialized button — typed fields win over
+// same-named Extra keys; nil Extra values are not sent (compact semantics).
+func (b AlimtalkTemplateButton) MarshalJSON() ([]byte, error) {
+	type alias AlimtalkTemplateButton
+	return mergeExtraJSON(alias(b), b.Extra)
+}
+
+// AlimtalkTemplateCreateParams represents own-template creation parameters
+// (POST /v1/alimtalk/templates)
+//
+// ⚠️ Register 를 false 로 주지 않으면 대행사·카카오에 **실제 등록**된다(되돌리려면 삭제해야 한다).
+// ⚠️ 본문 변수는 `#{변수명}` 형식이고 템플릿 전체에서 최대 40개다.
+//
+// EmphasizeType: NONE · TEXT(강조표기형) · IMAGE(이미지형) · ITEM_LIST(아이템리스트형)
+//   - TEXT 는 EmphasizeTitle·EmphasizeSubtitle 둘 다 필수(각 50자·40자)
+//   - IMAGE 는 이미지 필수 — AlimtalkTemplate.Image 로 올린 URL 을 StorageImageUrl 로 넘긴다
+//   - ITEM_LIST 는 TemplateItem.list(2~10개) 필수 + TemplateHeader·ItemHighlight·이미지 중 하나 이상
+//
+// MsgType: BA(기본형) · EX(부가정보형, TemplateExtra 필수) · AD(채널추가형) · MI(복합형)
+//   - AD·MI 는 채널추가(AC) 버튼이 필수다
+type AlimtalkTemplateCreateParams struct {
+	KspId string `json:"ksp_id"`
+	// ⚠️ 미지정(nil)이면 즉시 등록된다 — 초안만 만들려면 명시적으로 false 를 넘긴다.
+	// 그래서 pointer type 이다.
+	Register          *bool                    `json:"register,omitempty"`
+	Name              string                   `json:"name,omitempty"`
+	Content           string                   `json:"content,omitempty"`
+	Buttons           []AlimtalkTemplateButton `json:"buttons,omitempty"`
+	MsgType           string                   `json:"msg_type,omitempty"`
+	EmphasizeType     string                   `json:"emphasize_type,omitempty"`
+	EmphasizeTitle    string                   `json:"emphasize_title,omitempty"`
+	EmphasizeSubtitle string                   `json:"emphasize_subtitle,omitempty"`
+	TemplateExtra     string                   `json:"template_extra,omitempty"`
+	TemplateHeader    string                   `json:"template_header,omitempty"`
+	ItemHighlight     map[string]interface{}   `json:"item_highlight,omitempty"`
+	TemplateItem      map[string]interface{}   `json:"template_item,omitempty"`
+	ImageUrl          string                   `json:"image_url,omitempty"`
+	StorageImageUrl   string                   `json:"storage_image_url,omitempty"`
+	SecurityFlag      *bool                    `json:"security_flag,omitempty"`
+	Category          string                   `json:"category,omitempty"`
+	Tags              []string                 `json:"tags,omitempty"`
+	// 변수 예문(표시용). 주면 **모든 변수에 예문이 있어야** 한다(없으면 3017).
+	Examples     map[string]interface{} `json:"examples,omitempty"`
+	TemplateCode string                 `json:"template_code,omitempty"`
+	// Ruby `**attrs` 대응 — 타입 필드에 없는 키를 그대로 실어 보낸다
+	Extra map[string]interface{} `json:"-"`
+}
+
+// MarshalJSON merges Extra into the serialized body — typed fields win over
+// same-named Extra keys; nil Extra values are not sent (compact semantics).
+func (p AlimtalkTemplateCreateParams) MarshalJSON() ([]byte, error) {
+	type alias AlimtalkTemplateCreateParams
+	return mergeExtraJSON(alias(p), p.Extra)
+}
+
+// AlimtalkTemplateUpdateParams represents own-template update parameters
+// (PUT /v1/alimtalk/templates/{template_id})
+//
+// ⚠️ **부분 수정이 아니다.** 보내지 않은 필드는 서버에서 nil 로 덮어써지므로 항상 전체 필드를 보낸다.
+// ⚠️ 등록된 템플릿을 수정하면 벤더에도 수정 요청이 나간다. 수정 가능 상태는
+//
+//	초안 / REG(등록) / REJ(승인반려) / KRR(등록거절) 뿐이다 — APR·REQ 는 거부된다.
+//
+// storage_image_url 을 **빈 값으로** 보내면 이미지 삭제로 처리되어 벤더에도 전달된다.
+// omitempty 때문에 빈 문자열은 실리지 않으므로, 삭제 의도는
+// `Extra: map[string]interface{}{"storage_image_url": ""}` 로 명시한다.
+type AlimtalkTemplateUpdateParams struct {
+	Name              string                   `json:"name,omitempty"`
+	Content           string                   `json:"content,omitempty"`
+	Buttons           []AlimtalkTemplateButton `json:"buttons,omitempty"`
+	MsgType           string                   `json:"msg_type,omitempty"`
+	EmphasizeType     string                   `json:"emphasize_type,omitempty"`
+	EmphasizeTitle    string                   `json:"emphasize_title,omitempty"`
+	EmphasizeSubtitle string                   `json:"emphasize_subtitle,omitempty"`
+	TemplateExtra     string                   `json:"template_extra,omitempty"`
+	TemplateHeader    string                   `json:"template_header,omitempty"`
+	ItemHighlight     map[string]interface{}   `json:"item_highlight,omitempty"`
+	TemplateItem      map[string]interface{}   `json:"template_item,omitempty"`
+	ImageUrl          string                   `json:"image_url,omitempty"`
+	StorageImageUrl   string                   `json:"storage_image_url,omitempty"`
+	SecurityFlag      *bool                    `json:"security_flag,omitempty"`
+	Category          string                   `json:"category,omitempty"`
+	Tags              []string                 `json:"tags,omitempty"`
+	Examples          map[string]interface{}   `json:"examples,omitempty"`
+	TemplateCode      string                   `json:"template_code,omitempty"`
+	// Ruby `**attrs` 대응 — 타입 필드에 없는 키(및 빈 값 명시 전송)를 그대로 실어 보낸다
+	Extra map[string]interface{} `json:"-"`
+}
+
+// MarshalJSON merges Extra into the serialized body — typed fields win over
+// same-named Extra keys; nil Extra values are not sent (compact semantics).
+func (p AlimtalkTemplateUpdateParams) MarshalJSON() ([]byte, error) {
+	type alias AlimtalkTemplateUpdateParams
+	return mergeExtraJSON(alias(p), p.Extra)
+}
+
+// AlimtalkTemplateExportParams represents template export parameters
+// (GET /v1/alimtalk/templates/export)
+// ⚠️ 1회 5,000건을 넘으면 3031 로 거부되므로 채널·상태 필터로 좁힌다.
+type AlimtalkTemplateExportParams struct {
+	// json(SDK 기본) · csv. 서버 기본은 csv 지만 csv 본문은 JSON 이 아니라서
+	// 공용 파서를 통과하지 못한다 — SDK 는 json 을 기본으로 두고, csv 는 원문 그대로 돌려준다.
+	Format string `json:"format,omitempty"`
+	// private(기본, 내 채널 자체 템플릿) · official(공식 카탈로그) · all
+	Scope          string `json:"scope,omitempty"`
+	KspId          string `json:"ksp_id,omitempty"`
+	Status         string `json:"status,omitempty"`
+	IncludeContent *bool  `json:"include_content,omitempty"`
+}
+
+// AlimtalkWebhookUpdateParams represents alimtalk webhook configuration parameters
+// (PUT /v1/alimtalk/webhook)
+//
+// ⚠️ 주문·구독 통합 웹훅과 완전히 별개다 (Webhook.SendTest 는 주문 웹훅용이다).
+type AlimtalkWebhookUpdateParams struct {
+	// **https 만** 허용한다(아니면 3028). 최초 저장 시 서명 시크릿이 자동 발급된다.
+	Url string `json:"url,omitempty"`
+	// 구독할 이벤트 코드. 목록에 없는 값은 저장 시 조용히 버려진다(유령 구독 방지).
+	//   300 발송 접수(기본 미구독) / 301 전달 성공 / 302 전달 실패 / 303 예약 취소 /
+	//   304 문자(LMS) 대체발송 전환 / 310 검수 승인 / 311 검수 반려 / 320 수신거부 등록(기본 미구독)
+	// 비우면 기본 구독셋(301·302·303·304·310·311)이 적용된다.
+	Events []int `json:"events,omitempty"`
+	// explicit false 를 보내야 하므로 pointer type
+	Enabled *bool `json:"enabled,omitempty"`
+}
+
+// AlimtalkWebhookDeliveriesParams represents webhook delivery history query parameters
+// (GET /v1/alimtalk/webhook/deliveries)
+type AlimtalkWebhookDeliveriesParams struct {
+	Page int `json:"page,omitempty"`
+	// 서버 기본 20, 최대 100
+	Limit int `json:"limit,omitempty"`
+}
+
+// mergeExtraJSON serializes value and merges extra into the resulting object.
+// Typed fields win over same-named extra keys, and nil extra values are dropped
+// (Ruby `.merge(attrs).compact` semantics).
+func mergeExtraJSON(value interface{}, extra map[string]interface{}) ([]byte, error) {
+	raw, err := json.Marshal(value)
+	if err != nil {
+		return nil, err
+	}
+	if len(extra) == 0 {
+		return raw, nil
+	}
+	body := map[string]interface{}{}
+	if err := json.Unmarshal(raw, &body); err != nil {
+		return nil, err
+	}
+	for key, item := range extra {
+		if item == nil {
+			continue
+		}
+		if _, exists := body[key]; exists {
+			continue
+		}
+		body[key] = item
+	}
+	return json.Marshal(body)
 }

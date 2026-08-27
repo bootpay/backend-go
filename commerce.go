@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
@@ -50,6 +51,15 @@ type CommerceApi struct {
 	Cart                        *CartModule
 	MallSetting                 *MallSettingModule
 	Webhook                     *WebhookModule
+
+	// 알림톡 v1 API
+	AlimtalkMessage  *AlimtalkMessageModule
+	AlimtalkOfficial *AlimtalkOfficialModule
+	AlimtalkOptout   *AlimtalkOptoutModule
+	AlimtalkSend     *AlimtalkSendModule
+	AlimtalkSender   *AlimtalkSenderModule
+	AlimtalkTemplate *AlimtalkTemplateModule
+	AlimtalkWebhook  *AlimtalkWebhookModule
 }
 
 // CommerceResponse is the common response structure for Commerce API
@@ -121,6 +131,13 @@ func NewCommerceAPI(clientKey string, secretKey string, client *http.Client, mod
 	api.Cart = &CartModule{api: api}
 	api.MallSetting = &MallSettingModule{api: api}
 	api.Webhook = &WebhookModule{api: api}
+	api.AlimtalkMessage = &AlimtalkMessageModule{api: api}
+	api.AlimtalkOfficial = &AlimtalkOfficialModule{api: api}
+	api.AlimtalkOptout = &AlimtalkOptoutModule{api: api}
+	api.AlimtalkSend = &AlimtalkSendModule{api: api}
+	api.AlimtalkSender = &AlimtalkSenderModule{api: api}
+	api.AlimtalkTemplate = &AlimtalkTemplateModule{api: api}
+	api.AlimtalkWebhook = &AlimtalkWebhookModule{api: api}
 
 	return api
 }
@@ -377,6 +394,38 @@ func (api *CommerceApi) postMultipart(url string, body io.Reader, contentType st
 	return decodeCommerceBody(res.Body)
 }
 
+// getRaw performs a GET request and returns the body without parsing it.
+//
+// ⚠️ decodeCommerceBody always parses the body as JSON, so an endpoint answering with a
+// non-JSON body (alimtalk template export with format=csv) fails there and the caller sees
+// a parse error for a request that actually succeeded. This path keeps the original text.
+// The result is {"body": "<raw text>", "content_type": "..."} — mirroring the Ruby SDK.
+func (api *CommerceApi) getRaw(url string, headers map[string]string) (map[string]interface{}, error) {
+	req, err := api.newRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	req.Header.Set("Accept", "*/*")
+
+	res, err := api.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	raw, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]interface{}{
+		"body":         string(raw),
+		"content_type": res.Header.Get("Content-Type"),
+	}, nil
+}
+
 // newIdempotencyKey generates a UUID v4 string for the Idempotency-Key header
 func newIdempotencyKey() string {
 	b := make([]byte, 16)
@@ -401,6 +450,16 @@ func commerceRoleHeaders(role string, idempotencyKey string) map[string]string {
 	headers := commerceIdempotencyHeaders(idempotencyKey)
 	headers["BOOTPAY-ROLE"] = role
 	return headers
+}
+
+// alimtalkHeaders returns the header set for the Alimtalk v1 API.
+//
+// ⚠️ No Idempotency-Key here, unlike commerceRoleHeaders. The alimtalk API does not read
+// that header — idempotency is established only by ref_id on send. Attaching it anyway
+// would advertise a guarantee the server never gives.
+// BOOTPAY-ROLE is always user: every alimtalk scope key is user:alimtalk_*.
+func alimtalkHeaders() map[string]string {
+	return map[string]string{"BOOTPAY-ROLE": "user"}
 }
 
 // commerceMallHeaders returns V1 Mall API headers.
@@ -433,6 +492,16 @@ func (api *CommerceApi) Delete(url string) (map[string]interface{}, error) {
 	return api.doRequest(http.MethodDelete, url, nil)
 }
 
+// BoolPtr returns a pointer to v.
+//
+// Several Commerce/Alimtalk fields are tri-state: nil follows the server/project default,
+// while an explicit false means "turn this off" (AlimtalkSendParams.Fallback,
+// AlimtalkTemplateCreateParams.Register, ...). A plain bool would lose that distinction
+// because omitempty drops false — hence the pointer, and this helper to build one inline.
+func BoolPtr(v bool) *bool {
+	return &v
+}
+
 // firstOrEmpty returns the first element of an optional variadic string argument.
 // Used by Commerce methods that accept an optional Idempotency-Key without breaking
 // the existing call signature.
@@ -441,4 +510,13 @@ func firstOrEmpty(values []string) string {
 		return values[0]
 	}
 	return ""
+}
+
+// withQuery appends an encoded query string to a uri, omitting the "?" when there is
+// nothing to send (Ruby's params `.compact` leaves no trailing "?" either).
+func withQuery(uri string, query url.Values) string {
+	if len(query) == 0 {
+		return uri
+	}
+	return uri + "?" + query.Encode()
 }
