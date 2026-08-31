@@ -1,3 +1,20 @@
+### 2.8.1
+
+Ruby SDK `c716a1f` (현금 영수증 use_default_pg 옵션 추가) 반영. **계약 확인 + 테스트 고정**으로,
+기존 시그니처·JSON 바디·엔드포인트는 불변이다.
+
+Ruby 는 `request_cash_receipt` 의 `pg:` 를 필수 키워드에서 선택(`pg: nil`)으로 바꿨다 — PG 를 지정하지
+않으면 서버가 프로젝트 기본 PG 로 현금영수증을 발행한다. Go 는 `CashReceiptData.Pg` 가 처음부터
+`json:"pg,omitempty"` 라 값을 비우면 키 자체가 빠지므로 **동작은 이미 동일**했다. Ruby 는 `null` 을 싣고
+Go 는 키를 생략하지만, 서버는 둘 다 "미지정"으로 읽는다.
+
+바뀐 계약이 조용히 되돌아가지 않도록 아래를 추가했다.
+
+- `CashReceiptData.Pg` 에 선택값이라는 근거 주석 (`cash.go`)
+- `pg_cash_receipt_mock_test.go` — `Pg` 미지정 시 바디에 `pg` 키가 없고 나머지 필드는 그대로 실리는지,
+  지정 시에는 그대로 실리는지, 결제건 발행(`request/receipt/cash/publish`)도 같은지 검증
+- README 9-3 에 `Pg` 생략 가능 표기
+
 ### 2.8.0
 
 Ruby SDK `8f1ee1e` (알림톡 v1 API 35종 SDK 메서드 추가) 반영. **순수 추가**로, 기존 모듈·시그니처·JSON 바디는 불변이다.

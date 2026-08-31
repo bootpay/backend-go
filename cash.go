@@ -23,6 +23,8 @@ type CashReceiptData struct {
 	Email    string `json:"email,omitempty"`
 	Phone    string `json:"phone,omitempty"`
 	/* 별건 요청 파라미터 */
+	// Pg 는 선택값이다. 비워두면 키를 싣지 않고, 서버가 프로젝트 기본 PG 로 발행한다.
+	// (Ruby SDK c716a1f — request_cash_receipt 의 pg 가 필수에서 선택으로 바뀐 것과 동일한 계약)
 	Pg   string `json:"pg,omitempty"`
 	User User   `json:"user,omitempty"`
 }

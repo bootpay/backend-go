@@ -639,12 +639,14 @@ func RequestCashReceiptCancelByBootpay(api *bootpay.Api) {
 
 부트페이 결제와 상관없이 현금영수증을 발행합니다.
 
+`Pg` 는 선택값입니다. 비워두면 요청 바디에서 빠지고, 서버가 프로젝트에 설정된 기본 PG 로 발행합니다.
+
 ```go
 func RequestCashReceipt(api *bootpay.Api) {
     purchasedAt := time.Now().Format("2006-01-02T15:04:05-07:00")
 
     cashReceipt := bootpay.CashReceiptData{
-        Pg:              "토스",
+        Pg:              "토스",  // 생략 가능 — 미지정 시 기본 PG 로 발행
         Price:           1000,
         OrderName:       "테스트 상품",
         CashReceiptType: "소득공제",
