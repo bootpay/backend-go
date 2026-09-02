@@ -260,7 +260,7 @@ func TestCommerceAlimtalkTemplateCreateBody(t *testing.T) {
 		Register: BoolPtr(false),
 		MsgType:  "BA",
 		Buttons: []AlimtalkTemplateButton{
-			{Name: "주문조회", Type: "WL", UrlMobile: "https://m.example.com", Extra: map[string]interface{}{"ordering": 1}},
+			{Name: "주문조회", LinkType: "WL", LinkMo: "https://m.example.com", Ordering: 1},
 		},
 		Examples: map[string]interface{}{"user_name": "홍길동"},
 		Extra:    map[string]interface{}{"comment": "내부 메모", "dropped": nil},
@@ -288,8 +288,17 @@ func TestCommerceAlimtalkTemplateCreateBody(t *testing.T) {
 		t.Fatalf("buttons mismatch: %+v", body)
 	}
 	button, _ := buttons[0].(map[string]interface{})
-	if button["name"] != "주문조회" || button["type"] != "WL" || button["ordering"] != float64(1) {
-		t.Fatalf("button Extra 병합 실패: %+v", button)
+	// ⚠️ 등록 API 는 linkType/linkMo 를 읽는다. 발송 포맷(type/url_mobile)으로 보내면
+	//    서버가 linkType 을 못 읽어 "지원하지 않는 버튼 타입입니다" 로 거부한다.
+	if button["name"] != "주문조회" || button["linkType"] != "WL" ||
+		button["linkMo"] != "https://m.example.com" || button["ordering"] != float64(1) {
+		t.Fatalf("button 등록 포맷 mismatch: %+v", button)
+	}
+	if _, exists := button["type"]; exists {
+		t.Fatalf("발송 포맷 키(type)가 등록 요청에 실리면 안 된다: %+v", button)
+	}
+	if _, exists := button["url_mobile"]; exists {
+		t.Fatalf("발송 포맷 키(url_mobile)가 등록 요청에 실리면 안 된다: %+v", button)
 	}
 
 	// 수정은 부분 수정이 아니다. 이미지 삭제는 빈 문자열을 명시해야 하는데 omitempty 가 지우므로

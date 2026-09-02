@@ -1822,13 +1822,33 @@ type AlimtalkTemplateListParams struct {
 }
 
 // AlimtalkTemplateButton represents a template button
+//
+// ⚠️ 키 이름이 **등록 API 와 발송 API 에서 다르다.** 이 구조체는 템플릿 등록/수정
+// (POST·PUT /v1/alimtalk/templates) 용이라 등록 포맷을 쓴다.
+//
+//	등록: linkType / linkMo / linkPc / linkIos / linkAnd   ← 이 구조체
+//	발송: type / url_mobile / url_pc / ...                 (서버가 발송 시점에 변환한다)
+//
+// 발송 포맷 키로 보내면 서버가 linkType 을 못 읽어 "지원하지 않는 버튼 타입입니다" 로 거부한다.
+//
+// LinkType: WL(웹링크, LinkMo 필수) · AL(앱링크, LinkIos·LinkAnd 중 1개 이상) ·
+// BK(봇키워드) · MD(메시지전달) · BC(상담톡전환) · BT(봇전환) · DS(배송조회) ·
+// AC(채널추가 — 메시지 유형 AD/MI 에서만)
 type AlimtalkTemplateButton struct {
-	Name          string `json:"name,omitempty"`
-	Type          string `json:"type,omitempty"`
-	UrlMobile     string `json:"url_mobile,omitempty"`
-	UrlPc         string `json:"url_pc,omitempty"`
-	SchemeIos     string `json:"scheme_ios,omitempty"`
-	SchemeAndroid string `json:"scheme_android,omitempty"`
+	// 버튼명 (필수). ⚠️ 카카오가 변수를 금지한다 — #{...} 를 쓰면 검수에서 반려된다.
+	Name string `json:"name,omitempty"`
+	// 버튼 타입 (필수) — WL·AL·BK·MD·BC·BT·DS·AC
+	LinkType string `json:"linkType,omitempty"`
+	// 모바일 웹링크 (WL 필수)
+	LinkMo string `json:"linkMo,omitempty"`
+	// PC 웹링크 (WL 선택)
+	LinkPc string `json:"linkPc,omitempty"`
+	// iOS 앱링크 (AL — LinkAnd 와 함께 하나 이상)
+	LinkIos string `json:"linkIos,omitempty"`
+	// Android 앱링크 (AL — LinkIos 와 함께 하나 이상)
+	LinkAnd string `json:"linkAnd,omitempty"`
+	// 버튼 순서. 미지정이면 서버가 배열 순서대로 1..N 을 매긴다.
+	Ordering int `json:"ordering,omitempty"`
 	// 서버가 읽는 그 밖의 키는 Extra 로 넘긴다
 	Extra map[string]interface{} `json:"-"`
 }

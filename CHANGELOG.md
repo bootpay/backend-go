@@ -1,3 +1,31 @@
+### 2.8.2
+
+#### 템플릿 버튼 필드명을 등록 API 계약에 맞춤 (⚠️ 버튼이 있는 템플릿 등록이 항상 실패하던 버그)
+
+`AlimtalkTemplateButton` 이 **발송 포맷 키**를 템플릿 **등록** API 에 보내고 있었다.
+서버(`normalize_buttons`)는 `linkType`·`linkMo`·`linkPc`·`linkIos`·`linkAnd` 만 읽으므로
+`type`·`url_mobile`·`url_pc`·`scheme_ios`·`scheme_android` 는 전부 버려지고,
+`linkType` 이 빈 값이 되어 `validate_buttons!` 가 **"지원하지 않는 버튼 타입입니다"** 로 거부했다.
+즉 버튼을 하나라도 넣으면 `AlimtalkTemplate.Create` / `Update` 가 **항상 실패**했다.
+
+| 필드 | 변경 전 (발송 포맷) | 변경 후 (등록 포맷) |
+|------|--------------------|--------------------|
+| `Type` | `type` | `LinkType` → `linkType` |
+| `UrlMobile` | `url_mobile` | `LinkMo` → `linkMo` |
+| `UrlPc` | `url_pc` | `LinkPc` → `linkPc` |
+| `SchemeIos` | `scheme_ios` | `LinkIos` → `linkIos` |
+| `SchemeAndroid` | `scheme_android` | `LinkAnd` → `linkAnd` |
+
+- `Ordering int` 추가 — 종전에는 `Extra` 로만 넣을 수 있었다.
+- 등록/발송 키가 다르다는 사실을 구조체 주석에 명시했다 (서버 `Const::ALIMTALK_BUTTON_LINK_SPEC` 기준).
+- 회귀 방지: `TestCommerceAlimtalkTemplateCreateBody` 가 `linkType`·`linkMo` 전송을 단정하고,
+  발송 포맷 키(`type`·`url_mobile`)가 **실리지 않는지**도 함께 단정한다.
+  종전 테스트는 `button["type"] == "WL"` 을 단정해 이 버그를 통과시키고 있었다.
+
+**하위호환**: `AlimtalkTemplateButton` 은 2.8.0 에서 추가됐고 Go modules 에 배포된 적이 없다
+(레지스트리 최신은 2.7.0). 따라서 이 필드명 변경의 영향을 받는 기존 사용자는 없다.
+버튼을 자유형식 맵으로 넘기던 경로(`Extra`)는 그대로 동작한다.
+
 ### 2.8.1
 
 Ruby SDK `c716a1f` (현금 영수증 use_default_pg 옵션 추가) 반영. **계약 확인 + 테스트 고정**으로,
