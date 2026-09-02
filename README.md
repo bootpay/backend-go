@@ -41,6 +41,7 @@
   - [10-4. 주문 관리](#10-4-주문-관리)
   - [10-5. 정기구독 관리](#10-5-정기구독-관리)
   - [10-6. 청구서 관리](#10-6-청구서-관리)
+  - [10-7. 알림톡](#10-7-알림톡)
 - [Example 프로젝트](#example-프로젝트)
 - [Documentation](#documentation)
 - [기술문의](#기술문의)
@@ -638,12 +639,14 @@ func RequestCashReceiptCancelByBootpay(api *bootpay.Api) {
 
 부트페이 결제와 상관없이 현금영수증을 발행합니다.
 
+`Pg` 는 선택값입니다. 비워두면 요청 바디에서 빠지고, 서버가 프로젝트에 설정된 기본 PG 로 발행합니다.
+
 ```go
 func RequestCashReceipt(api *bootpay.Api) {
     purchasedAt := time.Now().Format("2006-01-02T15:04:05-07:00")
 
     cashReceipt := bootpay.CashReceiptData{
-        Pg:              "토스",
+        Pg:              "토스",  // 생략 가능 — 미지정 시 기본 PG 로 발행
         Price:           1000,
         OrderName:       "테스트 상품",
         CashReceiptType: "소득공제",
@@ -838,6 +841,73 @@ invoice, err := api.InvoiceCreate(map[string]interface{}{
 // 청구서 알림 전송
 err = api.InvoiceNotify("INVOICE_ID", []int{1, 2}) // 1: SMS, 2: Email
 ```
+
+### 10-7. 알림톡
+
+Commerce API 인스턴스(`NewCommerceAPI`)의 알림톡 모듈로 발신프로필 등록부터 템플릿 검수, 발송, 결과 조회까지 처리합니다.
+
+> ⚠️ 알림톡은 **샌드박스가 없습니다.** 발송·OTP·발신프로필 등록·템플릿 등록은 모두 실제로 나가고 과금됩니다.
+> 알림톡 API 는 `Idempotency-Key` 헤더를 읽지 않습니다 — 멱등은 발송의 `ref_id` 로만 성립합니다.
+
+```go
+api := bootpay.NewCommerceAPI(clientKey, secretKey, nil, "production")
+
+// 발신프로필(카카오채널) 등록 — 카테고리 조회 → OTP → 등록
+categories, err := api.AlimtalkSender.Categories()
+_, err = api.AlimtalkSender.Otp(bootpay.AlimtalkSenderOtpParams{
+    YellowId: "@부트페이", Phone: "01012345678",
+})
+sender, err := api.AlimtalkSender.Create(bootpay.AlimtalkSenderCreateParams{
+    Otp: "123456", YellowId: "@부트페이", Phone: "01012345678", CategoryCode: "001001",
+})
+
+// 공식 템플릿 (부트페이가 미리 승인받아 둔 카탈로그 — 검수 없이 즉시 발송 가능)
+official, err := api.AlimtalkOfficial.List(&bootpay.AlimtalkOfficialListParams{Keyword: "주문"})
+
+// 자체 템플릿 — 초안 생성 후 확인하고 등록/검수하는 것을 권장
+draft, err := api.AlimtalkTemplate.Create(bootpay.AlimtalkTemplateCreateParams{
+    KspId:    "KSP_ID",
+    Name:     "주문완료 안내",
+    Content:  "#{user_name}님, 주문이 완료되었습니다.",
+    Register: bootpay.BoolPtr(false), // ⚠️ 생략하면 생성 즉시 카카오에 실제 등록됩니다
+})
+_, err = api.AlimtalkTemplate.Register("TEMPLATE_ID")
+_, err = api.AlimtalkTemplate.Inspect("TEMPLATE_ID") // ⚠️ 검수 요청은 취소할 수 없습니다
+
+// 발송 — ref_id 가 멱등 키입니다
+receipt, err := api.AlimtalkSend.Send(bootpay.AlimtalkSendParams{
+    TemplateCode: "TEMPLATE_CODE",
+    To:           "01012345678",
+    Variables:    map[string]interface{}{"user_name": "홍길동"},
+    RefId:        "order-20260827-0001",
+    Fallback:     bootpay.BoolPtr(true), // 미지정(nil)이면 프로젝트 기본값을 따릅니다
+})
+
+// 벌크 발송 (1요청 = N수신자)
+_, err = api.AlimtalkSend.Bulk(bootpay.AlimtalkSendBulkParams{
+    TemplateCode: "TEMPLATE_CODE",
+    Recipients: []bootpay.AlimtalkSendRecipient{
+        {To: "01011112222", RefId: "bulk-0001", Variables: map[string]interface{}{"user_name": "홍길동"}},
+    },
+})
+
+// 발송 결과 · 집계
+messages, err := api.AlimtalkMessage.List(&bootpay.AlimtalkMessageListParams{Status: "success"})
+stats, err := api.AlimtalkMessage.Stats("2026-08-01", "2026-08-27")
+detail, err := api.AlimtalkMessage.Detail("RECEIPT_ID")
+
+// 수신거부 (발송 판정과 같은 기준 — 전역 차단은 조회만 되고 해제되지 않습니다)
+_, err = api.AlimtalkOptout.Check(bootpay.AlimtalkOptoutCheckParams{Phones: []string{"01012345678"}})
+_, err = api.AlimtalkOptout.Create(bootpay.AlimtalkOptoutCreateParams{Phone: "01012345678"})
+
+// 알림톡 전용 웹훅 (⚠️ 주문·구독 통합 웹훅과 별개입니다)
+_, err = api.AlimtalkWebhook.Update(bootpay.AlimtalkWebhookUpdateParams{
+    Url:    "https://example.com/alimtalk-hook", // https 만 허용
+    Events: []int{301, 302, 310, 311},
+})
+```
+
+---
 
 더 자세한 Commerce API 사용 예제는 [commerce_test](./commerce_test) 디렉토리를 참고해주세요.
 
