@@ -7,7 +7,7 @@ import (
 )
 
 // AlimtalkOfficialModule handles the Bootpay official alimtalk template catalog
-// GET/POST /v1/alimtalk/official 계열
+// GET/POST /alimtalk/official 계열
 //
 // 부트페이가 미리 카카오 승인을 받아 둔 템플릿이라, 그룹키가 등록된 채널이면 **검수 없이 즉시 발송**된다.
 // AlimtalkSender.Create 로 채널을 등록하면 그룹 등록이 함께 끝나므로 따로 채택할 것이 없다.
@@ -19,7 +19,7 @@ type AlimtalkOfficialModule struct {
 }
 
 // List searches the official template catalog
-// GET /v1/alimtalk/official
+// GET /alimtalk/official
 // keyword 는 본문·이름·분류를 부분일치(대소문자 무시)로 훑는다.
 // 응답: { list: [...], count:, page:, per:, categories: [...] }
 func (m *AlimtalkOfficialModule) List(params *AlimtalkOfficialListParams) (map[string]interface{}, error) {
@@ -49,14 +49,14 @@ func (m *AlimtalkOfficialModule) List(params *AlimtalkOfficialListParams) (map[s
 }
 
 // Recommend recommends official templates for the text you want to send
-// POST /v1/alimtalk/official/recommend
+// POST /alimtalk/official/recommend
 // 유사도 score(0~1) 내림차순으로 돌려준다.
 func (m *AlimtalkOfficialModule) Recommend(params AlimtalkOfficialRecommendParams) (map[string]interface{}, error) {
 	return m.api.postWithHeaders("alimtalk/official/recommend", params, alimtalkHeaders())
 }
 
 // Detail retrieves an official template
-// GET /v1/alimtalk/official/{code}
+// GET /alimtalk/official/{code}
 // code 는 서버 채번 코드(슬래시를 포함하지 않는다). 없거나 미노출이면 404(3015).
 // kspId 를 주면 그 채널의 변수 예문 사전으로 variable_examples 를 채워 준다(표시용).
 func (m *AlimtalkOfficialModule) Detail(code string, kspId string) (map[string]interface{}, error) {

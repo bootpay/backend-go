@@ -1,3 +1,22 @@
+### 2.8.3
+
+#### 알림톡 API 를 메시지 API 호스트로 이전 (⚠️ 옛 주소는 410)
+
+알림톡 API(`/alimtalk/*`)는 26-09-18 부터 커머스 API(`api.bootapi.com/v1`)가 아니라
+**메시지 API**(경로에 `/v1` 없음)가 받는다. 경로·파라미터·응답은 그대로이고 호스트만 다르다.
+옛 주소(`/v1/alimtalk/*`)는 410 으로 응답한다.
+
+| mode | 알림톡 (`/alimtalk/*`) | 그 외 커머스 API |
+|------|----------------------|-----------------|
+| development | `https://dev-m.bootapi.com` | `https://dev-api.bootapi.com/v1` |
+| stage | `https://stage-m.bootapi.com` | `https://stage-api.bootapi.com/v1` |
+| production | `https://message.bootapi.com` | `https://api.bootapi.com/v1` |
+
+- `COMMERCE_MESSAGE_DEVELOPMENT` · `COMMERCE_MESSAGE_STAGE` · `COMMERCE_MESSAGE_PRODUCTION` 상수 추가
+- `CommerceApi.SetMessageApiUrl(url)` 추가 — 알림톡 호스트만 바꾼다(커머스 API 주소는 그대로)
+- 요청 경로가 `alimtalk` 으로 시작하면 메시지 호스트로 보낸다 (`apiBaseUrl`). 알림톡 모듈 메서드 시그니처는 변경 없음
+- 테스트: 35종 엔드포인트 계약을 메시지 호스트 기준으로 갱신하고, 모드별 라우팅·`SetMessageApiUrl` 검증(`TestCommerceAlimtalkRoutesToMessageHost`)을 추가
+
 ### 2.8.2
 
 #### 템플릿 버튼 필드명을 등록 API 계약에 맞춤 (⚠️ 버튼이 있는 템플릿 등록이 항상 실패하던 버그)

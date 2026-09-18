@@ -33,126 +33,126 @@ func TestCommerceAlimtalkEndpointContract(t *testing.T) {
 		// messages
 		{"MessageList", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkMessage.List(nil)
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/messages"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/messages"},
 		{"MessageStats", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkMessage.Stats("2026-08-01", "2026-08-27")
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/messages/stats?e_at=2026-08-27&s_at=2026-08-01"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/messages/stats?e_at=2026-08-27&s_at=2026-08-01"},
 		{"MessageDetail", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkMessage.Detail("r1")
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/messages/r1"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/messages/r1"},
 
 		// official catalog
 		{"OfficialList", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOfficial.List(&AlimtalkOfficialListParams{Keyword: "주문", Per: 50})
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/official?per=50&q=%EC%A3%BC%EB%AC%B8"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/official?per=50&q=%EC%A3%BC%EB%AC%B8"},
 		{"OfficialRecommend", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOfficial.Recommend(AlimtalkOfficialRecommendParams{Text: "주문이 접수되었습니다"})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/official/recommend"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/official/recommend"},
 		{"OfficialDetail", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOfficial.Detail("BP0001", "k1")
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/official/BP0001?ksp_id=k1"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/official/BP0001?ksp_id=k1"},
 
 		// optouts
 		{"OptoutList", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOptout.List(&AlimtalkOptoutListParams{Phone: "0101234", Page: 2})
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/optouts?page=2&phone=0101234"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/optouts?page=2&phone=0101234"},
 		{"OptoutCreate", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOptout.Create(AlimtalkOptoutCreateParams{Phone: "01012345678", Reason: "고객요청"})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/optouts"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/optouts"},
 		{"OptoutCheck", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOptout.Check(AlimtalkOptoutCheckParams{Phones: []string{"01012345678"}})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/optouts/check"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/optouts/check"},
 		{"OptoutRelease", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkOptout.Release("01012345678")
-		}, http.MethodDelete, COMMERCE_DEVELOPMENT + "/alimtalk/optouts/01012345678"},
+		}, http.MethodDelete, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/optouts/01012345678"},
 
 		// send
 		{"Send", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSend.Send(AlimtalkSendParams{TemplateCode: "T1", To: "01012345678"})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/send"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/send"},
 		{"SendBulk", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSend.Bulk(AlimtalkSendBulkParams{
 				TemplateCode: "T1",
 				Recipients:   []AlimtalkSendRecipient{{To: "01012345678", RefId: "bulk-0001"}},
 			})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/send/bulk"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/send/bulk"},
 		{"SendCancel", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSend.Cancel("r1")
-		}, http.MethodDelete, COMMERCE_DEVELOPMENT + "/alimtalk/send/r1"},
+		}, http.MethodDelete, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/send/r1"},
 
 		// senders
 		{"SenderCategories", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.Categories()
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/categories"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/categories"},
 		{"SenderOtp", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.Otp(AlimtalkSenderOtpParams{YellowId: "@bootpay", Phone: "01012345678"})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/senders/otp"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/senders/otp"},
 		{"SenderCreate", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.Create(AlimtalkSenderCreateParams{
 				Otp: "123456", YellowId: "@bootpay", Phone: "01012345678", CategoryCode: "001001",
 			})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/senders"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/senders"},
 		{"SenderList", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.List()
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/senders"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/senders"},
 		{"SenderDetail", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.Detail("k1", BoolPtr(true))
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/senders/k1?sync=true"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/senders/k1?sync=true"},
 		{"SenderRelease", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.Release("k1")
-		}, http.MethodDelete, COMMERCE_DEVELOPMENT + "/alimtalk/senders/k1"},
+		}, http.MethodDelete, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/senders/k1"},
 		{"SenderVariableExamples", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkSender.VariableExamples("k1", map[string]interface{}{"user_name": "홍길동"})
-		}, http.MethodPut, COMMERCE_DEVELOPMENT + "/alimtalk/senders/k1/variable_examples"},
+		}, http.MethodPut, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/senders/k1/variable_examples"},
 
 		// templates
 		{"TemplateList", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.List(&AlimtalkTemplateListParams{Ins: "3", Sort: "latest"})
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/templates?ins=3&sort=latest"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates?ins=3&sort=latest"},
 		{"TemplateCreate", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Create(AlimtalkTemplateCreateParams{KspId: "k1", Name: "주문완료"})
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/templates"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates"},
 		{"TemplateDetail", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Detail("t1", BoolPtr(false))
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/templates/t1?sync=false"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/t1?sync=false"},
 		{"TemplateUpdate", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Update("t1", AlimtalkTemplateUpdateParams{Name: "주문완료v2"})
-		}, http.MethodPut, COMMERCE_DEVELOPMENT + "/alimtalk/templates/t1"},
+		}, http.MethodPut, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/t1"},
 		{"TemplateDelete", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Delete("t1")
-		}, http.MethodDelete, COMMERCE_DEVELOPMENT + "/alimtalk/templates/t1"},
+		}, http.MethodDelete, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/t1"},
 		{"TemplateRegister", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Register("t1")
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/templates/t1/register"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/t1/register"},
 		{"TemplateInspect", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Inspect("t1")
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/templates/t1/inspect"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/t1/inspect"},
 		{"TemplateExport", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Export(nil)
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/templates/export?format=json"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/export?format=json"},
 		{"TemplateImage", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.Image(image, "")
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/templates/image"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/image"},
 		{"TemplateHighlightImage", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkTemplate.HighlightImage(image, "")
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/templates/highlight_image"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/templates/highlight_image"},
 
 		// webhook
 		{"WebhookDetail", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkWebhook.Detail()
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/webhook"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/webhook"},
 		{"WebhookUpdate", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkWebhook.Update(AlimtalkWebhookUpdateParams{Url: "https://example.com/hook"})
-		}, http.MethodPut, COMMERCE_DEVELOPMENT + "/alimtalk/webhook"},
+		}, http.MethodPut, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/webhook"},
 		{"WebhookTest", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkWebhook.Test()
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/webhook/test"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/webhook/test"},
 		{"WebhookRotateSecret", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkWebhook.RotateSecret()
-		}, http.MethodPost, COMMERCE_DEVELOPMENT + "/alimtalk/webhook/secret"},
+		}, http.MethodPost, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/webhook/secret"},
 		{"WebhookDeliveries", func(api *CommerceApi) (map[string]interface{}, error) {
 			return api.AlimtalkWebhook.Deliveries(&AlimtalkWebhookDeliveriesParams{Page: 1, Limit: 100})
-		}, http.MethodGet, COMMERCE_DEVELOPMENT + "/alimtalk/webhook/deliveries?limit=100&page=1"},
+		}, http.MethodGet, COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/webhook/deliveries?limit=100&page=1"},
 	}
 
 	if len(cases) != 35 {
@@ -407,7 +407,7 @@ func TestCommerceAlimtalkTemplateImageMultipart(t *testing.T) {
 		t.Fatal(err)
 	}
 	req := lastRequest(t, captured)
-	if req.Method != http.MethodPost || req.URL != COMMERCE_DEVELOPMENT+"/alimtalk/templates/image" {
+	if req.Method != http.MethodPost || req.URL != COMMERCE_MESSAGE_DEVELOPMENT+"/alimtalk/templates/image" {
 		t.Fatalf("image upload mismatch: %s %s", req.Method, req.URL)
 	}
 
@@ -452,7 +452,7 @@ func TestCommerceAlimtalkTemplateImageMultipart(t *testing.T) {
 		t.Fatal(err)
 	}
 	req = lastRequest(t, captured)
-	if req.URL != COMMERCE_DEVELOPMENT+"/alimtalk/templates/highlight_image" {
+	if req.URL != COMMERCE_MESSAGE_DEVELOPMENT+"/alimtalk/templates/highlight_image" {
 		t.Fatalf("highlight image uri mismatch: %s", req.URL)
 	}
 	if strings.Contains(string(req.Body), "replace_url") {
@@ -471,7 +471,7 @@ func TestCommerceAlimtalkMessageListOmitsUnsetFilters(t *testing.T) {
 		t.Fatal(err)
 	}
 	req := lastRequest(t, captured)
-	want := COMMERCE_DEVELOPMENT + "/alimtalk/messages?limit=100&status=success&template_code=T1&to=01012345678"
+	want := COMMERCE_MESSAGE_DEVELOPMENT + "/alimtalk/messages?limit=100&status=success&template_code=T1&to=01012345678"
 	if req.URL != want {
 		t.Fatalf("message list query mismatch:\n got %s\nwant %s", req.URL, want)
 	}
@@ -529,5 +529,57 @@ func TestCommerceAlimtalkSenderVariableExamplesBody(t *testing.T) {
 	examples, ok := body["examples"].(map[string]interface{})
 	if !ok || examples["user_name"] != "홍길동" || examples["company_name"] != "부트페이몰" {
 		t.Fatalf("examples mismatch: %+v", body)
+	}
+}
+
+// 알림톡 API 는 26-09-18 부터 메시지 API 호스트(/v1 없음)가 받는다 — 옛 /v1/alimtalk/* 는 410 이다.
+// 모드별로 알림톡만 메시지 호스트로 가고, 그 외 커머스 API 는 기존 /v1 에 남는지 확인한다.
+func TestCommerceAlimtalkRoutesToMessageHost(t *testing.T) {
+	modes := []struct {
+		mode    string
+		message string
+		api     string
+	}{
+		{"development", "https://dev-m.bootapi.com", "https://dev-api.bootapi.com/v1"},
+		{"stage", "https://stage-m.bootapi.com", "https://stage-api.bootapi.com/v1"},
+		{"production", "https://message.bootapi.com", "https://api.bootapi.com/v1"},
+	}
+	for _, m := range modes {
+		t.Run(m.mode, func(t *testing.T) {
+			var captured []capturedCommerceRequest
+			api := newMockCommerceApi(&captured)
+			api.baseUrl = NewCommerceAPI("ck", "sk", nil, m.mode).baseUrl
+			api.messageBaseUrl = NewCommerceAPI("ck", "sk", nil, m.mode).messageBaseUrl
+
+			if _, err := api.AlimtalkSender.List(); err != nil {
+				t.Fatal(err)
+			}
+			if got, want := lastRequest(t, captured).URL, m.message+"/alimtalk/senders"; got != want {
+				t.Fatalf("alimtalk url = %s, want %s", got, want)
+			}
+
+			if _, err := api.Get("products"); err != nil {
+				t.Fatal(err)
+			}
+			if got, want := lastRequest(t, captured).URL, m.api+"/products"; got != want {
+				t.Fatalf("commerce url = %s, want %s", got, want)
+			}
+		})
+	}
+
+	var captured []capturedCommerceRequest
+	api := newMockCommerceApi(&captured)
+	api.SetMessageApiUrl("https://message.example.com/")
+	if _, err := api.AlimtalkWebhook.Detail(); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).URL; got != "https://message.example.com/alimtalk/webhook" {
+		t.Fatalf("SetMessageApiUrl 이 반영되지 않았다: %s", got)
+	}
+	if _, err := api.Get("products"); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).URL; got != COMMERCE_DEVELOPMENT+"/products" {
+		t.Fatalf("SetMessageApiUrl 이 커머스 API 주소를 바꾸면 안 된다: %s", got)
 	}
 }

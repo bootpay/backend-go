@@ -7,7 +7,7 @@ import (
 )
 
 // AlimtalkMessageModule handles alimtalk send-history and aggregate operations
-// GET /v1/alimtalk/messages 계열
+// GET /alimtalk/messages 계열
 //
 // **유료** 알림톡만 조회된다(무료 커머스 알림톡은 포함되지 않는다).
 // 상태는 벤더 결과 동기화로 확정되므로 접수 직후에는 requested 로 보인다.
@@ -16,7 +16,7 @@ type AlimtalkMessageModule struct {
 }
 
 // List retrieves the alimtalk send history
-// GET /v1/alimtalk/messages
+// GET /alimtalk/messages
 //
 // ⚠️ 기간 기본값은 최근 30일이고 최대 조회 폭은 92일이다 — 초과분은 거부하지 않고 시작일을
 // 당겨 잘라낸다. 실제 적용된 구간은 응답의 period 로 확인한다.
@@ -53,7 +53,7 @@ func (m *AlimtalkMessageModule) List(params *AlimtalkMessageListParams) (map[str
 }
 
 // Stats retrieves the period aggregate
-// GET /v1/alimtalk/messages/stats
+// GET /alimtalk/messages/stats
 // 일자별 집계 원장에서 읽으므로 응답이 빠르다.
 // 응답: { period:, totals: { sent, success, failed, fallback, opted_out_hit, rejected, canceled,
 //
@@ -73,7 +73,7 @@ func (m *AlimtalkMessageModule) Stats(sAt string, eAt string) (map[string]interf
 }
 
 // Detail retrieves a single send result
-// GET /v1/alimtalk/messages/{receipt_id}
+// GET /alimtalk/messages/{receipt_id}
 // 실패 사유는 error_code·error_message 에 담긴다.
 // fallback_type 은 폴백이 꺼진 건이면 null, 켜진 건이면 LMS 다.
 // 다른 프로젝트의 건이거나 없으면 404(3025).

@@ -20,6 +20,12 @@ const (
 	COMMERCE_STAGE       string = "https://stage-api.bootapi.com/v1"
 	COMMERCE_PRODUCTION  string = "https://api.bootapi.com/v1"
 
+	// 알림톡 API 전용 — 메시지 API 가 직접 받는다(경로에 /v1 없음). apiBaseUrl 이 고른다.
+	// @date: 26-09-18
+	COMMERCE_MESSAGE_DEVELOPMENT string = "https://dev-m.bootapi.com"
+	COMMERCE_MESSAGE_STAGE       string = "https://stage-m.bootapi.com"
+	COMMERCE_MESSAGE_PRODUCTION  string = "https://message.bootapi.com"
+
 	COMMERCE_API_VERSION string = "1.0.0"
 	COMMERCE_SDK_VERSION string = "1.0.0"
 )
@@ -30,8 +36,10 @@ type CommerceApi struct {
 	clientKey string
 	secretKey string
 	baseUrl   string
-	role      string
-	client    *http.Client
+	// messageBaseUrl 은 알림톡(/alimtalk/*) 요청이 향하는 메시지 API 주소다.
+	messageBaseUrl string
+	role           string
+	client         *http.Client
 
 	// Modules
 	User                        *UserModule
@@ -96,18 +104,22 @@ func NewCommerceAPI(clientKey string, secretKey string, client *http.Client, mod
 	}
 
 	baseUrl := COMMERCE_PRODUCTION
+	messageBaseUrl := COMMERCE_MESSAGE_PRODUCTION
 	if mode == "development" {
 		baseUrl = COMMERCE_DEVELOPMENT
+		messageBaseUrl = COMMERCE_MESSAGE_DEVELOPMENT
 	} else if mode == "stage" {
 		baseUrl = COMMERCE_STAGE
+		messageBaseUrl = COMMERCE_MESSAGE_STAGE
 	}
 
 	api := &CommerceApi{
-		clientKey: clientKey,
-		secretKey: secretKey,
-		baseUrl:   baseUrl,
-		role:      "user",
-		client:    client,
+		clientKey:      clientKey,
+		secretKey:      secretKey,
+		baseUrl:        baseUrl,
+		messageBaseUrl: messageBaseUrl,
+		role:           "user",
+		client:         client,
 	}
 
 	// Initialize modules
@@ -145,6 +157,26 @@ func NewCommerceAPI(clientKey string, secretKey string, client *http.Client, mod
 // NewCommerceApi creates a new Commerce API instance (deprecated: use NewCommerceAPI instead)
 func NewCommerceApi(clientKey string, secretKey string, client *http.Client, mode string) *CommerceApi {
 	return NewCommerceAPI(clientKey, secretKey, client, mode)
+}
+
+// SetMessageApiUrl overrides the message API (alimtalk) base URL
+// @date: 26-09-18
+func (api *CommerceApi) SetMessageApiUrl(url string) *CommerceApi {
+	api.messageBaseUrl = strings.TrimSuffix(url, "/")
+	return api
+}
+
+// apiBaseUrl returns the base URL that serves the given request path.
+//
+// 알림톡 API 는 26-09-18 부터 커머스 API(api.bootapi.com/v1)가 아니라
+// 메시지 API(message.bootapi.com, /v1 없음)가 받는다.
+// 경로·파라미터·응답은 그대로이고 호스트만 다르다 — 그래서 알림톡 메서드는 고치지 않고 여기서 주소만 가른다.
+// 옛 주소(/v1/alimtalk/*)는 410 으로 응답한다.
+func (api *CommerceApi) apiBaseUrl(url string) string {
+	if strings.HasPrefix(strings.TrimPrefix(url, "/"), "alimtalk") {
+		return api.messageBaseUrl
+	}
+	return api.baseUrl
 }
 
 // SetRole sets the role for API requests
@@ -215,7 +247,7 @@ func (api *CommerceApi) newRequest(method string, url string, body io.Reader) (*
 	if err := api.validateCredentials(); err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest(method, api.baseUrl+"/"+url, body)
+	req, err := http.NewRequest(method, api.apiBaseUrl(url)+"/"+url, body)
 	if err != nil {
 		return nil, errors.New("cannot create Commerce API request: " + err.Error())
 	}

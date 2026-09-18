@@ -1672,7 +1672,7 @@ type SendTestWebhookParams struct {
 // ============================================
 
 // AlimtalkMessageListParams represents alimtalk send-history query parameters
-// (GET /v1/alimtalk/messages)
+// (GET /alimtalk/messages)
 //
 // ⚠️ 유료 알림톡만 조회된다 (무료 커머스 알림톡은 포함되지 않는다).
 // ⚠️ 기간 기본값은 최근 30일이고 최대 조회 폭은 92일이다 — 초과분은 거부하지 않고
@@ -1694,7 +1694,7 @@ type AlimtalkMessageListParams struct {
 }
 
 // AlimtalkOfficialListParams represents official template catalog search parameters
-// (GET /v1/alimtalk/official)
+// (GET /alimtalk/official)
 type AlimtalkOfficialListParams struct {
 	// 본문·이름·분류를 부분일치(대소문자 무시)로 훑는다.
 	// 서버는 q 를 먼저 보고 없으면 keyword 를 본다 — 정본 키인 q 로 보낸다.
@@ -1710,7 +1710,7 @@ type AlimtalkOfficialListParams struct {
 }
 
 // AlimtalkOfficialRecommendParams represents official template recommendation parameters
-// (POST /v1/alimtalk/official/recommend)
+// (POST /alimtalk/official/recommend)
 type AlimtalkOfficialRecommendParams struct {
 	Text     string `json:"text"`
 	Category string `json:"category,omitempty"`
@@ -1720,7 +1720,7 @@ type AlimtalkOfficialRecommendParams struct {
 }
 
 // AlimtalkOptoutListParams represents optout list query parameters
-// (GET /v1/alimtalk/optouts)
+// (GET /alimtalk/optouts)
 // phone 은 숫자만 남겨 **부분일치**로 찾는다(정확 매칭이 아니다). 50건 단위로 페이징된다.
 type AlimtalkOptoutListParams struct {
 	Phone string `json:"phone,omitempty"`
@@ -1728,7 +1728,7 @@ type AlimtalkOptoutListParams struct {
 }
 
 // AlimtalkOptoutCreateParams represents optout registration parameters
-// (POST /v1/alimtalk/optouts)
+// (POST /alimtalk/optouts)
 // 내 프로젝트 스코프로 등록된다(source: api). 같은 번호를 다시 등록해도 멱등이다.
 type AlimtalkOptoutCreateParams struct {
 	Phone  string `json:"phone"`
@@ -1736,7 +1736,7 @@ type AlimtalkOptoutCreateParams struct {
 }
 
 // AlimtalkOptoutCheckParams represents optout pre-check parameters
-// (POST /v1/alimtalk/optouts/check)
+// (POST /alimtalk/optouts/check)
 // 단건(Phone)·다건(Phones) 모두 받는다.
 // ⚠️ 1회 최대 1,000건이고 넘으면 -48 이다 (중복은 서버가 제거).
 type AlimtalkOptoutCheckParams struct {
@@ -1744,7 +1744,7 @@ type AlimtalkOptoutCheckParams struct {
 	Phone  string   `json:"phone,omitempty"`
 }
 
-// AlimtalkSendParams represents single alimtalk send parameters (POST /v1/alimtalk/send)
+// AlimtalkSendParams represents single alimtalk send parameters (POST /alimtalk/send)
 //
 // ⚠️ 실제로 카카오톡이 발송되고 과금된다. 샌드박스가 없다.
 type AlimtalkSendParams struct {
@@ -1774,7 +1774,7 @@ type AlimtalkSendRecipient struct {
 	Variables map[string]interface{} `json:"variables,omitempty"`
 }
 
-// AlimtalkSendBulkParams represents bulk alimtalk send parameters (POST /v1/alimtalk/send/bulk)
+// AlimtalkSendBulkParams represents bulk alimtalk send parameters (POST /alimtalk/send/bulk)
 //
 // ⚠️ 수신자 수만큼 실제 발송되고 과금된다.
 //   - 쿼터를 넘으면 요청 시점에 **전체 거부**된다(3022) — 일부만 나가지 않는다.
@@ -1791,7 +1791,7 @@ type AlimtalkSendBulkParams struct {
 }
 
 // AlimtalkSenderOtpParams represents channel-admin OTP request parameters
-// (POST /v1/alimtalk/senders/otp)
+// (POST /alimtalk/senders/otp)
 // ⚠️ 실제로 문자가 나간다.
 type AlimtalkSenderOtpParams struct {
 	YellowId string `json:"yellow_id"`
@@ -1799,7 +1799,7 @@ type AlimtalkSenderOtpParams struct {
 }
 
 // AlimtalkSenderCreateParams represents sender profile registration parameters
-// (POST /v1/alimtalk/senders)
+// (POST /alimtalk/senders)
 // ⚠️ 카카오에 발신프로필이 실제 등록된다. 같은 yellow_id 를 다시 등록하면 기존 프로필을 재사용한다(dedup).
 type AlimtalkSenderCreateParams struct {
 	Otp          string `json:"otp"`
@@ -1809,7 +1809,7 @@ type AlimtalkSenderCreateParams struct {
 }
 
 // AlimtalkTemplateListParams represents own-template list query parameters
-// (GET /v1/alimtalk/templates)
+// (GET /alimtalk/templates)
 // ⚠️ 페이지네이션이 없다 — 필터에 걸린 템플릿을 한 번에 모두 돌려준다.
 type AlimtalkTemplateListParams struct {
 	// 검수상태 필터 — 1 REG(등록) / 2 REQ(검수요청) / 3 APR(승인) / 4 KRR(등록거절) / 5 REJ(승인반려).
@@ -1824,7 +1824,7 @@ type AlimtalkTemplateListParams struct {
 // AlimtalkTemplateButton represents a template button
 //
 // ⚠️ 키 이름이 **등록 API 와 발송 API 에서 다르다.** 이 구조체는 템플릿 등록/수정
-// (POST·PUT /v1/alimtalk/templates) 용이라 등록 포맷을 쓴다.
+// (POST·PUT /alimtalk/templates) 용이라 등록 포맷을 쓴다.
 //
 //	등록: linkType / linkMo / linkPc / linkIos / linkAnd   ← 이 구조체
 //	발송: type / url_mobile / url_pc / ...                 (서버가 발송 시점에 변환한다)
@@ -1861,7 +1861,7 @@ func (b AlimtalkTemplateButton) MarshalJSON() ([]byte, error) {
 }
 
 // AlimtalkTemplateCreateParams represents own-template creation parameters
-// (POST /v1/alimtalk/templates)
+// (POST /alimtalk/templates)
 //
 // ⚠️ Register 를 false 로 주지 않으면 대행사·카카오에 **실제 등록**된다(되돌리려면 삭제해야 한다).
 // ⚠️ 본문 변수는 `#{변수명}` 형식이고 템플릿 전체에서 최대 40개다.
@@ -1909,7 +1909,7 @@ func (p AlimtalkTemplateCreateParams) MarshalJSON() ([]byte, error) {
 }
 
 // AlimtalkTemplateUpdateParams represents own-template update parameters
-// (PUT /v1/alimtalk/templates/{template_id})
+// (PUT /alimtalk/templates/{template_id})
 //
 // ⚠️ **부분 수정이 아니다.** 보내지 않은 필드는 서버에서 nil 로 덮어써지므로 항상 전체 필드를 보낸다.
 // ⚠️ 등록된 템플릿을 수정하면 벤더에도 수정 요청이 나간다. 수정 가능 상태는
@@ -1950,7 +1950,7 @@ func (p AlimtalkTemplateUpdateParams) MarshalJSON() ([]byte, error) {
 }
 
 // AlimtalkTemplateExportParams represents template export parameters
-// (GET /v1/alimtalk/templates/export)
+// (GET /alimtalk/templates/export)
 // ⚠️ 1회 5,000건을 넘으면 3031 로 거부되므로 채널·상태 필터로 좁힌다.
 type AlimtalkTemplateExportParams struct {
 	// json(SDK 기본) · csv. 서버 기본은 csv 지만 csv 본문은 JSON 이 아니라서
@@ -1964,7 +1964,7 @@ type AlimtalkTemplateExportParams struct {
 }
 
 // AlimtalkWebhookUpdateParams represents alimtalk webhook configuration parameters
-// (PUT /v1/alimtalk/webhook)
+// (PUT /alimtalk/webhook)
 //
 // ⚠️ 주문·구독 통합 웹훅과 완전히 별개다 (Webhook.SendTest 는 주문 웹훅용이다).
 type AlimtalkWebhookUpdateParams struct {
@@ -1980,7 +1980,7 @@ type AlimtalkWebhookUpdateParams struct {
 }
 
 // AlimtalkWebhookDeliveriesParams represents webhook delivery history query parameters
-// (GET /v1/alimtalk/webhook/deliveries)
+// (GET /alimtalk/webhook/deliveries)
 type AlimtalkWebhookDeliveriesParams struct {
 	Page int `json:"page,omitempty"`
 	// 서버 기본 20, 최대 100
