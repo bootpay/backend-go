@@ -21,6 +21,7 @@ type AlimtalkSendModule struct {
 
 // Send sends a single alimtalk message
 // POST /alimtalk/send
+// WebhookUrl 을 주면 이 건의 결과 웹훅이 **그 주소로만** 간다 — 프로젝트 웹훅 설정은 쓰이지 않는다(26-09-21).
 // 응답: { receipt_id:, ref_id:, to:, status: } — 접수 직후 status 는 requested
 func (m *AlimtalkSendModule) Send(params AlimtalkSendParams) (map[string]interface{}, error) {
 	return m.api.postWithHeaders("alimtalk/send", params, alimtalkHeaders())
@@ -32,6 +33,8 @@ func (m *AlimtalkSendModule) Send(params AlimtalkSendParams) (map[string]interfa
 //   - 쿼터를 넘으면 요청 시점에 **전체 거부**된다(3022) — 일부만 나가지 않는다.
 //   - 개별 수신자의 실패는 건별 rejected 로 표시되고 나머지는 정상 발송된다.
 //   - 수신거부 번호는 skipped 이며 **과금되지 않고 발송 기록도 만들지 않는다**.
+//   - WebhookUrl 은 요청 단위 하나다 — 이 요청으로 나간 모든 수신자 건의 결과 웹훅이 그 주소로 간다.
+//     형식이 틀리면(https 아님·2,000자 초과) 요청 전체가 3028 로 거부된다(26-09-21).
 //
 // 응답: { count:, requested:, skipped:, rejected:, receipts: [...] }
 func (m *AlimtalkSendModule) Bulk(params AlimtalkSendBulkParams) (map[string]interface{}, error) {

@@ -881,6 +881,8 @@ receipt, err := api.AlimtalkSend.Send(bootpay.AlimtalkSendParams{
     Variables:    map[string]interface{}{"user_name": "홍길동"},
     RefId:        "order-20260827-0001",
     Fallback:     bootpay.BoolPtr(true), // 미지정(nil)이면 프로젝트 기본값을 따릅니다
+    // 이 건의 결과 웹훅만 받을 주소입니다 (https 만 허용, 주면 프로젝트 웹훅 설정 대신 이 주소로만 갑니다)
+    WebhookUrl: "https://example.com/hooks/alimtalk",
 })
 
 // 벌크 발송 (1요청 = N수신자)
@@ -889,6 +891,7 @@ _, err = api.AlimtalkSend.Bulk(bootpay.AlimtalkSendBulkParams{
     Recipients: []bootpay.AlimtalkSendRecipient{
         {To: "01011112222", RefId: "bulk-0001", Variables: map[string]interface{}{"user_name": "홍길동"}},
     },
+    WebhookUrl: "https://example.com/hooks/alimtalk", // 요청 단위 하나입니다 (수신자별 아님)
 })
 
 // 발송 결과 · 집계

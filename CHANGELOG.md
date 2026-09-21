@@ -1,3 +1,27 @@
+### 2.8.4
+
+#### 알림톡 발송에 건별 결과 웹훅 주소(`WebhookUrl`) 추가
+
+`AlimtalkSend.Send` / `AlimtalkSend.Bulk` 에 `webhook_url` 을 실을 수 있다(26-09-21).
+주면 발송 성공·실패·문자 대체발송·예약취소 웹훅이 **이 주소로만** 간다 —
+프로젝트 웹훅 설정(`AlimtalkWebhook.Update`)은 그 요청에 한해 쓰이지 않는다.
+
+- `AlimtalkSendParams.WebhookUrl` — 이 건의 결과 웹훅 주소
+- `AlimtalkSendBulkParams.WebhookUrl` — **요청 단위 하나**다. 수신자별이 아니라 최상위에 실리고,
+  이 요청으로 나간 모든 수신자 건의 결과 웹훅이 그 주소로 간다.
+
+제약:
+
+- `https` 만 허용하며 2,000자를 넘으면 `3028` 로 거부된다. 벌크는 형식이 틀리면 **요청 전체**가 거부된다.
+- 서명은 프로젝트 시크릿으로 한다. 시크릿만 필요하면 웹훅 설정 없이
+  `AlimtalkWebhook.RotateSecret` 으로 발급받을 수 있다.
+- ⚠️ 같은 `RefId` 로 이미 접수·성공한 건을 다시 요청하면 멱등 처리로 기존 접수가 그대로 돌아오고
+  새 주소는 무시된다.
+
+미지정이면 `omitempty` 로 아예 실리지 않는다 — 빈 문자열이 나가면 서버가 `3028` 로 거부하기 때문이다.
+회귀 방지로 `TestCommerceAlimtalkSendWebhookUrl` 이 미지정 시 키 부재, 지정 시 전송,
+벌크에서 수신자별이 아닌 요청 단위 전송을 단정한다.
+
 ### 2.8.3
 
 #### 알림톡 API 를 메시지 API 호스트로 이전 (⚠️ 옛 주소는 410)

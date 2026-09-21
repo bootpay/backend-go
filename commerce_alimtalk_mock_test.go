@@ -247,6 +247,58 @@ func TestCommerceAlimtalkSendFallbackTriState(t *testing.T) {
 	}
 }
 
+// webhook_url 을 주면 그 건의 결과 웹훅이 프로젝트 설정 대신 이 주소로만 간다.
+// 미지정이면 아예 실리면 안 된다 — 빈 문자열이 나가면 서버가 3028 로 거부한다.
+func TestCommerceAlimtalkSendWebhookUrl(t *testing.T) {
+	var captured []capturedCommerceRequest
+	api := newMockCommerceApi(&captured)
+
+	if _, err := api.AlimtalkSend.Send(AlimtalkSendParams{
+		TemplateCode: "T1", To: "01012345678",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body := decodeBody(t, lastRequest(t, captured))
+	if _, exists := body["webhook_url"]; exists {
+		t.Fatalf("미지정 webhook_url 은 전송되면 안 된다: %+v", body)
+	}
+
+	if _, err := api.AlimtalkSend.Send(AlimtalkSendParams{
+		TemplateCode: "T1",
+		To:           "01012345678",
+		RefId:        "order-1",
+		WebhookUrl:   "https://example.com/hooks/alimtalk",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body = decodeBody(t, lastRequest(t, captured))
+	if body["webhook_url"] != "https://example.com/hooks/alimtalk" {
+		t.Fatalf("send webhook_url mismatch: %+v", body)
+	}
+
+	// 벌크는 요청 단위 하나다 — 수신자마다가 아니라 최상위에 실린다.
+	if _, err := api.AlimtalkSend.Bulk(AlimtalkSendBulkParams{
+		TemplateCode: "T1",
+		Recipients: []AlimtalkSendRecipient{
+			{To: "01011112222", RefId: "b-1"},
+		},
+		WebhookUrl: "https://example.com/hooks/bulk",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	body = decodeBody(t, lastRequest(t, captured))
+	if body["webhook_url"] != "https://example.com/hooks/bulk" {
+		t.Fatalf("bulk webhook_url mismatch: %+v", body)
+	}
+	recipients, ok := body["recipients"].([]interface{})
+	if !ok || len(recipients) != 1 {
+		t.Fatalf("recipients mismatch: %+v", body)
+	}
+	if first, _ := recipients[0].(map[string]interface{}); first["webhook_url"] != nil {
+		t.Fatalf("webhook_url 은 수신자별이 아니라 요청 단위다: %+v", first)
+	}
+}
+
 // register 를 명시적으로 false 로 주지 않으면 생성 즉시 대행사·카카오에 실제 등록된다.
 // 그래서 false 가 바디에서 사라지면 안 된다(pointer type).
 func TestCommerceAlimtalkTemplateCreateBody(t *testing.T) {
