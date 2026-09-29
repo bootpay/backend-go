@@ -1999,6 +1999,355 @@ type AlimtalkWebhookDeliveriesParams struct {
 	Limit int `json:"limit,omitempty"`
 }
 
+// ============================================
+// Board Types (FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평)
+// ============================================
+
+// FaqListParams represents FAQ list query parameters (GET faqs)
+// page/limit default to 1/20 when unset — both are always sent, as in the Ruby SDK.
+type FaqListParams struct {
+	Page    int    `json:"page,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
+	Keyword string `json:"keyword,omitempty"`
+	// View "all" 은 비공개 FAQ 까지 포함한다 — Supervisor 일 때만 의미가 있다.
+	View string `json:"view,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (운영자 모드)
+	Supervisor bool `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// FaqCreateParams represents FAQ 등록 parameters (POST faqs, supervisor 전용)
+type FaqCreateParams struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	// Images 는 boardPayload 가 붙인다 — 길이 0 인 non-nil 슬라이스([])도 "모두 삭제" 로
+	// 그대로 보내야 하는데 omitempty 가 그걸 지우기 때문에 구조체 태그에서 빼 두었다.
+	// 항목은 URL 문자열 또는 {"url": ...} 맵이다.
+	Images []interface{} `json:"-"`
+	// explicit false 를 보내야 하므로 pointer type
+	IsDisplay *bool `json:"is_display,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// FaqUpdateParams represents FAQ 수정 parameters (PUT faqs/{faq_id}, supervisor 전용)
+// 보낸 필드만 바뀐다.
+type FaqUpdateParams struct {
+	// FaqId goes into the path, not the body
+	FaqId   string `json:"-"`
+	Title   string `json:"title,omitempty"`
+	Content string `json:"content,omitempty"`
+	// Images 는 보내면 목록 전체를 교체한다(빈 슬라이스면 모두 삭제) — FaqCreateParams.Images 참고
+	Images []interface{} `json:"-"`
+	// explicit false 를 보내야 하므로 pointer type
+	IsDisplay *bool `json:"is_display,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// NoticeListParams represents 공지사항 list query parameters (GET notices)
+// page/limit default to 1/20 when unset — both are always sent, as in the Ruby SDK.
+type NoticeListParams struct {
+	Page    int    `json:"page,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
+	Keyword string `json:"keyword,omitempty"`
+	// View "all" 은 비공개 공지까지 포함한다 — Supervisor 일 때만 의미가 있다.
+	View string `json:"view,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (운영자 모드)
+	Supervisor bool `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// NoticeCreateParams represents 공지사항 등록 parameters (POST notices, supervisor 전용)
+type NoticeCreateParams struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	// Images 는 boardPayload 가 붙인다 — FaqCreateParams.Images 참고
+	Images []interface{} `json:"-"`
+	// explicit false 를 보내야 하므로 pointer type
+	IsNotice  *bool `json:"is_notice,omitempty"`
+	IsDisplay *bool `json:"is_display,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// NoticeUpdateParams represents 공지사항 수정 parameters (PUT notices/{notice_id}, supervisor 전용)
+// 보낸 필드만 바뀐다.
+type NoticeUpdateParams struct {
+	// NoticeId goes into the path, not the body
+	NoticeId string `json:"-"`
+	Title    string `json:"title,omitempty"`
+	Content  string `json:"content,omitempty"`
+	// Images 는 보내면 목록 전체를 교체한다(빈 슬라이스면 모두 삭제) — FaqCreateParams.Images 참고
+	Images []interface{} `json:"-"`
+	// explicit false 를 보내야 하므로 pointer type
+	IsNotice  *bool `json:"is_notice,omitempty"`
+	IsDisplay *bool `json:"is_display,omitempty"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// InquiryListParams represents 1:1 문의 list query parameters (GET inquiries)
+// page/limit default to 1/20 when unset — both are always sent, as in the Ruby SDK.
+type InquiryListParams struct {
+	// UserId 는 Bootpay 회원 _id 또는 외부 회원 ID 다.
+	// Supervisor 모드에서는 작성 회원 필터(선택)로 쓰인다.
+	UserId  string `json:"user_id,omitempty"`
+	LoginId string `json:"login_id,omitempty"`
+	// Answered 는 tri-state 다 — true 답변 완료만 / false 미답변만 / nil 전체.
+	// 서버가 문자열로 읽으므로 "true"/"false" 로 직렬화해 보낸다.
+	Answered *bool `json:"answered,omitempty"`
+	Page     int   `json:"page,omitempty"`
+	Limit    int   `json:"limit,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (몰 전체 문의)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// InquiryDetailParams represents 1:1 문의 단건 parameters (GET inquiries/{inquiry_id})
+type InquiryDetailParams struct {
+	// InquiryId goes into the path
+	InquiryId string `json:"-"`
+	UserId    string `json:"user_id,omitempty"`
+	LoginId   string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (몰의 모든 문의)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// InquiryCreateParams represents 1:1 문의 작성 parameters (POST inquiries, 회원 전용)
+type InquiryCreateParams struct {
+	UserId  string `json:"user_id,omitempty"`
+	LoginId string `json:"login_id,omitempty"`
+	Title   string `json:"title,omitempty"`
+	Content string `json:"content"`
+	// ProductId 는 이 몰의 상품이어야 한다.
+	ProductId string `json:"product_id,omitempty"`
+	// Option 은 상품 옵션 문구다 (ProductId 가 함께 필요하다).
+	Option string `json:"option,omitempty"`
+	// OrderId 는 작성 회원의 주문이어야 한다.
+	OrderId string `json:"order_id,omitempty"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// InquiryUpdateParams represents 1:1 문의 수정 parameters (PUT inquiries/{inquiry_id}, 작성 회원 본인)
+type InquiryUpdateParams struct {
+	// InquiryId goes into the path, not the body
+	InquiryId string `json:"-"`
+	UserId    string `json:"user_id,omitempty"`
+	LoginId   string `json:"login_id,omitempty"`
+	// Title 은 빈 문자열을 보내면 제목을 지운다 — 미전송과 구분해야 하므로 pointer type 이다.
+	// StringPtr("") 로 "제목 삭제", nil 로 "그대로 둠" 을 표현한다.
+	Title   *string `json:"title,omitempty"`
+	Content string  `json:"content,omitempty"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// InquiryDeleteParams represents 1:1 문의 삭제 parameters (DELETE inquiries/{inquiry_id})
+// ⚠️ UserId·LoginId 는 body 가 아니라 query 로 간다.
+type InquiryDeleteParams struct {
+	// InquiryId goes into the path
+	InquiryId string `json:"-"`
+	UserId    string `json:"user_id,omitempty"`
+	LoginId   string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (작성 회원이 아니어도 삭제)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductQnaListParams represents 상품문의 list query parameters (GET product-qnas)
+// page/limit default to 1/20 when unset — both are always sent, as in the Ruby SDK.
+type ProductQnaListParams struct {
+	// ProductId 는 고객 모드에서 필수다. Supervisor + View "all" 이면 선택 필터가 된다.
+	ProductId string `json:"product_id,omitempty"`
+	// View "all" 은 몰 전체(숨김 포함) — Supervisor 일 때만 의미가 있다.
+	View    string `json:"view,omitempty"`
+	Page    int    `json:"page,omitempty"`
+	Limit   int    `json:"limit,omitempty"`
+	UserId  string `json:"user_id,omitempty"`
+	LoginId string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductQnaDetailParams represents 상품문의 단건 parameters (GET product-qnas/{product_qna_id})
+type ProductQnaDetailParams struct {
+	// ProductQnaId goes into the path
+	ProductQnaId string `json:"-"`
+	UserId       string `json:"user_id,omitempty"`
+	LoginId      string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (비밀글·숨김 글도 조회)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductQnaCreateParams represents 상품문의 작성 parameters (POST product-qnas)
+// 회원(UserId·LoginId·UserJwt) 또는 비회원(GuestName + GuestPassword)으로 쓴다.
+type ProductQnaCreateParams struct {
+	ProductId       string `json:"product_id"`
+	Title           string `json:"title,omitempty"`
+	Content         string `json:"content"`
+	ProductOptionId string `json:"product_option_id,omitempty"`
+	OptionText      string `json:"option_text,omitempty"`
+	// explicit false 를 보내야 하므로 pointer type
+	IsSecret *bool `json:"is_secret,omitempty"`
+	// ⚠️ 회원 문의면 Guest* 는 무시된다.
+	GuestName     string `json:"guest_name,omitempty"`
+	GuestPassword string `json:"guest_password,omitempty"`
+	UserId        string `json:"user_id,omitempty"`
+	LoginId       string `json:"login_id,omitempty"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductQnaUpdateParams represents 상품문의 수정 parameters (PUT product-qnas/{product_qna_id})
+type ProductQnaUpdateParams struct {
+	// ProductQnaId goes into the path, not the body
+	ProductQnaId string `json:"-"`
+	Title        string `json:"title,omitempty"`
+	Content      string `json:"content,omitempty"`
+	// explicit false 를 보내야 하므로 pointer type
+	IsSecret *bool `json:"is_secret,omitempty"`
+	// GuestPassword 는 비회원 글을 고칠 때의 인증값이다.
+	GuestPassword string `json:"guest_password,omitempty"`
+	UserId        string `json:"user_id,omitempty"`
+	LoginId       string `json:"login_id,omitempty"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductQnaDeleteParams represents 상품문의 삭제 parameters (DELETE product-qnas/{product_qna_id})
+// ⚠️ GuestPassword·UserId·LoginId 는 query 가 아니라 body 로 간다(접근로그 노출 방지).
+type ProductQnaDeleteParams struct {
+	// ProductQnaId goes into the path, not the body
+	ProductQnaId  string `json:"-"`
+	GuestPassword string `json:"guest_password,omitempty"`
+	UserId        string `json:"user_id,omitempty"`
+	LoginId       string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (작성자가 아니어도 삭제)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductReviewListParams represents 상품평 list query parameters (GET reviews)
+// page/limit default to 1/20 when unset — both are always sent, as in the Ruby SDK.
+// ⚠️ 상품 상세의 공개 상품평 목록은 GET products/{id}/reviews 다 — 이 엔드포인트가 아니다.
+type ProductReviewListParams struct {
+	Page      int    `json:"page,omitempty"`
+	Limit     int    `json:"limit,omitempty"`
+	ProductId string `json:"product_id,omitempty"`
+	// View "all" 은 숨김 상품평까지 포함한다 — Supervisor 일 때만 의미가 있다.
+	View string `json:"view,omitempty"`
+	// UserId 는 Supervisor 모드에서 작성 회원 필터(선택)로 쓰인다.
+	UserId  string `json:"user_id,omitempty"`
+	LoginId string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (몰 전체 상품평)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductReviewDetailParams represents 상품평 단건 parameters (GET reviews/{product_review_id})
+type ProductReviewDetailParams struct {
+	// ProductReviewId goes into the path
+	ProductReviewId string `json:"-"`
+	UserId          string `json:"user_id,omitempty"`
+	LoginId         string `json:"login_id,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (숨김 상품평도 조회)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductReviewCreateParams represents 상품평 작성 parameters (POST reviews, 회원 전용)
+type ProductReviewCreateParams struct {
+	UserId  string `json:"user_id,omitempty"`
+	LoginId string `json:"login_id,omitempty"`
+	// OrderId 는 회원의 구매확정 주문이어야 한다.
+	OrderId string `json:"order_id"`
+	// ProductId(·ProductOptionId)는 그 주문에 담긴 상품이어야 한다.
+	ProductId       string `json:"product_id"`
+	ProductOptionId string `json:"product_option_id,omitempty"`
+	Rating          int    `json:"rating"`
+	Content         string `json:"content"`
+	// Images 는 사진 URL 최대 5개다(문자열 또는 {"url": ...} 맵). 파일 업로드는 지원하지 않는다.
+	// boardPayload 가 붙인다 — FaqCreateParams.Images 참고
+	Images []interface{} `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductReviewUpdateParams represents 상품평 수정 parameters (PUT reviews/{product_review_id})
+// 작성 회원 본인만, 작성 후 7일 이내에 고칠 수 있다.
+type ProductReviewUpdateParams struct {
+	// ProductReviewId goes into the path, not the body
+	ProductReviewId string `json:"-"`
+	UserId          string `json:"user_id,omitempty"`
+	LoginId         string `json:"login_id,omitempty"`
+	Rating          int    `json:"rating,omitempty"`
+	Content         string `json:"content,omitempty"`
+	// Images 는 보내면 통째로 교체한다(빈 슬라이스면 모두 삭제) — FaqCreateParams.Images 참고
+	Images []interface{} `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
+// ProductReviewDeleteParams represents 상품평 삭제 parameters (DELETE reviews/{product_review_id})
+// ⚠️ UserId·LoginId·Reason 은 body 가 아니라 query 로 간다.
+type ProductReviewDeleteParams struct {
+	// ProductReviewId goes into the path
+	ProductReviewId string `json:"-"`
+	UserId          string `json:"user_id,omitempty"`
+	LoginId         string `json:"login_id,omitempty"`
+	// Reason 은 운영자 모드의 삭제 사유다.
+	Reason string `json:"reason,omitempty"`
+	// Supervisor sends BOOTPAY-ROLE: supervisor (작성 회원이 아니어도 삭제)
+	Supervisor bool `json:"-"`
+	// UserJwt is sent as the Bootpay-User-JWT header (attached only when present)
+	UserJwt string `json:"-"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
 // mergeExtraJSON serializes value and merges extra into the resulting object.
 // Typed fields win over same-named extra keys, and nil extra values are dropped
 // (Ruby `.merge(attrs).compact` semantics).

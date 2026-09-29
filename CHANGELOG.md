@@ -1,3 +1,45 @@
+### 2.9.0
+
+#### 커머스 게시판 API 27종 추가 (FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평)
+
+Ruby SDK 의 `commerce api 추가` 와 같은 계약으로 게시판 5개 모듈을 붙였다.
+`NewCommerceAPI` 인스턴스의 `Faq` · `Notice` · `Inquiry` · `ProductQna` · `ProductReview` 로 쓴다.
+
+| 모듈 | 메서드 | 엔드포인트 |
+|------|--------|-----------|
+| `Faq` | `List` · `Detail` · `Create` · `Update` · `Delete` | `/v1/faqs[/{id}]` |
+| `Notice` | `List` · `Detail` · `Create` · `Update` · `Delete` | `/v1/notices[/{id}]` |
+| `Inquiry` | `List` · `Detail` · `Create` · `Update` · `Delete` · `Answer` | `/v1/inquiries[/{id}[/answer]]` |
+| `ProductQna` | `List` · `Detail` · `Create` · `Update` · `Delete` · `Answer` | `/v1/product-qnas[/{id}[/answer]]` |
+| `ProductReview` | `List` · `Detail` · `Create` · `Update` · `Delete` · `Reply` | `/v1/reviews[/{id}[/reply]]` |
+
+핵심 계약:
+
+- **같은 경로를 고객 모드와 운영자 모드가 나눠 쓴다.** 조회 계열은 `Supervisor` 로 `BOOTPAY-ROLE` 을
+  `user` / `supervisor` 중에 고르고, 등록·수정·삭제 중 운영자 전용(FAQ·공지 전체, 답변·답글)은
+  항상 `supervisor` 로 나간다. ⚠️ 인스턴스 기본 role 에 맡기면 운영자 조회가 조용히 고객 모드로 나가
+  비공개 글이 빠진 응답을 받는다(에러가 아니라 눈에 띄지 않는다).
+- 회원 식별은 `UserId`(Bootpay 회원 `_id` 또는 외부 회원 ID) · `LoginId` · `UserJwt` 중 하나다.
+  `UserJwt` 는 값이 있을 때만 `Bootpay-User-JWT` 헤더로 붙는다.
+- `page` / `limit` 은 미지정 시 `1` / `20` 으로 **항상** 전송된다(Ruby 기본값과 동일).
+- `Images` 는 3-state 다 — `nil` 그대로 둠 / `[]interface{}{}` 모두 삭제 / 값 통째 교체.
+  `omitempty` 가 빈 슬라이스를 지워 "전부 삭제" 를 표현할 수 없으므로 태그에서 빼고
+  `boardPayload` 가 `nil` 여부로만 판단해 붙인다. 항목은 URL 문자열 또는 `{"url": ...}` 맵이다.
+- `IsDisplay` · `IsNotice` · `IsSecret` 는 explicit false 가 "끔" 이라 pointer type 이다 (`BoolPtr`).
+- `InquiryUpdateParams.Title` 은 빈 문자열이 **제목 삭제**라서 `*string` 이다 — 새 헬퍼 `StringPtr` 추가.
+- 삭제 요청은 자리가 다르다. **상품문의**는 `guest_password` 를 **본문**으로 보내고(쿼리는 접근로그에
+  비밀번호가 남는다), **1:1 문의·상품평**은 회원 식별값·사유를 **쿼리**로 보낸다.
+- 식별자가 비면 요청 전에 에러로 막는다 — `DELETE /v1/faqs/` 가 컬렉션 경로로 해석되는 사고 방지.
+
+`Inquiry.Answer` · `ProductQna.Answer` · `ProductReview.Reply` 는 답변이 없으면 만들고 있으면 바꾼다.
+응답은 답변·답글이 반영된 원본 객체다.
+
+⚠️ 상품 상세의 공개 상품평 목록은 기존 `GET /v1/products/{id}/reviews` 를 쓴다 —
+`ProductReview.List`(`/v1/reviews`)는 회원 본인 또는 운영자 시점의 목록이다.
+
+테스트: `commerce_board_mock_test.go` 가 27종 method·uri·role 계약, `Bootpay-User-JWT` 부착 조건,
+images 3-state, explicit false 플래그, 제목 삭제, 삭제 파라미터 위치, Idempotency-Key, 빈 id 가드를 단정한다.
+
 ### 2.8.4
 
 #### 알림톡 발송에 건별 결과 웹훅 주소(`WebhookUrl`) 추가

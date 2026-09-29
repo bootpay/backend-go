@@ -42,6 +42,7 @@
   - [10-5. 정기구독 관리](#10-5-정기구독-관리)
   - [10-6. 청구서 관리](#10-6-청구서-관리)
   - [10-7. 알림톡](#10-7-알림톡)
+  - [10-8. 게시판 (FAQ · 공지사항 · 문의 · 상품평)](#10-8-게시판-faq--공지사항--문의--상품평)
 - [Example 프로젝트](#example-프로젝트)
 - [Documentation](#documentation)
 - [기술문의](#기술문의)
@@ -909,6 +910,64 @@ _, err = api.AlimtalkWebhook.Update(bootpay.AlimtalkWebhookUpdateParams{
     Events: []int{301, 302, 310, 311},
 })
 ```
+
+### 10-8. 게시판 (FAQ · 공지사항 · 문의 · 상품평)
+
+FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평을 다룹니다.
+같은 경로를 **고객 모드와 운영자 모드가 나눠 씁니다** — 조회는 `Supervisor` 로 고르고,
+등록·수정·삭제 중 운영자 전용(FAQ·공지, 답변·답글)은 항상 `supervisor` 로 나갑니다.
+
+> ⚠️ `Supervisor` 를 빠뜨리면 운영자 조회가 고객 모드로 나가 비공개 글이 빠진 응답이 옵니다(에러가 아닙니다).
+> 회원 식별은 `UserId`(Bootpay 회원 `_id` 또는 외부 회원 ID) · `LoginId` · `UserJwt` 중 하나를 씁니다.
+
+```go
+api := bootpay.NewCommerceAPI(clientKey, secretKey, nil, "production")
+
+// FAQ · 공지사항 — page/limit 은 미지정 시 1/20 으로 나갑니다
+faqs, err := api.Faq.List(&bootpay.FaqListParams{Keyword: "배송"})
+_, err = api.Faq.List(&bootpay.FaqListParams{View: "all", Supervisor: true}) // 비공개 포함
+_, err = api.Faq.Create(bootpay.FaqCreateParams{Title: "배송 문의", Content: "본문"})
+_, err = api.Notice.Create(bootpay.NoticeCreateParams{
+    Title: "점검 안내", Content: "본문",
+    IsNotice: bootpay.BoolPtr(true), // 미지정(nil)이면 서버 기본값을 따릅니다
+})
+// Images 는 보내면 목록 전체를 교체합니다 — 빈 슬라이스는 "모두 삭제" 입니다
+_, err = api.Notice.Update(bootpay.NoticeUpdateParams{NoticeId: "NOTICE_ID", Images: []interface{}{}})
+
+// 1:1 문의 — Answered 는 true 답변완료 / false 미답변 / nil 전체
+inquiries, err := api.Inquiry.List(&bootpay.InquiryListParams{UserJwt: memberJwt, Answered: bootpay.BoolPtr(false)})
+_, err = api.Inquiry.Create(bootpay.InquiryCreateParams{
+    Content: "배송이 언제 되나요?", UserJwt: memberJwt, ProductId: "PRODUCT_ID",
+})
+// 제목을 지우려면 빈 문자열을 명시합니다 (미지정 nil 은 그대로 둡니다)
+_, err = api.Inquiry.Update(bootpay.InquiryUpdateParams{
+    InquiryId: "INQUIRY_ID", UserJwt: memberJwt, Title: bootpay.StringPtr(""),
+})
+_, err = api.Inquiry.Answer("INQUIRY_ID", "답변 본문입니다") // supervisor 전용
+
+// 상품문의 — 회원 또는 비회원(GuestName + GuestPassword)
+_, err = api.ProductQna.Create(bootpay.ProductQnaCreateParams{
+    ProductId: "PRODUCT_ID", Content: "재입고 되나요?",
+    GuestName: "홍길동", GuestPassword: "1234", IsSecret: bootpay.BoolPtr(true),
+})
+// ⚠️ 비회원 비밀번호는 쿼리가 아니라 본문으로 나갑니다 (접근로그 노출 방지)
+_, err = api.ProductQna.Delete(bootpay.ProductQnaDeleteParams{ProductQnaId: "QNA_ID", GuestPassword: "1234"})
+_, err = api.ProductQna.Answer("QNA_ID", "곧 재입고 예정입니다") // supervisor 전용
+
+// 상품평 — OrderId 는 구매확정 주문, Images 는 URL 최대 5개(파일 업로드는 지원하지 않습니다)
+_, err = api.ProductReview.Create(bootpay.ProductReviewCreateParams{
+    OrderId: "ORDER_ID", ProductId: "PRODUCT_ID", Rating: 5, Content: "잘 쓰고 있습니다",
+    Images:  []interface{}{"https://example.com/review1.png"},
+    UserJwt: memberJwt,
+})
+_, err = api.ProductReview.Delete(bootpay.ProductReviewDeleteParams{
+    ProductReviewId: "REVIEW_ID", Reason: "광고성 후기", Supervisor: true,
+})
+_, err = api.ProductReview.Reply("REVIEW_ID", "소중한 후기 감사합니다") // supervisor 전용
+```
+
+> 상품 상세의 공개 상품평 목록은 기존 `GET /v1/products/{id}/reviews` 를 씁니다.
+> `ProductReview.List` 는 회원 본인 또는 운영자 시점의 목록입니다.
 
 ---
 

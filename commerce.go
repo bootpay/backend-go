@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -59,6 +60,13 @@ type CommerceApi struct {
 	Cart                        *CartModule
 	MallSetting                 *MallSettingModule
 	Webhook                     *WebhookModule
+
+	// 게시판 API (FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평)
+	Faq           *FaqModule
+	Notice        *NoticeModule
+	Inquiry       *InquiryModule
+	ProductQna    *ProductQnaModule
+	ProductReview *ProductReviewModule
 
 	// 알림톡 v1 API
 	AlimtalkMessage  *AlimtalkMessageModule
@@ -143,6 +151,11 @@ func NewCommerceAPI(clientKey string, secretKey string, client *http.Client, mod
 	api.Cart = &CartModule{api: api}
 	api.MallSetting = &MallSettingModule{api: api}
 	api.Webhook = &WebhookModule{api: api}
+	api.Faq = &FaqModule{api: api}
+	api.Notice = &NoticeModule{api: api}
+	api.Inquiry = &InquiryModule{api: api}
+	api.ProductQna = &ProductQnaModule{api: api}
+	api.ProductReview = &ProductReviewModule{api: api}
 	api.AlimtalkMessage = &AlimtalkMessageModule{api: api}
 	api.AlimtalkOfficial = &AlimtalkOfficialModule{api: api}
 	api.AlimtalkOptout = &AlimtalkOptoutModule{api: api}
@@ -504,6 +517,57 @@ func commerceMallHeaders(userJwt string, idempotencyKey string) map[string]strin
 	return headers
 }
 
+// commerceBoardHeaders returns 게시판(FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평) headers.
+//
+// 이 엔드포인트들은 같은 경로를 고객 모드와 운영자 모드가 나눠 쓴다 —
+// supervisor 가 true 면 BOOTPAY-ROLE: supervisor, 아니면 user 다.
+// 인스턴스 기본 role 을 그대로 두면 운영자 전용 조회가 조용히 고객 모드로 나가므로 항상 명시한다.
+// Bootpay-User-JWT 는 회원 JWT 가 있을 때만 붙는다.
+func commerceBoardHeaders(supervisor bool, userJwt string, idempotencyKey string) map[string]string {
+	role := "user"
+	if supervisor {
+		role = "supervisor"
+	}
+	headers := commerceRoleHeaders(role, idempotencyKey)
+	if userJwt != "" {
+		headers["Bootpay-User-JWT"] = userJwt
+	}
+	return headers
+}
+
+// boardPageParams sets page/limit with the 게시판 defaults (1 / 20).
+// Ruby 쪽 기본값과 같고, 둘 다 언제나 전송된다.
+func boardPageParams(query url.Values, page int, limit int) {
+	if page <= 0 {
+		page = 1
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+	query.Set("page", strconv.Itoa(page))
+	query.Set("limit", strconv.Itoa(limit))
+}
+
+// boardPayload marshals params and attaches images when the caller provided a slice.
+//
+// ⚠️ images 는 보내면 목록 전체를 교체하고, 빈 배열([])은 "모두 삭제" 를 뜻한다.
+// 구조체 태그의 omitempty 는 길이 0 인 슬라이스를 지워 버려 그 의도를 표현할 수 없으므로,
+// Images 는 `json:"-"` 로 두고 여기서 nil 여부로만 판단해 붙인다 (nil = 그대로 둠).
+func boardPayload(params interface{}, images []interface{}) (map[string]interface{}, error) {
+	raw, err := json.Marshal(params)
+	if err != nil {
+		return nil, err
+	}
+	body := map[string]interface{}{}
+	if err := json.Unmarshal(raw, &body); err != nil {
+		return nil, err
+	}
+	if images != nil {
+		body["images"] = images
+	}
+	return body, nil
+}
+
 // Get performs a GET request
 func (api *CommerceApi) Get(url string) (map[string]interface{}, error) {
 	return api.doRequest(http.MethodGet, url, nil)
@@ -531,6 +595,15 @@ func (api *CommerceApi) Delete(url string) (map[string]interface{}, error) {
 // AlimtalkTemplateCreateParams.Register, ...). A plain bool would lose that distinction
 // because omitempty drops false — hence the pointer, and this helper to build one inline.
 func BoolPtr(v bool) *bool {
+	return &v
+}
+
+// StringPtr returns a pointer to v.
+//
+// 몇몇 필드는 "보내지 않음"(nil)과 "빈 값으로 지움"("")을 구분한다
+// (InquiryUpdateParams.Title 은 빈 문자열을 보내면 제목이 지워진다).
+// 값 타입이면 omitempty 가 "" 를 지워 그 구분이 사라지므로 pointer 로 둔다 — 이 헬퍼로 바로 만든다.
+func StringPtr(v string) *string {
 	return &v
 }
 
