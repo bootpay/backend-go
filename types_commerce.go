@@ -1989,6 +1989,8 @@ type AlimtalkWebhookUpdateParams struct {
 	Events []int `json:"events,omitempty"`
 	// explicit false 를 보내야 하므로 pointer type
 	Enabled *bool `json:"enabled,omitempty"`
+	// 건별 재시도 횟수(1~25, 기본 10). 범위 밖이면 11304. 생략하면 기존 값을 유지한다.
+	RetryCount int `json:"retry_count,omitempty"`
 }
 
 // AlimtalkWebhookDeliveriesParams represents webhook delivery history query parameters

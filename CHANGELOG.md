@@ -1,3 +1,18 @@
+### 2.9.1
+
+#### 알림톡 웹훅 설정에 재시도 횟수(`RetryCount`) 추가
+
+`AlimtalkWebhook.Update` 에 `retry_count` 를 실을 수 있다(26-09-30).
+전달 실패한 웹훅을 **건별로 몇 번까지 다시 보낼지**를 정한다.
+
+- `AlimtalkWebhookUpdateParams.RetryCount` — 1~25, 서버 기본 10.
+  범위 밖이면 `11304` 로 거부된다.
+- 미지정(`0`)이면 `omitempty` 로 아예 실리지 않고 **기존 값이 그대로 유지**된다 —
+  URL·이벤트만 고치려고 호출했다가 재시도 횟수가 기본값으로 되돌아가는 일이 없다.
+
+회귀 방지로 `TestCommerceAlimtalkWebhookUpdateBody` 가 지정 시 전송과
+미지정 시 키 부재를 함께 단정한다.
+
 ### 2.9.0
 
 #### 커머스 게시판 API 27종 추가 (FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평)

@@ -535,9 +535,10 @@ func TestCommerceAlimtalkWebhookUpdateBody(t *testing.T) {
 	api := newMockCommerceApi(&captured)
 
 	if _, err := api.AlimtalkWebhook.Update(AlimtalkWebhookUpdateParams{
-		Url:     "https://example.com/alimtalk-hook",
-		Events:  []int{301, 302, 310},
-		Enabled: BoolPtr(false),
+		Url:        "https://example.com/alimtalk-hook",
+		Events:     []int{301, 302, 310},
+		Enabled:    BoolPtr(false),
+		RetryCount: 25,
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -551,6 +552,19 @@ func TestCommerceAlimtalkWebhookUpdateBody(t *testing.T) {
 	events, ok := body["events"].([]interface{})
 	if !ok || len(events) != 3 || events[0] != float64(301) {
 		t.Fatalf("events mismatch: %+v", body)
+	}
+	if body["retry_count"] != float64(25) {
+		t.Fatalf("retry_count mismatch: %+v", body)
+	}
+
+	// 생략하면 기존 값을 유지해야 하므로 retry_count 키 자체가 실리면 안 된다
+	if _, err := api.AlimtalkWebhook.Update(AlimtalkWebhookUpdateParams{
+		Url: "https://example.com/alimtalk-hook",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if body := decodeBody(t, lastRequest(t, captured)); body["retry_count"] != nil {
+		t.Fatalf("미지정 retry_count 는 전송되면 안 된다: %+v", body)
 	}
 
 	// 파라미터 없는 POST 도 빈 JSON 오브젝트를 보낸다 (Ruby payload 기본값 {} 과 동일)

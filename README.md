@@ -908,6 +908,8 @@ _, err = api.AlimtalkOptout.Create(bootpay.AlimtalkOptoutCreateParams{Phone: "01
 _, err = api.AlimtalkWebhook.Update(bootpay.AlimtalkWebhookUpdateParams{
     Url:    "https://example.com/alimtalk-hook", // https 만 허용
     Events: []int{301, 302, 310, 311},
+    // 건별 재시도 횟수입니다 (1~25, 기본 10). 생략하면 기존 값을 유지합니다
+    RetryCount: 15,
 })
 ```
 

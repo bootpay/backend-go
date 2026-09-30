@@ -34,6 +34,7 @@ func (m *AlimtalkWebhookModule) Detail() (map[string]interface{}, error) {
 // Update saves the webhook setting
 // PUT /alimtalk/webhook
 // Url 은 **https 만** 허용한다(아니면 3028). 최초 저장 시 서명 시크릿이 자동 발급된다.
+// RetryCount 는 건별 재시도 횟수(1~25, 기본 10)다. 범위 밖이면 11304. 생략하면 기존 값을 유지한다.
 func (m *AlimtalkWebhookModule) Update(params AlimtalkWebhookUpdateParams) (map[string]interface{}, error) {
 	return m.api.putWithHeaders("alimtalk/webhook", params, alimtalkHeaders())
 }
