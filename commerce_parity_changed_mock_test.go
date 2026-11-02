@@ -195,8 +195,8 @@ func TestCommerceProductWriteHeaders(t *testing.T) {
 	if req.Method != http.MethodPut || req.URL != COMMERCE_DEVELOPMENT+"/products/prod_1" {
 		t.Fatalf("product update mismatch: %s %s", req.Method, req.URL)
 	}
-	if req.Header.Get("BOOTPAY-ROLE") != "manager" || req.Header.Get("Idempotency-Key") == "" {
-		t.Fatalf("product update must use manager role + Idempotency-Key: role=%q", req.Header.Get("BOOTPAY-ROLE"))
+	if req.Header.Get("BOOTPAY-ROLE") != "user" || req.Header.Get("Idempotency-Key") == "" {
+		t.Fatalf("product update must use user role + Idempotency-Key: role=%q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 
 	statusFrozen := false
@@ -212,7 +212,7 @@ func TestCommerceProductWriteHeaders(t *testing.T) {
 	if req.URL != COMMERCE_DEVELOPMENT+"/products/prod_1/status" {
 		t.Fatalf("product status URL mismatch: %s", req.URL)
 	}
-	if req.Header.Get("BOOTPAY-ROLE") != "manager" || req.Header.Get("Idempotency-Key") != "status-key" {
+	if req.Header.Get("BOOTPAY-ROLE") != "user" || req.Header.Get("Idempotency-Key") != "status-key" {
 		t.Fatalf("product status headers mismatch: role=%q key=%q", req.Header.Get("BOOTPAY-ROLE"), req.Header.Get("Idempotency-Key"))
 	}
 	body := decodeBody(t, req)
@@ -227,7 +227,7 @@ func TestCommerceProductWriteHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 	req = lastRequest(t, captured)
-	if req.Method != http.MethodDelete || req.Header.Get("BOOTPAY-ROLE") != "manager" {
+	if req.Method != http.MethodDelete || req.Header.Get("BOOTPAY-ROLE") != "user" {
 		t.Fatalf("product delete mismatch: %s role=%q", req.Method, req.Header.Get("BOOTPAY-ROLE"))
 	}
 
@@ -235,8 +235,8 @@ func TestCommerceProductWriteHeaders(t *testing.T) {
 		t.Fatal(err)
 	}
 	req = lastRequest(t, captured)
-	if req.Header.Get("BOOTPAY-ROLE") != "manager" {
-		t.Fatalf("CreateSimple must use manager role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("CreateSimple must use user role, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 }
 

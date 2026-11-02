@@ -322,8 +322,8 @@ func TestCommerceProductCreateMultipart(t *testing.T) {
 	if !strings.HasPrefix(req.Header.Get("Content-Type"), "application/json") {
 		t.Fatalf("no-image create must be JSON: %q", req.Header.Get("Content-Type"))
 	}
-	if req.Header.Get("BOOTPAY-ROLE") != "manager" {
-		t.Fatalf("product create must use manager role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("product create must use user role, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 	body := decodeBody(t, req)
 	if body["name"] != "상품A" || body["display_price"] != float64(1000) {
@@ -350,6 +350,9 @@ func TestCommerceProductCreateMultipart(t *testing.T) {
 	req = lastRequest(t, captured)
 	if req.Method != http.MethodPost || req.URL != COMMERCE_DEVELOPMENT+"/products" {
 		t.Fatalf("multipart create mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("multipart product create must use user role, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 
 	mediaType, mediaParams, err := mime.ParseMediaType(req.Header.Get("Content-Type"))

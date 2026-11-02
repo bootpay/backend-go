@@ -133,13 +133,16 @@ func (m *ProductModule) Products(params *MallProductListParams) (map[string]inte
 	return m.api.getWithHeaders("products?"+queryParams.Encode(), commerceMallHeaders(params.UserJwt, params.IdempotencyKey))
 }
 
-// Create creates a new product with optional images (manager scope)
+// Create creates a new product with optional images (user scope)
 // POST /v1/products
+// Bootpay-Role is "user": server scopes are only user:product_create/update/delete/status —
+// sending manager looks up manager:product_* and fails with 401 API_ROLE_NOT_SUPPORT(-50)
+// (Update, Status and Delete are the same).
 // With imagePaths the request is sent as multipart/form-data, otherwise as JSON.
 // ⚠️ Rails does not accept repeated `images` as an array — files must be indexed
 // as images[0], images[1], ...
 func (m *ProductModule) Create(product CommerceProduct, imagePaths []string) (map[string]interface{}, error) {
-	headers := commerceRoleHeaders("manager", "")
+	headers := commerceRoleHeaders("user", "")
 
 	if len(imagePaths) == 0 {
 		return m.api.postWithHeaders("products", product, headers)
@@ -213,9 +216,9 @@ func productMultipartFields(product CommerceProduct) (map[string]string, error) 
 	return fields, nil
 }
 
-// CreateSimple creates a new product without images (JSON only, manager scope)
+// CreateSimple creates a new product without images (JSON only, user scope)
 func (m *ProductModule) CreateSimple(product CommerceProduct) (map[string]interface{}, error) {
-	return m.api.postWithHeaders("products", product, commerceRoleHeaders("manager", ""))
+	return m.api.postWithHeaders("products", product, commerceRoleHeaders("user", ""))
 }
 
 // Detail retrieves product details
@@ -239,7 +242,7 @@ func (m *ProductModule) LookupProduct(productId string, userJwt string, idempote
 	return m.api.getWithHeaders(fmt.Sprintf("products/%s", productId), commerceMallHeaders(userJwt, idempotencyKey))
 }
 
-// Update updates product information (manager scope)
+// Update updates product information (user scope — see Create)
 // PUT /v1/products/{product_id}
 // Only changed values need to be sent. ⚠️ category_id presence is how the server detects
 // an unset intention — be careful when including it.
@@ -247,21 +250,21 @@ func (m *ProductModule) Update(product CommerceProduct) (map[string]interface{},
 	if product.ProductId == "" {
 		return nil, fmt.Errorf("product_id is required")
 	}
-	return m.api.putWithHeaders(fmt.Sprintf("products/%s", product.ProductId), product, commerceRoleHeaders("manager", ""))
+	return m.api.putWithHeaders(fmt.Sprintf("products/%s", product.ProductId), product, commerceRoleHeaders("user", ""))
 }
 
-// Status changes product display/sale status (manager scope)
+// Status changes product display/sale status (user scope — see Create)
 // PUT /v1/products/{product_id}/status
 // ⚠️ Stock is changed through Update, not here.
 func (m *ProductModule) Status(params ProductStatusParams) (map[string]interface{}, error) {
 	if params.ProductId == "" {
 		return nil, fmt.Errorf("product_id is required")
 	}
-	return m.api.putWithHeaders(fmt.Sprintf("products/%s/status", params.ProductId), params, commerceRoleHeaders("manager", params.IdempotencyKey))
+	return m.api.putWithHeaders(fmt.Sprintf("products/%s/status", params.ProductId), params, commerceRoleHeaders("user", params.IdempotencyKey))
 }
 
-// Delete deletes a product (manager scope)
+// Delete deletes a product (user scope — see Create)
 // DELETE /v1/products/{product_id}
 func (m *ProductModule) Delete(productId string) (map[string]interface{}, error) {
-	return m.api.deleteWithHeaders(fmt.Sprintf("products/%s", productId), nil, commerceRoleHeaders("manager", ""))
+	return m.api.deleteWithHeaders(fmt.Sprintf("products/%s", productId), nil, commerceRoleHeaders("user", ""))
 }
