@@ -2376,3 +2376,154 @@ func mergeExtraJSON(value interface{}, extra map[string]interface{}) ([]byte, er
 	}
 	return json.Marshal(body)
 }
+
+// ============================================
+// Deposit Types (뱅크알람 입금대기)
+// ============================================
+
+const (
+	BANK_DEPOSIT_WEBHOOK_EVENT_RECEIVED           = 400 // 입금 알림 저장 (주문 연결 전)
+	BANK_DEPOSIT_WEBHOOK_EVENT_MATCHED            = 401 // 주문 연결·입금 확인
+	BANK_DEPOSIT_WEBHOOK_EVENT_AMBIGUOUS          = 402 // 후보 주문 여러 건
+	BANK_DEPOSIT_WEBHOOK_EVENT_UNMATCHED          = 403 // 연결할 주문 없음
+	BANK_DEPOSIT_WEBHOOK_EVENT_CONFIRMED_MANUALLY = 404 // 판매자 수동 확인
+	BANK_DEPOSIT_WEBHOOK_EVENT_EXPIRED            = 405 // 기한 만료
+	BANK_DEPOSIT_WEBHOOK_EVENT_CANCELLED          = 406 // 입금대기 취소
+	BANK_DEPOSIT_WEBHOOK_EVENT_REVERTED           = 407 // 입금 확인 되돌림
+)
+
+// DepositCreateParams represents 입금대기 등록 parameters.
+// 미지정 선택 필드는 보내지 않는다. IdempotencyKey 는 헤더로만 보낸다.
+type DepositCreateParams struct {
+	MerchantOrderId string               `json:"merchant_order_id"`
+	Price           float64              `json:"price"`
+	Depositor       string               `json:"depositor"`
+	OrderName       string               `json:"order_name,omitempty"`
+	Memo            string               `json:"memo,omitempty"`
+	BuyerName       string               `json:"buyer_name,omitempty"`
+	BuyerPhone      string               `json:"buyer_phone,omitempty"`
+	BuyerEmail      string               `json:"buyer_email,omitempty"`
+	AccountId       string               `json:"account_id,omitempty"`
+	WebhookUrl      string               `json:"webhook_url,omitempty"`
+	Notify          *DepositNotifyParams `json:"notify,omitempty"`
+	IdempotencyKey  string               `json:"-"`
+}
+
+// DepositNotifyParams represents paid buyer alimtalk options.
+// 하나라도 true 면 BuyerPhone 이 필요하다(18134). Link 는 https, 500자 이하(18135).
+// bool 포인터는 미지정과 명시적 false 를 구분한다.
+type DepositNotifyParams struct {
+	DepositGuide *bool  `json:"deposit_guide,omitempty"`
+	DepositPaid  *bool  `json:"deposit_paid,omitempty"`
+	Link         string `json:"link,omitempty"`
+}
+
+// DepositAccount represents a seller's deposit account.
+// Primary 는 계좌 목록 응답에만 실린다.
+type DepositAccount struct {
+	Id        string `json:"id,omitempty"`
+	BankName  string `json:"bank_name,omitempty"`
+	AccountNo string `json:"account_no,omitempty"`
+	Holder    string `json:"holder,omitempty"`
+	Primary   *bool  `json:"primary,omitempty"`
+}
+
+type DepositAccountsResponse struct {
+	Accounts []DepositAccount `json:"accounts,omitempty"`
+}
+
+// DepositWebhookSecretResponse contains the secret shown only upon issuance.
+type DepositWebhookSecretResponse struct {
+	Secret string `json:"secret,omitempty"`
+}
+
+// DepositNotice represents the matched bank notification (webhook data only).
+type DepositNotice struct {
+	Key         string  `json:"key,omitempty"`
+	BankName    string  `json:"bank_name,omitempty"`
+	AccountTail string  `json:"account_tail,omitempty"`
+	Depositor   string  `json:"depositor,omitempty"`
+	Amount      float64 `json:"amount,omitempty"`
+	ReceivedAt  *string `json:"received_at,omitempty"`
+}
+
+// DepositNotify represents buyer notification settings in the response.
+type DepositNotify struct {
+	DepositGuide *bool `json:"deposit_guide,omitempty"`
+	DepositPaid  *bool `json:"deposit_paid,omitempty"`
+}
+
+// CommerceDeposit represents create/detail/cancel responses and deposit webhook data.
+type CommerceDeposit struct {
+	MerchantOrderId string          `json:"merchant_order_id,omitempty"`
+	OrderNumber     string          `json:"order_number,omitempty"`
+	OrderName       string          `json:"order_name,omitempty"`
+	Amount          float64         `json:"amount,omitempty"`
+	Status          string          `json:"status,omitempty"` // awaiting | paid | expired | cancelled
+	BuyerName       string          `json:"buyer_name,omitempty"`
+	Depositor       string          `json:"depositor,omitempty"`
+	Account         *DepositAccount `json:"account,omitempty"`
+	Deadline        *string         `json:"deadline,omitempty"`
+	DeadlineLabel   *string         `json:"deadline_label,omitempty"`
+	PaidAt          *string         `json:"paid_at,omitempty"`
+	Notify          *DepositNotify  `json:"notify,omitempty"`
+	Deposit         *DepositNotice  `json:"deposit,omitempty"`
+}
+
+// ============================================
+// Payout Types (입점사 지급 요청)
+// ============================================
+
+// PayoutStatus is the string status returned by the payout API.
+type PayoutStatus string
+
+const (
+	PAYOUT_STATUS_READY      PayoutStatus = "ready"
+	PAYOUT_STATUS_HELD       PayoutStatus = "held"
+	PAYOUT_STATUS_SENDING    PayoutStatus = "sending"
+	PAYOUT_STATUS_REQUESTED  PayoutStatus = "requested"
+	PAYOUT_STATUS_PROCESSING PayoutStatus = "processing"
+	PAYOUT_STATUS_SUCCEEDED  PayoutStatus = "succeeded"
+	PAYOUT_STATUS_FAILED     PayoutStatus = "failed"
+	PAYOUT_STATUS_CANCELLED  PayoutStatus = "cancelled"
+	PAYOUT_STATUS_UNKNOWN    PayoutStatus = "unknown"
+	PAYOUT_STATUS_VOID       PayoutStatus = "void"
+)
+
+// PayoutCreateParams represents payout registration parameters.
+// Amount is required and therefore serializes even when zero, allowing the server to validate it.
+type PayoutCreateParams struct {
+	SubSellerId      string `json:"sub_seller_id"`
+	Amount           int    `json:"amount"`
+	MerchantPayoutId string `json:"merchant_payout_id"`
+	OrderNumber      string `json:"order_number,omitempty"`
+	PayoutDate       string `json:"payout_date,omitempty"`
+	IdempotencyKey   string `json:"-"`
+}
+
+// PayoutListParams represents optional payout list filters.
+// Page and Limit are omitted when zero; the SDK does not apply client-side defaults.
+type PayoutListParams struct {
+	Status         PayoutStatus `json:"status,omitempty"`
+	SubSellerId    string       `json:"sub_seller_id,omitempty"`
+	From           string       `json:"from,omitempty"`
+	To             string       `json:"to,omitempty"`
+	Page           int          `json:"page,omitempty"`
+	Limit          int          `json:"limit,omitempty"`
+	IdempotencyKey string       `json:"-"`
+}
+
+// CommercePayout represents create/detail/list payout items.
+type CommercePayout struct {
+	Id               string       `json:"id"`
+	MerchantPayoutId string       `json:"merchant_payout_id"`
+	SubSellerId      string       `json:"sub_seller_id"`
+	Amount           int          `json:"amount"`
+	Status           PayoutStatus `json:"status"`
+	PayoutDate       string       `json:"payout_date"`
+	OrderNumber      *string      `json:"order_number"`
+	LastCode         *string      `json:"last_code"`
+	LastMessage      *string      `json:"last_message"`
+	CreatedAt        string       `json:"created_at"`
+	UpdatedAt        string       `json:"updated_at"`
+}

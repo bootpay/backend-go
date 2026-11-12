@@ -1,4 +1,40 @@
-### 2.9.1
+### 2.10.0
+
+#### 뱅크알람 입금대기 API 5종 — `Deposit`
+
+가맹점 서버가 입금대기 주문을 등록하면 금액·입금자명이 맞는 은행 입금 알림을
+뱅크알람이 연결하고 입금 웹훅으로 알린다. NodeJS 2.15.0과 같은 계약이다.
+
+- `Deposit.Accounts()` — `GET /v1/sdk/deposits/accounts`. 판매자 계좌 목록(첫 계좌가 대표).
+- `Deposit.WebhookSecret(key...)` — `POST /v1/sdk/deposits/webhook_secret`. 빈 객체로 비밀값을 발급하며 원문은 이 응답에서만 준다.
+- `Deposit.Create(params)` — `POST /v1/sdk/deposits`. 가맹점 주문번호·금액·입금자명 필수,
+  주문명·메모·구매자 정보(이메일 포함)·계좌·웹훅·구매자 알림톡 선택.
+- `Deposit.Detail(id)` / `Deposit.Cancel(id, key...)` — `GET` / `DELETE /v1/sdk/deposits/{id}`.
+  가맹점 주문번호 또는 부트페이 주문번호를 경로 세그먼트로 인코딩한다.
+  빈 id 는 상위 경로를 때리지 않도록 요청 전에 에러를 돌려준다(게시판 모듈과 같은 규칙).
+- 모든 요청은 인스턴스 role 변경 없이 supervisor로 전송한다. 멱등키 미지정 시 호출마다 UUID를 생성한다.
+  Create는 `IdempotencyKey`, WebhookSecret·Cancel은 선택 인자로 지정할 수 있다.
+- 요청·응답 타입과 `BANK_DEPOSIT_WEBHOOK_EVENT_*`(400~407) 상수를 추가했다.
+  미지정 선택 필드는 생략하며 알림 옵션의 명시적 `false`는 보존한다.
+- mock transport 계약 테스트와 `ExampleDepositModule` 사용 예제를 추가했다.
+
+#### 입점사 지급 요청 API 3종 — `Payout`
+
+가맹점 지정 금액(`manual`) 정산 방식의 쇼핑몰이 입점사와 지급액을 정해 지급 원장에 등록한다. 실제 송금은 부트페이 배치가 한다.
+
+- `Payout.Create(params)` — `POST /v1/sdk/payouts`. `sub_seller_id` · `amount` · `merchant_payout_id` 필수, `order_number` · `payout_date`(YYYY-MM-DD) 선택.
+  같은 `merchant_payout_id` 재호출은 처음 항목을 돌려준다.
+- `Payout.Detail(id, key...)` — `GET /v1/sdk/payouts/{id}`. id는 `merchant_payout_id` 또는 지급 항목 id이며 경로 세그먼트로 인코딩한다.
+- `Payout.List(params)` — `GET /v1/sdk/payouts`. `status` · `sub_seller_id` · `from` · `to` · `page` · `limit` 필터를 선택적으로 보낸다.
+  서버의 bare array 응답은 기존 Commerce API 관례대로 `data` 배열로 감싸 반환한다.
+- 전부 supervisor scope(`payout_*`)라 인스턴스 role과 무관하게 `BOOTPAY-ROLE: supervisor`로 나간다.
+  `Idempotency-Key`는 미지정 시 매 호출 자동 생성하며 세 메서드 모두 호출자가 지정할 수 있다.
+- 응답 타입 `CommercePayout`과 상태 타입 `PayoutStatus`, mock transport 계약 테스트, `ExamplePayoutModule`을 추가했다.
+
+#### 상품 등록·수정·삭제·상태변경 `BOOTPAY-ROLE` manager → user (봇 sync `9a8bb2bf`)
+
+`Product.Create` · `Update` · `Delete` · `Status`가 `BOOTPAY-ROLE: manager`로 나가던 것을 `user`로 바꿨다.
+서버 스코프는 `user:product_*`만 있어 manager로 보내면 401 `API_ROLE_NOT_SUPPORT(-50)`로 막혔다. 인스턴스 role은 바꾸지 않는다.
 
 #### 알림톡 웹훅 설정에 재시도 횟수(`RetryCount`) 추가
 

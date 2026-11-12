@@ -59,6 +59,8 @@ type CommerceApi struct {
 	Point                       *PointModule
 	Cart                        *CartModule
 	MallSetting                 *MallSettingModule
+	Deposit                     *DepositModule
+	Payout                      *PayoutModule
 	Webhook                     *WebhookModule
 
 	// 게시판 API (FAQ · 공지사항 · 1:1 문의 · 상품문의 · 상품평)
@@ -151,6 +153,8 @@ func NewCommerceAPI(clientKey string, secretKey string, client *http.Client, mod
 	api.Cart = &CartModule{api: api}
 	api.MallSetting = &MallSettingModule{api: api}
 	api.Webhook = &WebhookModule{api: api}
+	api.Deposit = &DepositModule{api: api}
+	api.Payout = &PayoutModule{api: api}
 	api.Faq = &FaqModule{api: api}
 	api.Notice = &NoticeModule{api: api}
 	api.Inquiry = &InquiryModule{api: api}

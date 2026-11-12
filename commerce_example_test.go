@@ -508,3 +508,78 @@ func TestCommerceAllEndpoints(t *testing.T) {
 
 	fmt.Println("\n========== Test Complete ==========")
 }
+
+// ExampleDepositModule demonstrates 뱅크알람 입금대기 operations.
+// 라이브 사용 예제이며 Output 지시자가 없어 go test 에서는 실행하지 않는다.
+func ExampleDepositModule() {
+	// 키와 호스트를 같은 BOOTPAY_ENV 기준으로 고른다 (TestCommerceAllEndpoints 와 같은 팩토리)
+	commerce := CreateCommerceApi()
+
+	// 첫 계좌가 대표 계좌다. 선택 계좌의 id 를 Create 의 AccountId 에 넣을 수 있다.
+	accounts, err := commerce.Deposit.Accounts()
+	if err != nil {
+		return
+	}
+	_ = accounts
+
+	// 원문은 이 응답에서만 준다. 비밀값은 안전하게 저장하고 로그에는 남기지 않는다.
+	secret, err := commerce.Deposit.WebhookSecret("deposit-secret-key")
+	if err != nil {
+		return
+	}
+	_ = secret
+
+	_, err = commerce.Deposit.Create(DepositCreateParams{
+		MerchantOrderId: "ORDER_1234",
+		Price:           15000,
+		Depositor:       "홍길동",
+		BuyerName:       "홍길동",
+		BuyerPhone:      "01012345678",
+		BuyerEmail:      "buyer@example.com",
+		WebhookUrl:      "https://example.com/hooks/deposit",
+		Notify: &DepositNotifyParams{
+			DepositGuide: BoolPtr(true),
+			DepositPaid:  BoolPtr(false),
+			Link:         "https://example.com/orders/ORDER_1234",
+		},
+		IdempotencyKey: "deposit-create-key",
+	})
+	if err != nil {
+		return
+	}
+
+	// 가맹점 주문번호 또는 부트페이 주문번호를 받는다.
+	_, err = commerce.Deposit.Detail("ORDER_1234")
+	if err != nil {
+		return
+	}
+	_, err = commerce.Deposit.Cancel("ORDER_1234", "deposit-cancel-key")
+	if err != nil {
+		return
+	}
+}
+
+// ExamplePayoutModule demonstrates 입점사 지급 요청 operations.
+// 라이브 사용 예제이며 Output 지시자가 없어 go test 에서는 실행하지 않는다.
+func ExamplePayoutModule() {
+	commerce := CreateCommerceApi()
+
+	// 실제 송금은 별도 배치가 처리한다. 생성 호출은 실지급 원장을 만들므로 예제에서 실행하지 않는다.
+	// _, err := commerce.Payout.Create(PayoutCreateParams{
+	// 	SubSellerId: "SUB_SELLER_ID", Amount: 150000, MerchantPayoutId: "PAYOUT_20261112_001",
+	// 	OrderNumber: "ORDER_1234", PayoutDate: "2026-11-20", IdempotencyKey: "payout-create-key",
+	// })
+
+	items, err := commerce.Payout.List(&PayoutListParams{
+		Status: PAYOUT_STATUS_READY, SubSellerId: "SUB_SELLER_ID", From: "2026-11-01", To: "2026-11-30", Page: 1, Limit: 20,
+	})
+	if err != nil {
+		return
+	}
+	_ = items // bare array 응답은 기존 Commerce API 관례대로 data 배열에 담긴다.
+
+	_, err = commerce.Payout.Detail("PAYOUT_20261112_001", "payout-detail-key")
+	if err != nil {
+		return
+	}
+}

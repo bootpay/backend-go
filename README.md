@@ -973,6 +973,108 @@ _, err = api.ProductReview.Reply("REVIEW_ID", "소중한 후기 감사합니다"
 
 ---
 
+### 10-9. 뱅크알람 입금대기 (무통장 입금 자동 확인)
+
+가맹점 서버가 아직 입금되지 않은 주문을 등록하면, 판매자 폰의 입금 알림 중 **금액 · 입금자명**이 맞는 것을
+뱅크알람이 그 주문에 연결해 입금을 확인하고 입금 웹훅으로 알립니다.
+전부 supervisor 전용이며, 인스턴스 role과 무관하게 `BOOTPAY-ROLE: supervisor`로 나갑니다.
+알림톡 메시지 호스트가 아닌 커머스 호스트의 `/v1/sdk/deposits`를 사용합니다.
+
+```go
+// api := bootpay.NewCommerceAPI(clientKey, secretKey, nil, "production")
+// 키는 환경변수에서 읽습니다. 각 호출의 err를 확인하세요.
+
+// 판매자 입금 계좌 목록 — 첫 계좌가 대표 계좌(primary: true)
+accounts, err := api.Deposit.Accounts()
+if err != nil { return err }
+_ = accounts // 응답은 기존 커머스 메서드와 같은 map 형식입니다.
+
+// 웹훅 서명 비밀값 발급 — 원문은 이 응답에서만 받습니다. 다시 부르면 바뀝니다.
+secret, err := api.Deposit.WebhookSecret()
+if err != nil { return err }
+_ = secret // 비밀값은 안전하게 저장하고 로그에 남기지 마세요.
+
+// 같은 MerchantOrderId로 같은 금액·입금자명·계좌를 다시 보내면 기존 주문을 돌려줍니다.
+// 하나라도 다르면 18110(BANK_DEPOSIT_MERCHANT_ID_CONFLICT)으로 거절됩니다.
+order, err := api.Deposit.Create(bootpay.DepositCreateParams{
+    MerchantOrderId: "ORDER_1234",
+    Price:          15000,
+    Depositor:      "홍길동", // 은행 입금 알림과 맞춰 볼 이름
+    BuyerName:      "홍길동", // 미지정시 입금자명
+    BuyerEmail:     "buyer@example.com", // 입금 안내·확인 메일 (무료)
+    // AccountId: "계좌 목록의 id", // 미지정시 대표 계좌
+    WebhookUrl: "https://example.com/hooks/deposit", // 비밀값 먼저 발급(18131)
+    // 구매자 알림톡 (유료) — BuyerPhone 필수, Link는 https
+    // BuyerPhone: "01012345678",
+    // Notify: &bootpay.DepositNotifyParams{
+    //     DepositGuide: bootpay.BoolPtr(true), DepositPaid: bootpay.BoolPtr(false),
+    //     Link: "https://example.com/orders/ORDER_1234",
+    // },
+    // IdempotencyKey: "my-create-key", // 미지정시 매 호출 새 UUID
+})
+if err != nil { return err }
+_ = order
+
+// 가맹점 주문번호 또는 부트페이 주문번호 — 경로 구분자는 자동 인코딩됩니다.
+order, err = api.Deposit.Detail("ORDER_1234") // awaiting · paid · expired · cancelled
+if err != nil { return err }
+order, err = api.Deposit.Cancel("ORDER_1234") // 이미 닫힌 주문은 그대로 반환
+if err != nil { return err }
+```
+
+선택 필드는 미지정시 본문에서 빠집니다. `Notify`의 불리언은 `BoolPtr(false)`로 명시적 `false`를 보냅니다.
+`WebhookSecret("my-secret-key")`, `Cancel("ORDER_1234", "my-cancel-key")`도 멱등키를 지정할 수 있습니다.
+응답 구조체는 `CommerceDeposit`, `DepositAccountsResponse`, `DepositWebhookSecretResponse`를 제공합니다.
+
+> 입금 웹훅은 `X-Bootpay-Signature: sha256=HMAC_SHA256(secret, "{X-Bootpay-Timestamp}.{raw_body}")`로 서명됩니다.
+> 다시 발급해도 이미 만든 웹훅 작업은 이전 비밀값으로 서명됩니다.
+> 이벤트 코드는 `BANK_DEPOSIT_WEBHOOK_EVENT_*` 상수(400~407)를 참고하세요.
+
+사용 예제는 [ExampleDepositModule](./commerce_example_test.go), 오프라인 계약 테스트는
+[commerce_deposit_mock_test.go](./commerce_deposit_mock_test.go)를 참고하세요.
+
+---
+
+### 10-10. 입점사 지급 요청
+
+가맹점 지정 금액(`manual`) 정산 방식의 쇼핑몰이 입점사와 지급액을 정해 지급 원장에 등록합니다.
+실제 송금은 등록 즉시가 아니라 부트페이 배치가 약 5분 간격으로 처리합니다.
+전부 supervisor 전용이며, 인스턴스 role과 무관하게 `BOOTPAY-ROLE: supervisor`로 나갑니다.
+
+```go
+// 같은 MerchantPayoutId로 다시 보내면 처음 만든 항목을 그대로 돌려줍니다.
+payout, err := api.Payout.Create(bootpay.PayoutCreateParams{
+    SubSellerId:     "SUB_SELLER_ID", // PG 판매자 등록을 마친 입점사
+    Amount:          150000,           // 1원 이상 정수
+    MerchantPayoutId: "PAYOUT_20261112_001",
+    OrderNumber:     "ORDER_1234",    // 선택
+    PayoutDate:      "2026-11-20",    // 선택, YYYY-MM-DD (미지정시 오늘)
+})
+if err != nil { return err }
+_ = payout
+
+// MerchantPayoutId 또는 지급 항목 id로 조회합니다.
+payout, err = api.Payout.Detail("PAYOUT_20261112_001")
+if err != nil { return err }
+
+// 최근 생성 순입니다. 서버의 bare array 응답은 기존 관례대로 result["data"] 배열에 담깁니다.
+payouts, err := api.Payout.List(&bootpay.PayoutListParams{
+    Status: bootpay.PAYOUT_STATUS_READY, SubSellerId: "SUB_SELLER_ID",
+    From: "2026-11-01", To: "2026-11-30", Page: 1, Limit: 20,
+})
+if err != nil { return err }
+_ = payouts
+```
+
+상태는 `ready`, `held`, `sending`, `requested`, `processing`, `succeeded`, `failed`, `cancelled`, `unknown`, `void`입니다.
+`Create`의 `IdempotencyKey`, `Detail`의 두 번째 인자, `ListParams.IdempotencyKey`로 멱등키를 지정할 수 있고 미지정시 매 호출 새로 생성합니다.
+응답 항목 구조체는 nullable `OrderNumber`, `LastCode`, `LastMessage`를 포함한 `CommercePayout`입니다.
+
+사용 예제는 [ExamplePayoutModule](./commerce_example_test.go), 오프라인 계약 테스트는
+[commerce_payout_mock_test.go](./commerce_payout_mock_test.go)를 참고하세요.
+
+---
+
 더 자세한 Commerce API 사용 예제는 [commerce_test](./commerce_test) 디렉토리를 참고해주세요.
 
 ---
