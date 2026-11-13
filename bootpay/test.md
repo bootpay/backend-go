@@ -29,7 +29,7 @@ const CurrentEnv = "production"
 
 ### 전체 테스트 실행
 ```bash
-cd /Users/taesupyoon/bootpay/server/sdk/go
+cd backend-go  # 리포 루트
 go test ./bootpay/... -v
 ```
 
