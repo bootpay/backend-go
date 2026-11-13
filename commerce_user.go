@@ -30,9 +30,12 @@ func (m *UserModule) CheckExist(key string, value string) (map[string]interface{
 	return m.api.Get(fmt.Sprintf("users/join/%s?pk=%s", key, encodedValue))
 }
 
-// AuthenticationData retrieves authentication data by standId
+// AuthenticationData retrieves authentication data by standId.
+//
+// Deprecated: use UserAuthenticate (same endpoint GET /v1/users/authenticate/{id}).
+// Kept for backward compatibility; it delegates to UserAuthenticate.
 func (m *UserModule) AuthenticationData(standId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("users/authenticate/%s", standId))
+	return m.UserAuthenticate(standId, "", "")
 }
 
 // UserAuthenticate retrieves the signup email verification standby status (V1 Mall API)
