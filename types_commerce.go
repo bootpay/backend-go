@@ -707,6 +707,26 @@ type OrderCancelActionParams struct {
 	IdempotencyKey string `json:"-"`
 }
 
+// OrderPurchaseUpdateItem is one purchase (shipment) row for PUT /v1/orders/{order_number}/purchases.
+type OrderPurchaseUpdateItem struct {
+	OrderPurchaseNumber   string `json:"order_purchase_number"`
+	Status                int    `json:"status"`
+	ChosenProductOptionId string `json:"chosen_product_option_id,omitempty"`
+	DeliveryType          int    `json:"delivery_type,omitempty"`
+	DeliveryCompanyCode   string `json:"delivery_company_code,omitempty"`
+	TrackingNumber        string `json:"tracking_number,omitempty"`
+}
+
+// OrderPurchasesUpdateParams is the request for OrderModule.UpdatePurchases.
+type OrderPurchasesUpdateParams struct {
+	// OrderNumber goes into the path (not the body)
+	OrderNumber string `json:"-"`
+	// Purchases is sent as {"purchases": [...]} (max 50 per request)
+	Purchases []OrderPurchaseUpdateItem `json:"purchases"`
+	// IdempotencyKey is sent as the Idempotency-Key header (auto-generated when empty)
+	IdempotencyKey string `json:"-"`
+}
+
 // CommerceOrderCancelRequestHistory represents order cancel request history
 type CommerceOrderCancelRequestHistory struct {
 	OrderCancelRequestHistoryId string `json:"order_cancel_request_history_id,omitempty"`

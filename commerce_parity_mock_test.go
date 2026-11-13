@@ -922,3 +922,73 @@ func TestCommerceUserAuthenticate(t *testing.T) {
 		t.Fatalf("Idempotency-Key mismatch: %q", req.Header.Get("Idempotency-Key"))
 	}
 }
+
+func TestCommerceOrderPurchases(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.Order.Purchases("ORD-1"); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.Method != http.MethodGet || req.URL != COMMERCE_DEVELOPMENT+"/orders/ORD-1/purchases" {
+		t.Fatalf("order purchases mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("order purchases must use user role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	}
+	if req.Header.Get("Idempotency-Key") == "" {
+		t.Fatal("Idempotency-Key must be auto-generated")
+	}
+
+	if _, err := commerce.Order.Purchases("ORD-1", "idem-1"); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.Header.Get("Idempotency-Key") != "idem-1" {
+		t.Fatalf("Idempotency-Key mismatch: %q", req.Header.Get("Idempotency-Key"))
+	}
+}
+
+func TestCommerceOrderUpdatePurchases(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.Order.UpdatePurchases(OrderPurchasesUpdateParams{
+		OrderNumber: "ORD-1",
+		Purchases: []OrderPurchaseUpdateItem{
+			{OrderPurchaseNumber: "P1", Status: 4, TrackingNumber: "123"},
+		},
+		IdempotencyKey: "idem-2",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.Method != http.MethodPut || req.URL != COMMERCE_DEVELOPMENT+"/orders/ORD-1/purchases" {
+		t.Fatalf("order update purchases mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "user" || req.Header.Get("Idempotency-Key") != "idem-2" {
+		t.Fatalf("order update purchases headers mismatch: role=%q key=%q", req.Header.Get("BOOTPAY-ROLE"), req.Header.Get("Idempotency-Key"))
+	}
+	body := decodeBody(t, req)
+	purchases, ok := body["purchases"].([]interface{})
+	if !ok || len(purchases) != 1 {
+		t.Fatalf("purchases body mismatch: %+v", body)
+	}
+	row, ok := purchases[0].(map[string]interface{})
+	if !ok || row["order_purchase_number"] != "P1" || row["status"] != float64(4) || row["tracking_number"] != "123" {
+		t.Fatalf("purchase row mismatch: %+v", purchases[0])
+	}
+	if _, exists := body["order_number"]; exists {
+		t.Fatalf("order_number must not be in body: %+v", body)
+	}
+	if _, exists := body["idempotency_key"]; exists {
+		t.Fatalf("idempotency_key must not be in body: %+v", body)
+	}
+
+	if _, err := commerce.Order.UpdatePurchases(OrderPurchasesUpdateParams{
+		Purchases: []OrderPurchaseUpdateItem{{OrderPurchaseNumber: "P1", Status: 4}},
+	}); err == nil {
+		t.Fatal("empty order_number must return an error")
+	}
+}
