@@ -423,6 +423,32 @@ func TestCommerceInvoiceRequests(t *testing.T) {
 		t.Fatalf("invoice list URL mismatch:\n got %s\nwant %s", req.URL, expected)
 	}
 
+	// create 는 인스턴스 role 과 무관하게 user (서버 스코프 user:invoice_create 뿐)
+	commerce.AsManager()
+	if _, err := commerce.Invoice.Create(CommerceInvoice{Name: "청구서"}); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.Method != "POST" || req.URL != COMMERCE_DEVELOPMENT+"/invoices" {
+		t.Fatalf("invoice create mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("invoice create must use user role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	}
+	if req.Header.Get("Idempotency-Key") == "" {
+		t.Fatal("invoice create Idempotency-Key must be auto-generated")
+	}
+	if _, err := commerce.Invoice.Create(CommerceInvoice{Name: "청구서"}, "idem-invoice"); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).Header.Get("Idempotency-Key"); got != "idem-invoice" {
+		t.Fatalf("invoice create explicit Idempotency-Key mismatch: %q", got)
+	}
+	if commerce.GetRole() != "manager" {
+		t.Fatalf("instance role must stay manager, got %q", commerce.GetRole())
+	}
+	commerce.AsUser()
+
 	// sendTypes nil → send_types 미전송, 빈 배열 → 빈 배열 전송
 	if _, err := commerce.Invoice.Notify("inv_1", nil); err != nil {
 		t.Fatal(err)

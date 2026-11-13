@@ -63,8 +63,11 @@ func (m *InvoiceModule) ListWithParams(params *InvoiceListParams) (map[string]in
 }
 
 // Create creates a new invoice
-func (m *InvoiceModule) Create(invoice CommerceInvoice) (map[string]interface{}, error) {
-	return m.api.Post("invoices", invoice)
+// POST /v1/invoices
+// 서버 스코프는 user:invoice_create 뿐이라 인스턴스 role 과 무관하게 BOOTPAY-ROLE: user 로 보낸다
+// (manager/supervisor 로 나가면 401 API_ROLE_NOT_SUPPORT). idempotencyKey 미지정시 자동 생성.
+func (m *InvoiceModule) Create(invoice CommerceInvoice, idempotencyKey ...string) (map[string]interface{}, error) {
+	return m.api.postWithHeaders("invoices", invoice, commerceRoleHeaders("user", firstOrEmpty(idempotencyKey)))
 }
 
 // Notify sends invoice notification

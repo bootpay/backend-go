@@ -1,3 +1,11 @@
+### Unreleased
+
+#### 청구서 생성 `BOOTPAY-ROLE` 을 user 로 고정 (nodejs `40b5d45` parity)
+
+`Invoice.Create(invoice, idempotencyKey ...string)` 가 인스턴스 role 을 그대로 실어, manager·supervisor 로 둔 인스턴스에서 부르면
+401 `API_ROLE_NOT_SUPPORT(-50)` 로 실패했다. 서버 스코프는 `user:invoice_create` 뿐이다(dev 실측: user 만 스코프 통과).
+이제 list·detail·notify 와 같이 항상 `user` 로 보내고 `Idempotency-Key` 를 싣는다(미지정시 자동 생성). 인스턴스 role 은 바뀌지 않는다.
+
 ### 2.10.0
 
 #### 뱅크알람 입금대기 API 5종 — `Deposit`
