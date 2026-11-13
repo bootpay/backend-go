@@ -892,3 +892,33 @@ func TestCommerceMallProductsExUidAndLookup(t *testing.T) {
 		t.Fatalf("explicit Idempotency-Key must win: %q", req.Header.Get("Idempotency-Key"))
 	}
 }
+
+func TestCommerceUserAuthenticate(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.User.UserAuthenticate("standby_1", "", ""); err != nil {
+		t.Fatal(err)
+	}
+	req := lastRequest(t, captured)
+	if req.Method != http.MethodGet || req.URL != COMMERCE_DEVELOPMENT+"/users/authenticate/standby_1" {
+		t.Fatalf("user authenticate mismatch: %s %s", req.Method, req.URL)
+	}
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("user authenticate must use user role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	}
+	if req.Header.Get("Idempotency-Key") == "" {
+		t.Fatal("Idempotency-Key must be auto-generated")
+	}
+
+	if _, err := commerce.User.UserAuthenticate("standby_1", "signup", "idem-1"); err != nil {
+		t.Fatal(err)
+	}
+	req = lastRequest(t, captured)
+	if req.URL != COMMERCE_DEVELOPMENT+"/users/authenticate/standby_1?verification_context=signup" {
+		t.Fatalf("user authenticate URL mismatch: %s", req.URL)
+	}
+	if req.Header.Get("Idempotency-Key") != "idem-1" {
+		t.Fatalf("Idempotency-Key mismatch: %q", req.Header.Get("Idempotency-Key"))
+	}
+}

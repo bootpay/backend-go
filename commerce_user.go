@@ -35,6 +35,19 @@ func (m *UserModule) AuthenticationData(standId string) (map[string]interface{},
 	return m.api.Get(fmt.Sprintf("users/authenticate/%s", standId))
 }
 
+// UserAuthenticate retrieves the signup email verification standby status (V1 Mall API)
+// GET /v1/users/authenticate/{userStandbyId}
+// verificationContext is optional (sent as a query parameter only when non-empty).
+// The server applies no scope check to this lookup; BOOTPAY-ROLE is fixed to user like the other member APIs.
+// idempotencyKey is auto-generated when empty.
+func (m *UserModule) UserAuthenticate(userStandbyId string, verificationContext string, idempotencyKey string) (map[string]interface{}, error) {
+	path := "users/authenticate/" + url.PathEscape(userStandbyId)
+	if verificationContext != "" {
+		path += "?" + url.Values{"verification_context": {verificationContext}}.Encode()
+	}
+	return m.api.getWithHeaders(path, commerceRoleHeaders("user", idempotencyKey))
+}
+
 // Login performs user login
 func (m *UserModule) Login(loginId string, loginPw string) (map[string]interface{}, error) {
 	data := map[string]string{
