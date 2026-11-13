@@ -63,7 +63,9 @@ func TestCommerceDepositExplicitIdempotencyKey(t *testing.T) {
 		func() (map[string]interface{}, error) {
 			return api.Deposit.Create(DepositCreateParams{MerchantOrderId: "m-1", Price: 1, Depositor: "홍", IdempotencyKey: "idem-deposit"})
 		},
+		func() (map[string]interface{}, error) { return api.Deposit.Accounts("idem-deposit") },
 		func() (map[string]interface{}, error) { return api.Deposit.WebhookSecret("idem-deposit") },
+		func() (map[string]interface{}, error) { return api.Deposit.Detail("a/b", "idem-deposit") },
 		func() (map[string]interface{}, error) { return api.Deposit.Cancel("a/b", "idem-deposit") },
 	}
 	for _, call := range calls {

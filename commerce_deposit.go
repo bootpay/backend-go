@@ -15,8 +15,8 @@ type DepositModule struct {
 // Accounts retrieves the seller's deposit accounts.
 // GET /v1/sdk/deposits/accounts
 // 첫 계좌가 대표 계좌(primary: true)다.
-func (m *DepositModule) Accounts() (map[string]interface{}, error) {
-	return m.api.getWithHeaders("sdk/deposits/accounts", commerceRoleHeaders("supervisor", ""))
+func (m *DepositModule) Accounts(idempotencyKey ...string) (map[string]interface{}, error) {
+	return m.api.getWithHeaders("sdk/deposits/accounts", commerceRoleHeaders("supervisor", firstOrEmpty(idempotencyKey)))
 }
 
 // WebhookSecret reissues the webhook signing secret.
@@ -38,11 +38,12 @@ func (m *DepositModule) Create(params DepositCreateParams) (map[string]interface
 // Detail retrieves a pending deposit by merchant order ID or Bootpay order number.
 // GET /v1/sdk/deposits/{id}
 // 기한이 지났으면 조회 시점에 expired 로 닫힌다.
-func (m *DepositModule) Detail(depositId string) (map[string]interface{}, error) {
+func (m *DepositModule) Detail(depositId string, idempotencyKey ...string) (map[string]interface{}, error) {
 	if depositId == "" {
 		return nil, fmt.Errorf("deposit_id is required")
 	}
-	return m.api.getWithHeaders("sdk/deposits/"+url.PathEscape(depositId), commerceRoleHeaders("supervisor", ""))
+	return m.api.getWithHeaders("sdk/deposits/"+url.PathEscape(depositId),
+		commerceRoleHeaders("supervisor", firstOrEmpty(idempotencyKey)))
 }
 
 // Cancel cancels a pending deposit.
