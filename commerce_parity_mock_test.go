@@ -1052,12 +1052,22 @@ func roleRuleCases() []roleRuleCase {
 		{"product detail", "user", func(a *CommerceApi) error { return disc(a.Product.Detail("p1")) }},
 		{"mall products", "user", func(a *CommerceApi) error { return disc(a.Product.Products(nil)) }},
 		{"mall product detail", "user", func(a *CommerceApi) error { return disc(a.Product.ProductDetail("p1", "", "")) }},
+		{"mall product lookup", "user", func(a *CommerceApi) error { return disc(a.Product.LookupProduct("p1", "", "")) }},
 		{"store info", "user", func(a *CommerceApi) error { return disc(a.Store.Info()) }},
 		{"store detail", "user", func(a *CommerceApi) error { return disc(a.Store.Detail()) }},
 		{"user token", "user", func(a *CommerceApi) error { return disc(a.User.Token("u1")) }},
 		{"user join", "user", func(a *CommerceApi) error { return disc(a.User.Join(CommerceUser{})) }},
 		{"user check exist", "user", func(a *CommerceApi) error { return disc(a.User.CheckExist("email", "a@b.c")) }},
 		{"user login", "user", func(a *CommerceApi) error { return disc(a.User.Login("id", "pw")) }},
+		{"user authenticate", "user", func(a *CommerceApi) error { return disc(a.User.UserAuthenticate("s1", "", "")) }},
+		{"mall user join", "user", func(a *CommerceApi) error {
+			return disc(a.User.UserJoin(MallUserJoinParams{LoginId: "id", Password: "pw", Name: "n"}))
+		}},
+		{"mall user login", "user", func(a *CommerceApi) error {
+			return disc(a.User.UserLogin(MallUserLoginParams{LoginId: "id", Password: "pw"}))
+		}},
+		{"mall user join check", "user", func(a *CommerceApi) error { return disc(a.User.UserJoinCheck("id-exist", "a", "")) }},
+		{"user uid exist", "user", func(a *CommerceApi) error { return disc(a.User.UidExist("x", "")) }},
 		{"user session", "user", func(a *CommerceApi) error { return disc(a.User.UserSession("jwt", "")) }},
 		{"user list", "user", func(a *CommerceApi) error { return disc(a.User.List(nil)) }},
 		{"user detail", "user", func(a *CommerceApi) error { return disc(a.User.Detail("u1")) }},
