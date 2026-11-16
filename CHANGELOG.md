@@ -1,5 +1,9 @@
 ### Unreleased
 
+#### 청구서 `Detail` · `Notify` 에 멱등 키 가변 인자
+
+`Invoice.Detail(invoiceId, idempotencyKey ...string)` · `Invoice.Notify(invoiceId, sendTypes, idempotencyKey ...string)` — 지정하지 않으면 종전처럼 자동 생성한다.
+
 #### 빈 id 로 상세 메서드를 부르면 목록이 돌아오던 문제 수정 (ruby `79594ea` parity)
 
 `Order.Detail("")` 처럼 id 가 비면 경로가 `orders/` · `orders//purchases` 가 되어 서버가 목록·다른 엔드포인트로 라우팅해

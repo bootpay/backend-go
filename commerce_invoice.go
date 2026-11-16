@@ -74,16 +74,16 @@ func (m *InvoiceModule) Create(invoice CommerceInvoice, idempotencyKey ...string
 // POST /v1/invoices/{invoice_id}/notify
 // sendTypes may be nil — the key is then omitted and the server treats it as an empty array.
 // ⚠️ Real customer notifications are sent — be careful with test calls.
-func (m *InvoiceModule) Notify(invoiceId string, sendTypes []int) (map[string]interface{}, error) {
+func (m *InvoiceModule) Notify(invoiceId string, sendTypes []int, idempotencyKey ...string) (map[string]interface{}, error) {
 	data := map[string]interface{}{}
 	if sendTypes != nil {
 		data["send_types"] = sendTypes
 	}
-	return m.api.postWithHeaders(fmt.Sprintf("invoices/%s/notify", invoiceId), data, commerceRoleHeaders("user", ""))
+	return m.api.postWithHeaders(fmt.Sprintf("invoices/%s/notify", invoiceId), data, commerceRoleHeaders("user", firstOrEmpty(idempotencyKey)))
 }
 
 // Detail retrieves invoice details
 // GET /v1/invoices/{invoice_id}
-func (m *InvoiceModule) Detail(invoiceId string) (map[string]interface{}, error) {
-	return m.api.getWithHeaders(fmt.Sprintf("invoices/%s", invoiceId), commerceRoleHeaders("user", ""))
+func (m *InvoiceModule) Detail(invoiceId string, idempotencyKey ...string) (map[string]interface{}, error) {
+	return m.api.getWithHeaders(fmt.Sprintf("invoices/%s", invoiceId), commerceRoleHeaders("user", firstOrEmpty(idempotencyKey)))
 }
