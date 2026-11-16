@@ -63,7 +63,7 @@ func (m *OrderSubscriptionRequestModule) List(params *OrderSubscriptionRequestLi
 	if params.UserGroupId != "" {
 		queryParams.Set("user_group_id", params.UserGroupId)
 	}
-	return m.api.getWithHeaders("order-subscription-requests?"+queryParams.Encode(), requestScopeHeaders(params.ProjectId, params.IdempotencyKey))
+	return m.api.getWithHeaders("order-subscription-requests?"+queryParams.Encode(), requestScopeHeaders(m.api, params.ProjectId, params.IdempotencyKey))
 }
 
 // Detail retrieves a single request (user / supervisor common)
@@ -75,7 +75,7 @@ func (m *OrderSubscriptionRequestModule) Detail(orderSubscriptionRequestHistoryI
 		queryParams.Set("project_id", projectId)
 		query = "?" + queryParams.Encode()
 	}
-	return m.api.getWithHeaders(fmt.Sprintf("order-subscription-requests/%s%s", orderSubscriptionRequestHistoryId, query), requestScopeHeaders(projectId, ""))
+	return m.api.getWithHeaders(fmt.Sprintf("order-subscription-requests/%s%s", orderSubscriptionRequestHistoryId, query), requestScopeHeaders(m.api, projectId, ""))
 }
 
 // Update approves/rejects a request (supervisor only)
@@ -102,9 +102,10 @@ func (m *OrderSubscriptionRequestModule) Update(params OrderSubscriptionRequestU
 	return m.api.putWithHeaders(fmt.Sprintf("order-subscription-requests/%s", historyId), body, commerceRoleHeaders("supervisor", params.IdempotencyKey))
 }
 
-// requestScopeHeaders returns lookup headers — supervisor when project_id is present, user otherwise.
-func requestScopeHeaders(projectId string, idempotencyKey string) map[string]string {
-	role := "user"
+// requestScopeHeaders returns lookup headers — supervisor when project_id is present,
+// otherwise user_or_supervisor by the instance role (manager never leaks out).
+func requestScopeHeaders(api *CommerceApi, projectId string, idempotencyKey string) map[string]string {
+	role := api.userOrSupervisorRole()
 	if projectId != "" {
 		role = "supervisor"
 	}

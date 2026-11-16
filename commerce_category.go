@@ -9,12 +9,12 @@ type CategoryModule struct {
 
 // List retrieves category tree
 func (m *CategoryModule) List() (map[string]interface{}, error) {
-	return m.api.Get("categories")
+	return m.api.getWithHeaders("categories", commerceRoleOnlyHeaders("user"))
 }
 
 // Detail retrieves a single category
 func (m *CategoryModule) Detail(categoryId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("categories/%s", categoryId))
+	return m.api.getWithHeaders(fmt.Sprintf("categories/%s", categoryId), commerceRoleOnlyHeaders("user"))
 }
 
 // Create creates a new category

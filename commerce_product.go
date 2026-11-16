@@ -66,7 +66,7 @@ func (m *ProductModule) List(params *ProductListParams) (map[string]interface{},
 			query = "?" + queryParams.Encode()
 		}
 	}
-	return m.api.Get("products" + query)
+	return m.api.getWithHeaders("products"+query, commerceRoleOnlyHeaders("user"))
 }
 
 // Products retrieves product list (V1 Mall API)
@@ -223,7 +223,7 @@ func (m *ProductModule) CreateSimple(product CommerceProduct) (map[string]interf
 
 // Detail retrieves product details
 func (m *ProductModule) Detail(productId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("products/%s", productId))
+	return m.api.getWithHeaders(fmt.Sprintf("products/%s", productId), commerceRoleOnlyHeaders("user"))
 }
 
 // ProductDetail retrieves product details (V1 Mall API)

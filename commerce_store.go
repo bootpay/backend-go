@@ -14,7 +14,7 @@ func (m *StoreModule) Info() (map[string]interface{}, error) {
 // InfoWithIdempotencyKey retrieves store basic information with an explicit Idempotency-Key
 // (auto-generated when empty)
 func (m *StoreModule) InfoWithIdempotencyKey(idempotencyKey string) (map[string]interface{}, error) {
-	return m.api.getWithHeaders("store", commerceIdempotencyHeaders(idempotencyKey))
+	return m.api.getWithHeaders("store", commerceRoleHeaders("user", idempotencyKey))
 }
 
 // Detail retrieves store detailed information (/v1/store/detail)
@@ -26,5 +26,5 @@ func (m *StoreModule) Detail() (map[string]interface{}, error) {
 // DetailWithIdempotencyKey retrieves store detailed information with an explicit Idempotency-Key
 // (auto-generated when empty)
 func (m *StoreModule) DetailWithIdempotencyKey(idempotencyKey string) (map[string]interface{}, error) {
-	return m.api.getWithHeaders("store/detail", commerceIdempotencyHeaders(idempotencyKey))
+	return m.api.getWithHeaders("store/detail", commerceRoleHeaders("user", idempotencyKey))
 }

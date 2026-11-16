@@ -34,7 +34,7 @@ func (m *OrderCancelModule) List(params *OrderCancelListParams) (map[string]inte
 
 // Request creates a cancel request
 func (m *OrderCancelModule) Request(params OrderCancelParams) (map[string]interface{}, error) {
-	return m.api.Post("order/cancel", params)
+	return m.api.postWithHeaders("order/cancel", params, m.api.userOrSupervisorHeaders())
 }
 
 // Withdraw withdraws a cancel request (buyer side)

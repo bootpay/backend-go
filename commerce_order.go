@@ -71,12 +71,12 @@ func (m *OrderModule) List(params *OrderListParams) (map[string]interface{}, err
 			query = "?" + queryParams.Encode()
 		}
 	}
-	return m.api.Get("orders" + query)
+	return m.api.getWithHeaders("orders"+query, commerceRoleOnlyHeaders("user"))
 }
 
 // Detail retrieves order details
 func (m *OrderModule) Detail(orderId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("orders/%s", orderId))
+	return m.api.getWithHeaders(fmt.Sprintf("orders/%s", orderId), commerceRoleOnlyHeaders("user"))
 }
 
 // Month retrieves monthly orders
@@ -84,7 +84,7 @@ func (m *OrderModule) Month(userGroupId string, searchDate string) (map[string]i
 	queryParams := url.Values{}
 	queryParams.Set("user_group_id", userGroupId)
 	queryParams.Set("search_date", searchDate)
-	return m.api.Get("orders/month?" + queryParams.Encode())
+	return m.api.getWithHeaders("orders/month?"+queryParams.Encode(), commerceRoleOnlyHeaders("user"))
 }
 
 // Purchases 발송 정보 조회 — 발주(배송) 단위 운송장·택배사·배송추적 상태·이력

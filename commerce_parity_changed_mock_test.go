@@ -323,21 +323,21 @@ func TestCommerceRoleHeaderNotOverwritten(t *testing.T) {
 		t.Fatalf("supervisor-scoped endpoint must send supervisor even on user instance, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 
-	// role 미지정 endpoint (Order.List, mall 계열) 는 인스턴스 role 유지
+	// endpoint 규칙으로 고정된 user (Order.List, mall 계열) 는 supervisor 인스턴스에서도 user 로 나간다
 	commerce.AsSupervisor()
 	if _, err := commerce.Order.List(nil); err != nil {
 		t.Fatal(err)
 	}
 	req = lastRequest(t, captured)
-	if req.Header.Get("BOOTPAY-ROLE") != "supervisor" {
-		t.Fatalf("role-neutral endpoint must keep instance role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("Order.List is fixed to user by endpoint rule, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 	if _, err := commerce.User.UserSession("jwt-token", ""); err != nil {
 		t.Fatal(err)
 	}
 	req = lastRequest(t, captured)
-	if req.Header.Get("BOOTPAY-ROLE") != "supervisor" {
-		t.Fatalf("mall endpoint must keep instance role, got %q", req.Header.Get("BOOTPAY-ROLE"))
+	if req.Header.Get("BOOTPAY-ROLE") != "user" {
+		t.Fatalf("mall endpoint is fixed to user by endpoint rule, got %q", req.Header.Get("BOOTPAY-ROLE"))
 	}
 }
 

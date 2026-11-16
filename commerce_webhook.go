@@ -15,5 +15,5 @@ func (m *WebhookModule) SendTest(params *SendTestWebhookParams) (map[string]inte
 		body = params
 		idempotencyKey = params.IdempotencyKey
 	}
-	return m.api.postWithHeaders("webhook/test", body, commerceIdempotencyHeaders(idempotencyKey))
+	return m.api.postWithHeaders("webhook/test", body, commerceRoleHeaders("supervisor", idempotencyKey))
 }

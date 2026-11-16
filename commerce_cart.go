@@ -15,5 +15,5 @@ func (m *CartModule) OrderPreview(params *OrderPreviewParams) (map[string]interf
 	if body == nil {
 		body = &OrderPreviewParams{}
 	}
-	return m.api.Post("cart/order-preview", body)
+	return m.api.postWithHeaders("cart/order-preview", body, commerceRoleOnlyHeaders("user"))
 }

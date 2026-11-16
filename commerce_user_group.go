@@ -13,7 +13,7 @@ type UserGroupModule struct {
 
 // Create creates a new user group
 func (m *UserGroupModule) Create(userGroup CommerceUserGroup) (map[string]interface{}, error) {
-	return m.api.Post("user-groups", userGroup)
+	return m.api.postWithHeaders("user-groups", userGroup, commerceRoleOnlyHeaders("user"))
 }
 
 // List retrieves user group list
@@ -37,12 +37,12 @@ func (m *UserGroupModule) List(params *UserGroupListParams) (map[string]interfac
 			query = "?" + queryParams.Encode()
 		}
 	}
-	return m.api.Get("user-groups" + query)
+	return m.api.getWithHeaders("user-groups"+query, commerceRoleOnlyHeaders("user"))
 }
 
 // Detail retrieves user group details
 func (m *UserGroupModule) Detail(userGroupId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("user-groups/%s", userGroupId))
+	return m.api.getWithHeaders(fmt.Sprintf("user-groups/%s", userGroupId), commerceRoleOnlyHeaders("user"))
 }
 
 // Update updates user group information
@@ -50,7 +50,7 @@ func (m *UserGroupModule) Update(userGroup CommerceUserGroup) (map[string]interf
 	if userGroup.UserGroupId == "" {
 		return nil, fmt.Errorf("user_group_id is required")
 	}
-	return m.api.Put(fmt.Sprintf("user-groups/%s", userGroup.UserGroupId), userGroup)
+	return m.api.putWithHeaders(fmt.Sprintf("user-groups/%s", userGroup.UserGroupId), userGroup, commerceRoleOnlyHeaders("user"))
 }
 
 // UserCreate adds a user to a group

@@ -44,12 +44,12 @@ func (m *OrderSubscriptionBillModule) List(params *OrderSubscriptionBillListPara
 		}
 		queryParams.Set("status", strings.Join(statusStrs, ","))
 	}
-	return m.api.getWithHeaders("order_subscription_bills?"+queryParams.Encode(), commerceRoleHeaders("user", params.IdempotencyKey))
+	return m.api.getWithHeaders("order_subscription_bills?"+queryParams.Encode(), commerceRoleHeaders(m.api.userOrSupervisorRole(), params.IdempotencyKey))
 }
 
 // Detail retrieves order subscription bill details
 func (m *OrderSubscriptionBillModule) Detail(orderSubscriptionBillId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("order_subscription_bills/%s", orderSubscriptionBillId))
+	return m.api.getWithHeaders(fmt.Sprintf("order_subscription_bills/%s", orderSubscriptionBillId), m.api.userOrSupervisorHeaders())
 }
 
 // Update updates order subscription bill
@@ -57,5 +57,5 @@ func (m *OrderSubscriptionBillModule) Update(orderSubscriptionBill CommerceOrder
 	if orderSubscriptionBill.OrderSubscriptionBillId == "" {
 		return nil, fmt.Errorf("order_subscription_bill_id is required")
 	}
-	return m.api.Put(fmt.Sprintf("order_subscription_bills/%s", orderSubscriptionBill.OrderSubscriptionBillId), orderSubscriptionBill)
+	return m.api.putWithHeaders(fmt.Sprintf("order_subscription_bills/%s", orderSubscriptionBill.OrderSubscriptionBillId), orderSubscriptionBill, commerceRoleOnlyHeaders("supervisor"))
 }

@@ -992,3 +992,162 @@ func TestCommerceOrderUpdatePurchases(t *testing.T) {
 		t.Fatal("empty order_number must return an error")
 	}
 }
+
+// roleRuleCase 는 서버가 검증한 엔드포인트별 BOOTPAY-ROLE 규칙 한 줄이다.
+// rule: user / supervisor / manager 는 고정, user_or_supervisor 는 인스턴스 role 이 supervisor 일 때만 supervisor.
+type roleRuleCase struct {
+	name string
+	rule string
+	call func(api *CommerceApi) error
+}
+
+func roleRuleCases() []roleRuleCase {
+	disc := func(_ map[string]interface{}, err error) error { return err }
+	return []roleRuleCase{
+		{"coupon list", "user_or_supervisor", func(a *CommerceApi) error { return disc(a.Coupon.List(nil)) }},
+		{"coupon available", "user_or_supervisor", func(a *CommerceApi) error { return disc(a.Coupon.Available()) }},
+		{"coupon download", "user", func(a *CommerceApi) error {
+			return disc(a.Coupon.Download(CouponDownloadParams{CouponTemplateId: "t1"}))
+		}},
+		{"cart order-preview", "user", func(a *CommerceApi) error { return disc(a.Cart.OrderPreview(nil)) }},
+		{"category list", "user", func(a *CommerceApi) error { return disc(a.Category.List()) }},
+		{"category detail", "user", func(a *CommerceApi) error { return disc(a.Category.Detail("c1")) }},
+		{"category create", "supervisor", func(a *CommerceApi) error {
+			return disc(a.Category.Create(CategoryCreateParams{Name: "n"}))
+		}},
+		{"order list", "user", func(a *CommerceApi) error { return disc(a.Order.List(nil)) }},
+		{"order detail", "user", func(a *CommerceApi) error { return disc(a.Order.Detail("o1")) }},
+		{"order month", "user", func(a *CommerceApi) error { return disc(a.Order.Month("g1", "2026-01")) }},
+		{"order purchases", "user", func(a *CommerceApi) error { return disc(a.Order.Purchases("o1")) }},
+		{"order cancel request", "user_or_supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderCancel.Request(OrderCancelParams{OrderNumber: "o1"}))
+		}},
+		{"order cancel list", "user", func(a *CommerceApi) error { return disc(a.OrderCancel.List(nil)) }},
+		{"order subscription list", "user", func(a *CommerceApi) error { return disc(a.OrderSubscription.List(nil)) }},
+		{"order subscription detail", "user", func(a *CommerceApi) error { return disc(a.OrderSubscription.Detail("s1")) }},
+		{"order subscription update", "supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscription.Update(OrderSubscriptionUpdateParams{OrderSubscriptionId: "s1"}))
+		}},
+		{"order subscription approve", "supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscription.SupervisorApprove("s1", nil))
+		}},
+		{"order subscription bill list", "user_or_supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscriptionBill.List(nil))
+		}},
+		{"order subscription bill detail", "user_or_supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscriptionBill.Detail("b1"))
+		}},
+		{"order subscription bill update", "supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscriptionBill.Update(CommerceOrderSubscriptionBill{OrderSubscriptionBillId: "b1"}))
+		}},
+		{"order subscription request list", "user_or_supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscriptionRequest.List(nil))
+		}},
+		{"order subscription request detail", "user_or_supervisor", func(a *CommerceApi) error {
+			return disc(a.OrderSubscriptionRequest.Detail("h1", ""))
+		}},
+		{"point balance", "user", func(a *CommerceApi) error { return disc(a.Point.Balance()) }},
+		{"point transactions", "user", func(a *CommerceApi) error { return disc(a.Point.Transactions(nil)) }},
+		{"product list", "user", func(a *CommerceApi) error { return disc(a.Product.List(nil)) }},
+		{"product detail", "user", func(a *CommerceApi) error { return disc(a.Product.Detail("p1")) }},
+		{"mall products", "user", func(a *CommerceApi) error { return disc(a.Product.Products(nil)) }},
+		{"mall product detail", "user", func(a *CommerceApi) error { return disc(a.Product.ProductDetail("p1", "", "")) }},
+		{"store info", "user", func(a *CommerceApi) error { return disc(a.Store.Info()) }},
+		{"store detail", "user", func(a *CommerceApi) error { return disc(a.Store.Detail()) }},
+		{"user token", "user", func(a *CommerceApi) error { return disc(a.User.Token("u1")) }},
+		{"user join", "user", func(a *CommerceApi) error { return disc(a.User.Join(CommerceUser{})) }},
+		{"user check exist", "user", func(a *CommerceApi) error { return disc(a.User.CheckExist("email", "a@b.c")) }},
+		{"user login", "user", func(a *CommerceApi) error { return disc(a.User.Login("id", "pw")) }},
+		{"user session", "user", func(a *CommerceApi) error { return disc(a.User.UserSession("jwt", "")) }},
+		{"user list", "user", func(a *CommerceApi) error { return disc(a.User.List(nil)) }},
+		{"user detail", "user", func(a *CommerceApi) error { return disc(a.User.Detail("u1")) }},
+		{"user update", "user", func(a *CommerceApi) error { return disc(a.User.Update(CommerceUser{UserId: "u1"})) }},
+		{"user delete", "user", func(a *CommerceApi) error { return disc(a.User.Delete("u1")) }},
+		{"user group create", "user", func(a *CommerceApi) error { return disc(a.UserGroup.Create(CommerceUserGroup{})) }},
+		{"user group list", "user", func(a *CommerceApi) error { return disc(a.UserGroup.List(nil)) }},
+		{"user group detail", "user", func(a *CommerceApi) error { return disc(a.UserGroup.Detail("g1")) }},
+		{"user group update", "user", func(a *CommerceApi) error {
+			return disc(a.UserGroup.Update(CommerceUserGroup{UserGroupId: "g1"}))
+		}},
+		{"user group user create", "manager", func(a *CommerceApi) error { return disc(a.UserGroup.UserCreate("g1", "u1")) }},
+		{"webhook test", "supervisor", func(a *CommerceApi) error { return disc(a.Webhook.SendTest(nil)) }},
+		{"invoice detail", "user", func(a *CommerceApi) error { return disc(a.Invoice.Detail("i1")) }},
+		{"invoice notify", "user", func(a *CommerceApi) error { return disc(a.Invoice.Notify("i1", nil)) }},
+		{"mall setting get", "supervisor", func(a *CommerceApi) error { return disc(a.MallSetting.GetMallSetting("")) }},
+	}
+}
+
+func expectedRole(rule string, instanceRole string) string {
+	if rule == "user_or_supervisor" {
+		if instanceRole == "supervisor" {
+			return "supervisor"
+		}
+		return "user"
+	}
+	return rule
+}
+
+func TestCommerceFixedRolePerEndpoint(t *testing.T) {
+	for _, instanceRole := range []string{"manager", "supervisor"} {
+		for _, tc := range roleRuleCases() {
+			t.Run(instanceRole+"/"+tc.name, func(t *testing.T) {
+				var captured []capturedCommerceRequest
+				commerce := newMockCommerceApi(&captured)
+				commerce.SetRole(instanceRole)
+
+				if err := tc.call(commerce); err != nil {
+					t.Fatal(err)
+				}
+				req := lastRequest(t, captured)
+				want := expectedRole(tc.rule, instanceRole)
+				if got := req.Header.Get("BOOTPAY-ROLE"); got != want {
+					t.Fatalf("%s %s: BOOTPAY-ROLE = %q, want %q", req.Method, req.URL, got, want)
+				}
+				if commerce.GetRole() != instanceRole {
+					t.Fatalf("instance role must not change, got %q", commerce.GetRole())
+				}
+			})
+		}
+	}
+}
+
+func TestCommerceSdkVersionHeader(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+	if _, err := commerce.Store.Info(); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).Header.Get("BOOTPAY-SDK-VERSION"); got != SDK_VERSION {
+		t.Fatalf("BOOTPAY-SDK-VERSION = %q, want %q", got, SDK_VERSION)
+	}
+	if COMMERCE_SDK_VERSION != SDK_VERSION {
+		t.Fatalf("COMMERCE_SDK_VERSION = %q, want %q", COMMERCE_SDK_VERSION, SDK_VERSION)
+	}
+}
+
+func TestCommerceInvoiceDetailNotifyIdempotencyKey(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	if _, err := commerce.Invoice.Detail("i1", "key-detail"); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).Header.Get("Idempotency-Key"); got != "key-detail" {
+		t.Fatalf("detail Idempotency-Key = %q, want key-detail", got)
+	}
+
+	if _, err := commerce.Invoice.Notify("i1", []int{1}, "key-notify"); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).Header.Get("Idempotency-Key"); got != "key-notify" {
+		t.Fatalf("notify Idempotency-Key = %q, want key-notify", got)
+	}
+
+	// 미지정이면 종전처럼 자동 생성된다.
+	if _, err := commerce.Invoice.Detail("i1"); err != nil {
+		t.Fatal(err)
+	}
+	if got := lastRequest(t, captured).Header.Get("Idempotency-Key"); got == "" {
+		t.Fatal("Idempotency-Key must be auto-generated when omitted")
+	}
+}

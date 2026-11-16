@@ -519,6 +519,26 @@ func commerceIdempotencyHeaders(idempotencyKey string) map[string]string {
 	return map[string]string{"Idempotency-Key": idempotencyKey}
 }
 
+// commerceRoleOnlyHeaders returns headers with a fixed BOOTPAY-ROLE and no Idempotency-Key.
+// 서버가 엔드포인트별로 받는 role 이 정해져 있어, 인스턴스 role(AsManager 등)과 무관하게 고정해 보낸다.
+func commerceRoleOnlyHeaders(role string) map[string]string {
+	return map[string]string{"BOOTPAY-ROLE": role}
+}
+
+// userOrSupervisorRole returns "supervisor" when the instance role is supervisor, otherwise "user".
+// user_or_supervisor 엔드포인트용 — manager 등 다른 role 이 새어 나가 401(-50)이 되지 않게 한다.
+func (api *CommerceApi) userOrSupervisorRole() string {
+	if api.role == "supervisor" {
+		return "supervisor"
+	}
+	return "user"
+}
+
+// userOrSupervisorHeaders returns role-only headers using userOrSupervisorRole.
+func (api *CommerceApi) userOrSupervisorHeaders() map[string]string {
+	return commerceRoleOnlyHeaders(api.userOrSupervisorRole())
+}
+
 // commerceRoleHeaders returns headers with a per-request BOOTPAY-ROLE and Idempotency-Key
 func commerceRoleHeaders(role string, idempotencyKey string) map[string]string {
 	headers := commerceIdempotencyHeaders(idempotencyKey)
@@ -540,6 +560,7 @@ func alimtalkHeaders() map[string]string {
 // Bootpay-User-JWT is attached only when a member JWT is present.
 func commerceMallHeaders(userJwt string, idempotencyKey string) map[string]string {
 	headers := commerceIdempotencyHeaders(idempotencyKey)
+	headers["BOOTPAY-ROLE"] = "user"
 	if userJwt != "" {
 		headers["Bootpay-User-JWT"] = userJwt
 	}

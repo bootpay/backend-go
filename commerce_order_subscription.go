@@ -115,12 +115,12 @@ func (m *OrderSubscriptionModule) List(params *OrderSubscriptionListParams) (map
 			query = "?" + queryParams.Encode()
 		}
 	}
-	return m.api.Get("order_subscriptions" + query)
+	return m.api.getWithHeaders("order_subscriptions"+query, commerceRoleOnlyHeaders("user"))
 }
 
 // Detail retrieves order subscription details
 func (m *OrderSubscriptionModule) Detail(orderSubscriptionId string) (map[string]interface{}, error) {
-	return m.api.Get(fmt.Sprintf("order_subscriptions/%s", orderSubscriptionId))
+	return m.api.getWithHeaders(fmt.Sprintf("order_subscriptions/%s", orderSubscriptionId), commerceRoleOnlyHeaders("user"))
 }
 
 // Update updates the subscription contract (supervisor scope)

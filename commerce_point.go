@@ -12,7 +12,7 @@ type PointModule struct {
 
 // Balance retrieves point balance
 func (m *PointModule) Balance() (map[string]interface{}, error) {
-	return m.api.Get("point/balance")
+	return m.api.getWithHeaders("point/balance", commerceRoleOnlyHeaders("user"))
 }
 
 // Transactions retrieves point transaction history
@@ -33,5 +33,5 @@ func (m *PointModule) Transactions(params *PointTransactionsParams) (map[string]
 			query = "?" + queryParams.Encode()
 		}
 	}
-	return m.api.Get("point/transactions" + query)
+	return m.api.getWithHeaders("point/transactions"+query, commerceRoleOnlyHeaders("user"))
 }

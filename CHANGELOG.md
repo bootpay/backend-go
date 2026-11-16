@@ -1,5 +1,14 @@
 ### Unreleased
 
+#### 엔드포인트별 `BOOTPAY-ROLE` 고정
+
+role 을 안 싣던 Commerce 메서드가 인스턴스 role(`AsManager()` 등)을 그대로 실어, 서버가 받지 않는 role 이면 401 `API_ROLE_NOT_SUPPORT(-50)` 로 실패했다.
+서버 검증 규칙대로 모든 Commerce 메서드가 인스턴스 role 과 무관하게 고정 role 을 보낸다(`Idempotency-Key` 동작은 그대로).
+
+- `user`: 쿠폰 내려받기, 장바구니 주문 미리보기, 카테고리 조회, 주문·구독 조회, 포인트, 상품 조회, 회원·회원그룹 조회/수정, 스토어, 쇼핑몰 회원 API(`commerceMallHeaders`)
+- `supervisor`: 정기결제 청구서 수정(`OrderSubscriptionBill.Update`), 웹훅 테스트(`Webhook.SendTest`)
+- `user_or_supervisor`(인스턴스가 supervisor 일 때만 supervisor, 그 외 user): 쿠폰 목록·다운로드 가능 목록, 주문 취소 신청, 구독 계약 수정(`OrderSubscription.Update`, 종전 supervisor 고정에서 변경), 청구서 목록·상세, 구독 요청 목록·상세(`project_id` 가 있으면 종전처럼 supervisor)
+
 #### 쇼핑몰 SDK 버전 헤더를 패키지 버전과 일치
 
 `BOOTPAY-SDK-VERSION` 이 `COMMERCE_SDK_VERSION`(1.0.0)을 보내 패키지 버전(`SDK_VERSION`)과 어긋났다. `COMMERCE_SDK_VERSION` 이름은 유지하되 `SDK_VERSION` 값을 쓴다.

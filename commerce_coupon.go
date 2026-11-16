@@ -28,15 +28,15 @@ func (m *CouponModule) List(params *CouponListParams) (map[string]interface{}, e
 			query = "?" + queryParams.Encode()
 		}
 	}
-	return m.api.Get("coupon" + query)
+	return m.api.getWithHeaders("coupon"+query, m.api.userOrSupervisorHeaders())
 }
 
 // Available retrieves coupons available for download
 func (m *CouponModule) Available() (map[string]interface{}, error) {
-	return m.api.Get("coupon/available")
+	return m.api.getWithHeaders("coupon/available", m.api.userOrSupervisorHeaders())
 }
 
 // Download downloads a coupon from a template
 func (m *CouponModule) Download(params CouponDownloadParams) (map[string]interface{}, error) {
-	return m.api.Post("coupon/download", params)
+	return m.api.postWithHeaders("coupon/download", params, commerceRoleOnlyHeaders("user"))
 }
