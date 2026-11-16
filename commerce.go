@@ -28,7 +28,8 @@ const (
 	COMMERCE_MESSAGE_PRODUCTION  string = "https://message.bootapi.com"
 
 	COMMERCE_API_VERSION string = "1.0.0"
-	COMMERCE_SDK_VERSION string = "1.0.0"
+	// 26-11-16: 패키지 버전(SDK_VERSION)과 같은 값을 BOOTPAY-SDK-VERSION 으로 보낸다. 이름은 호환을 위해 유지.
+	COMMERCE_SDK_VERSION string = SDK_VERSION
 )
 
 // CommerceApi is the main struct for Commerce API
