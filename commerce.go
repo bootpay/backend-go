@@ -363,6 +363,22 @@ func (api *CommerceApi) GetAccessToken() (map[string]interface{}, error) {
 	return result, nil
 }
 
+// blankPathSegment reports whether the request path has an empty segment.
+//
+// 26-11-16: calling a detail method with an empty id builds "orders/" (trailing /) or
+// "orders//purchases" (//), which the server routes to the list or another endpoint —
+// a wrong response with no error. Such requests are not sent (ruby `79594ea` parity).
+func blankPathSegment(url string) bool {
+	path := strings.SplitN(url, "?", 2)[0]
+	path = strings.TrimPrefix(path, "/")
+	return path == "" || strings.HasSuffix(path, "/") || strings.Contains(path, "//")
+}
+
+// blankPathSegmentError is returned instead of sending a request whose path has an empty id.
+func blankPathSegmentError(url string) error {
+	return fmt.Errorf("commerce: 요청 경로에 빈 id 가 있습니다: %s", url)
+}
+
 // doRequest performs an HTTP request and returns the response
 func (api *CommerceApi) doRequest(method string, url string, data interface{}) (map[string]interface{}, error) {
 	return api.doRequestWithHeaders(method, url, data, nil)
@@ -373,6 +389,10 @@ func (api *CommerceApi) doRequest(method string, url string, data interface{}) (
 // after the common headers, so a request-specific BOOTPAY-ROLE is never overwritten by
 // the instance default (supervisor-only endpoint support).
 func (api *CommerceApi) doRequestWithHeaders(method string, url string, data interface{}, headers map[string]string) (map[string]interface{}, error) {
+	// 26-11-16: 경로 id 가 비면 요청하지 않는다(blankPathSegment 참고).
+	if blankPathSegment(url) {
+		return nil, blankPathSegmentError(url)
+	}
 	var body io.Reader
 	if data != nil {
 		postBody, err := json.Marshal(data)
@@ -450,6 +470,10 @@ func (api *CommerceApi) postMultipart(url string, body io.Reader, contentType st
 // a parse error for a request that actually succeeded. This path keeps the original text.
 // The result is {"body": "<raw text>", "content_type": "..."} — mirroring the Ruby SDK.
 func (api *CommerceApi) getRaw(url string, headers map[string]string) (map[string]interface{}, error) {
+	// 26-11-16: 경로 id 가 비면 요청하지 않는다(blankPathSegment 참고).
+	if blankPathSegment(url) {
+		return nil, blankPathSegmentError(url)
+	}
 	req, err := api.newRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err

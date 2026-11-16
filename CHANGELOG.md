@@ -1,5 +1,11 @@
 ### Unreleased
 
+#### 빈 id 로 상세 메서드를 부르면 목록이 돌아오던 문제 수정 (ruby `79594ea` parity)
+
+`Order.Detail("")` 처럼 id 가 비면 경로가 `orders/` · `orders//purchases` 가 되어 서버가 목록·다른 엔드포인트로 라우팅해
+오류 없이 엉뚱한 응답이 왔다. 이제 Commerce 공용 요청(`Get`·`Post`·`Put`·`Delete` 및 헤더 지정 요청)과 원문 응답 요청(`getRaw`)은
+경로(쿼리 제외)가 비었거나 `/` 로 끝나거나 `//` 를 포함하면 요청을 보내지 않고 `요청 경로에 빈 id 가 있습니다: <경로>` 에러를 돌려준다.
+
 #### 주문 발송 정보 조회·발송처리 추가 (ruby `b762095` parity)
 
 - `Order.Purchases(orderNumber, idempotencyKey ...string)` — `GET /v1/orders/{order_number}/purchases`. 발주(배송) 단위 운송장·택배사·배송추적 상태·이력을 조회한다.

@@ -719,3 +719,50 @@ func TestCommerceUserListMembershipType(t *testing.T) {
 		t.Fatalf("membership_type must win over member_type: %s", req.URL)
 	}
 }
+
+// 빈 id 로 상세 메서드를 부르면 "orders/" · "orders//purchases" 같은 경로가 생겨
+// 서버가 목록·다른 엔드포인트로 라우팅한다 — 요청을 보내지 않고 에러를 돌려줘야 한다 (ruby `79594ea` parity).
+func TestCommerceBlankPathSegmentNotSent(t *testing.T) {
+	var captured []capturedCommerceRequest
+	commerce := newMockCommerceApi(&captured)
+
+	cases := []struct {
+		name string
+		call func() (map[string]interface{}, error)
+	}{
+		{"order detail", func() (map[string]interface{}, error) { return commerce.Order.Detail("") }},
+		{"product detail", func() (map[string]interface{}, error) { return commerce.Product.Detail("") }},
+		{"double slash", func() (map[string]interface{}, error) { return commerce.Get("orders//purchases") }},
+		{"empty path", func() (map[string]interface{}, error) { return commerce.Get("") }},
+		{"trailing slash with query", func() (map[string]interface{}, error) { return commerce.Get("orders/?page=1") }},
+		{"put", func() (map[string]interface{}, error) { return commerce.Put("products/", map[string]interface{}{}) }},
+		{"delete", func() (map[string]interface{}, error) { return commerce.Delete("products/") }},
+		{"raw", func() (map[string]interface{}, error) { return commerce.getRaw("alimtalk//templates", nil) }},
+	}
+	for _, c := range cases {
+		result, err := c.call()
+		if err == nil || !strings.Contains(err.Error(), "빈 id") {
+			t.Fatalf("%s: expected blank id error, got result=%v err=%v", c.name, result, err)
+		}
+		if result != nil {
+			t.Fatalf("%s: result must be nil, got %v", c.name, result)
+		}
+	}
+	if len(captured) != 0 {
+		t.Fatalf("blank path requests must not be sent, got %d", len(captured))
+	}
+
+	// 정상 경로 · 쿼리 안의 / 는 그대로 전송된다
+	if _, err := commerce.Order.Detail("ord_1"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := commerce.Get("orders?redirect=a//b/"); err != nil {
+		t.Fatal(err)
+	}
+	if len(captured) != 2 {
+		t.Fatalf("valid requests must be sent, got %d", len(captured))
+	}
+	if captured[0].URL != COMMERCE_DEVELOPMENT+"/orders/ord_1" {
+		t.Fatalf("detail url mismatch: %s", captured[0].URL)
+	}
+}
