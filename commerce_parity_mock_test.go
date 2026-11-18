@@ -1031,7 +1031,7 @@ func roleRuleCases() []roleRuleCase {
 		{"order subscription approve", "supervisor", func(a *CommerceApi) error {
 			return disc(a.OrderSubscription.SupervisorApprove("s1", nil))
 		}},
-		{"order subscription bill list", "user_or_supervisor", func(a *CommerceApi) error {
+		{"order subscription bill list", "user", func(a *CommerceApi) error {
 			return disc(a.OrderSubscriptionBill.List(nil))
 		}},
 		{"order subscription bill detail", "user_or_supervisor", func(a *CommerceApi) error {
@@ -1040,10 +1040,10 @@ func roleRuleCases() []roleRuleCase {
 		{"order subscription bill update", "supervisor", func(a *CommerceApi) error {
 			return disc(a.OrderSubscriptionBill.Update(CommerceOrderSubscriptionBill{OrderSubscriptionBillId: "b1"}))
 		}},
-		{"order subscription request list", "user_or_supervisor", func(a *CommerceApi) error {
+		{"order subscription request list", "user", func(a *CommerceApi) error {
 			return disc(a.OrderSubscriptionRequest.List(nil))
 		}},
-		{"order subscription request detail", "user_or_supervisor", func(a *CommerceApi) error {
+		{"order subscription request detail", "user", func(a *CommerceApi) error {
 			return disc(a.OrderSubscriptionRequest.Detail("h1", ""))
 		}},
 		{"point balance", "user", func(a *CommerceApi) error { return disc(a.Point.Balance()) }},

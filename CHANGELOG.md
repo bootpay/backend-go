@@ -1,4 +1,4 @@
-### Unreleased
+### 2.11.0
 
 #### 엔드포인트별 `BOOTPAY-ROLE` 고정
 
@@ -7,7 +7,8 @@ role 을 안 싣던 Commerce 메서드가 인스턴스 role(`AsManager()` 등)�
 
 - `user`: 쿠폰 내려받기, 장바구니 주문 미리보기, 카테고리 조회, 주문·구독 조회, 포인트, 상품 조회, 회원·회원그룹 조회/수정, 스토어, 쇼핑몰 회원 API(`commerceMallHeaders`)
 - `supervisor`: 정기결제 청구서 수정(`OrderSubscriptionBill.Update`), 웹훅 테스트(`Webhook.SendTest`)
-- `user_or_supervisor`(인스턴스가 supervisor 일 때만 supervisor, 그 외 user): 쿠폰 목록·다운로드 가능 목록, 주문 취소 신청, 구독 계약 수정(`OrderSubscription.Update`, 종전 supervisor 고정에서 변경), 청구서 목록·상세, 구독 요청 목록·상세(`project_id` 가 있으면 종전처럼 supervisor)
+- `user_or_supervisor`(인스턴스가 supervisor 일 때만 supervisor, 그 외 user): 쿠폰 목록·다운로드 가능 목록, 주문 취소 신청, 청구서 상세
+- 이미 role 을 명시하던 엔드포인트는 기존 동작을 그대로 둔다 — supervisor 인스턴스여도 바뀌지 않는다. 청구서 목록은 user, 구독 요청 목록·상세는 `project_id` 가 있을 때만 supervisor(그 외 user), 게시판 상세·상품문의 삭제는 `supervisor` 인자가 true 일 때만 supervisor.
 
 #### 쇼핑몰 SDK 버전 헤더를 패키지 버전과 일치
 

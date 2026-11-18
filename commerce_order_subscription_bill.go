@@ -44,7 +44,7 @@ func (m *OrderSubscriptionBillModule) List(params *OrderSubscriptionBillListPara
 		}
 		queryParams.Set("status", strings.Join(statusStrs, ","))
 	}
-	return m.api.getWithHeaders("order_subscription_bills?"+queryParams.Encode(), commerceRoleHeaders(m.api.userOrSupervisorRole(), params.IdempotencyKey))
+	return m.api.getWithHeaders("order_subscription_bills?"+queryParams.Encode(), commerceRoleHeaders("user", params.IdempotencyKey))
 }
 
 // Detail retrieves order subscription bill details
